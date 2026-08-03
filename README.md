@@ -42,6 +42,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Implementation tracker](TODO.md)
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
+- [Authentication, permissions, and threat model](docs/security-model.md)
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [Current deployment-system inventory](docs/current-system-inventory.md)

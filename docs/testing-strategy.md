@@ -54,7 +54,41 @@ Required scenarios:
 - Callback duplicated with conflicting result.
 - Agent task reference is preserved through completion.
 
-## 2. UI delivery and live-update tests
+## 2. Authentication and security tests
+
+Caller and browser boundaries:
+
+- Exercise OAuth authorization code with PKCE, exact redirect URI, one-use
+  code, access-token audience/expiry/revocation, scope enforcement, refresh
+  rotation, and refresh-family reuse revocation.
+- Prove a valid task reference, prompt, branch, PR label, contributor, or
+  GitHub identity grants no authority without the wallet-backed role and
+  required scope.
+- Prove staging authority cannot invoke production, and that production
+  authority is bound to the exact request and rechecked before mutation.
+- Exercise browser session rotation, expiry, logout/role-change revocation,
+  exact-origin and CSRF enforcement, and WebSocket ticket expiry/single use.
+- Prove no GitHub, AWS, OAuth refresh, wallet JWT, session, CSRF, WebSocket, or
+  callback credential reaches UI code, URLs, Check Runs, ledger/events,
+  fixtures, logs, Sentry, or error payloads; use seeded canary values.
+
+External identity and permission boundaries:
+
+- Verify raw-body webhook HMAC, constant-time comparison, hook/App/install/repo
+  allowlists, delivery-ID idempotency, and same-ID/different-digest rejection.
+- Verify GitHub OIDC issuer/JWKS, audience, repository ID, workflow ref/SHA,
+  run/attempt, event, ref/environment, time, and exact-request binding.
+- Exercise wrong-repository, wrong-workflow, replayed, moved-ref, stale-SHA,
+  arbitrary-workflow, cross-repository, and conflicting-callback failures.
+- Snapshot the GitHub App registration, installations, rulesets, environment
+  policy, token permission subset, AWS trust, and IAM policy for each phase.
+- In read-only shadow, attempt workflow dispatch, ref update, Check Run write,
+  Deployment write, environment/AWS access, and CI/release-note publication;
+  every attempt must fail because the credential lacks the capability.
+- Run IAM Access Analyzer and a manual resource review before any staging or
+  production role is trusted.
+
+## 3. UI delivery and live-update tests
 
 Static delivery:
 
@@ -76,7 +110,9 @@ Live behavior in an already-open browser:
   version without manual refresh.
 - Show accepted or observed changes within two seconds during normal live
   operation.
-- Reconnect automatically after a dropped event stream.
+- Reject unauthenticated subscriptions and consume each WebSocket ticket only
+  once.
+- Reconnect automatically after a dropped WebSocket connection.
 - Fetch a fresh authoritative snapshot before applying events after reconnect.
 - Exercise a missed event and prove that snapshot resynchronization repairs the
   screen.
@@ -87,7 +123,7 @@ Live behavior in an already-open browser:
 - Keep a healthy deployment visibly successful when a communication side
   effect fails, while presenting the warning and exact recovery evidence.
 
-## 3. Shadow tests
+## 4. Shadow tests
 
 Use real repositories, PRs, workflow history, and authorization evidence
 without allowing cloud or ref mutation.
@@ -133,7 +169,7 @@ Shadow acceptance proves control-plane behavior only. AWS deployment, runtime
 health, rollback, and actual shared-environment concurrency require a separate
 isolated execution environment before shared-staging use.
 
-## 4. Staging canaries
+## 5. Staging canaries
 
 Run controlled real deployments through canonical workflows.
 
@@ -165,7 +201,7 @@ Initial timing expectations are approximately seven minutes for a full staging
 baseline. The UI uses rolling observed durations rather than treating that
 estimate as a deadline.
 
-## 5. Recovery drills
+## 6. Recovery drills
 
 - Stop Deploy Hub after accepting but before dispatching a request.
 - Stop it after dispatch while the workflow is running.
@@ -185,7 +221,7 @@ estimate as a deadline.
 After restart, Deploy Hub must reconcile from GitHub and runtime truth without
 creating another logical deployment.
 
-## 6. Production pilots
+## 7. Production pilots
 
 - Start with a low-risk exact backend service release.
 - Perform a low-risk exact frontend release.
@@ -208,7 +244,7 @@ Initial timing expectations are approximately four minutes for a full
 production baseline. The UI uses rolling observed durations and retains
 outliers rather than promising a fixed completion time.
 
-## 7. Acceptance gate
+## 8. Acceptance gate
 
 Deploy Hub becomes the default only when:
 

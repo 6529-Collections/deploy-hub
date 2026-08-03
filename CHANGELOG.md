@@ -2,6 +2,22 @@
 
 ## 2026-08-03
 
+- Completed Task 3 after its acceptance audit: every requested GitHub
+  capability maps to a feature and rollout phase, read-only shadow is enforced
+  by absent credential capabilities, production authority is exact and
+  request-bound, secret-bearing surfaces are forbidden, and 26 abuse cases
+  were reviewed before any credential existed.
+- Accepted ADR 0007: use wallet-backed OAuth 2.1/PKCE for Codex MCP calls,
+  short-lived browser sessions with CSRF, a broker-held GitHub App with
+  per-operation narrowed tokens, GitHub OIDC for workflow callbacks and AWS,
+  and the existing authenticated WebSocket stack with snapshot/polling
+  recovery.
+- Added the normative authentication/permission/threat model and a saved trust-
+  boundary diagram; synchronized requirements, architecture, migration, and
+  testing plans and removed the earlier SSE assumption.
+- Kept the repository specification-only: no OAuth client, GitHub App,
+  credential, state branch, workflow, repository permission, environment, or
+  AWS authority was created. Task 4 is now next.
 - Started Task 3 authentication, permissions, secured live-transport, and
   threat-model definition without creating credentials or live authority.
 - Completed Task 2 after an acceptance audit of every criterion; Tasks 0–2 are

@@ -72,7 +72,9 @@ a genuine blocker requires user input.
 
 ## 4. Agent-facing operation contract
 
-Deploy Hub must provide machine-facing operations equivalent to:
+Deploy Hub must provide these machine-facing operations through an
+OAuth-authenticated Streamable HTTP MCP surface backed by the same versioned
+HTTP/domain contracts:
 
 ```text
 requestDeployment({
@@ -109,6 +111,14 @@ retryValidation(validationId)
 
 Requirements:
 
+- The authenticated wallet/profile and current server-side role grant
+  authority; `taskReference` is lifecycle/callback correlation only.
+- Staging, production, validation, cancellation, retry, and read operations
+  have separate OAuth scopes, with production exposed as an explicit
+  destructive action.
+- Every call revalidates token issuer, audience, expiry, revocation, scope, and
+  current role. No static Codex service token or caller-supplied callback URL is
+  accepted.
 - `sourceSha` is an immutable 40-character commit SHA.
 - Repeating the same `requestId` and identical payload returns the same logical
   operation.
@@ -282,11 +292,14 @@ The operational UI must update without a browser refresh when:
 - A CI-drop or production release-note milestone changes.
 
 The browser first loads an authoritative snapshot, then consumes a live event
-channel. It must reconnect automatically and resynchronize from a fresh
-snapshot after any interruption. Under normal operation, accepted or observed
+channel through the existing backend WebSocket runtime. It obtains a
+single-use, short-lived WebSocket ticket through authenticated HTTP, must
+reconnect automatically, and must resynchronize from a fresh snapshot after
+any interruption or event gap. Under normal operation, accepted or observed
 changes appear within two seconds. A fallback polling path must preserve
 automatic updates at least every five seconds if the live channel is
-temporarily unavailable.
+temporarily unavailable. Commands remain authenticated HTTP operations and are
+never authorized by a WebSocket connection.
 
 PR Check Runs update from the same operation transitions. Developers must not
 need to monitor Actions logs to understand progress.
@@ -387,20 +400,42 @@ Deploy Hub API supplies snapshots, live events, history, and commands.
 
 ## 12. Security and audit
 
-- Human and agent callers are authenticated and attributable.
-- An organization-owned GitHub App is the control-plane identity.
-- Shadow begins with a physically read-only installation. Repository writes,
-  workflow dispatch, Check Run writes, and environment authority are granted
-  separately and only when the corresponding rollout phase requires them.
-- Production authority is explicit and bound to the initiating request.
+- Human authority comes from the existing wallet-authenticated 6529 profile
+  and current server-side Deploy Hub role.
+- Codex uses OAuth 2.1 authorization-code with PKCE and short-lived,
+  audience-bound, scoped tokens. A Codex task ID, prompt, PR author, branch,
+  label, webhook sender, or contributor list is never deployment authority.
+- The browser exchanges existing wallet authentication for a short-lived,
+  `Secure`, `HttpOnly`, `SameSite=Strict` Deploy Hub session. Mutations require
+  an allowed origin and session-bound CSRF token; browser code never receives a
+  GitHub or AWS credential.
+- An organization-owned GitHub App is the control-plane executor. Its private
+  key is available only to the token broker, and each operation receives one
+  repository- and permission-subset installation token.
+- Shadow begins with an App registration and installation that are physically
+  read-only. Repository writes, workflow dispatch, Check Run writes,
+  deployment records, and environment authority are granted separately and
+  only when the corresponding rollout phase requires them.
+- Production authority requires the explicit production role and scope and is
+  bound atomically to the exact initiating request, source, environment, and
+  action; staging success never implies production authority.
 - Repository and environment permissions use least privilege.
-- AWS access uses GitHub Actions OIDC where practical.
+- Canonical workflow callbacks and AWS access use short-lived GitHub OIDC
+  identity bound to the exact repository, workflow, run, ref/environment, and
+  accepted request. No Release Bus shared callback bearer or long-lived AWS key
+  is introduced.
+- GitHub webhooks are verified over raw bytes and deduplicated by delivery ID;
+  callbacks and webhooks can report only an existing exact request and never
+  create authority.
 - Every request records requester, task reference, PR, exact SHA, target,
   authenticated deployment authority, workflow run, deployed version,
   notification/release-note identities, timestamps, and terminal result.
 - Requester, deployment authority, CI-drop contributors, and per-PR
   release-note contributors remain separately attributable.
-- Secret values never enter request records, Check Runs, or UI payloads.
+- Secret values never enter request records, Check Runs, UI payloads, task
+  events, logs, diagnostic URLs, or artifacts.
+- The normative model, permission phases, and reviewed abuse cases are in
+  `security-model.md` and ADR 0007.
 
 ## 13. MVP
 

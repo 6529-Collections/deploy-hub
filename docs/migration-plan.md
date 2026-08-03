@@ -106,6 +106,17 @@ Exit criteria:
 ## Phase 3 — Build Deploy Hub MVP
 
 - Create the dedicated Deploy Hub implementation repository.
+- Before executable code or Actions, protect `deploy-hub/main` and switch to
+  reviewed task branches; create no live credential as part of skeleton work.
+- Implement wallet-backed OAuth 2.1/PKCE for the Streamable HTTP MCP surface,
+  with separate read, staging, production, validation, cancellation, and retry
+  scopes and current server-side role checks.
+- Implement short-lived `HttpOnly` browser sessions, exact-origin/CSRF checks,
+  and one-time WebSocket tickets. Do not retain the current pasted-GitHub-token
+  browser model.
+- Implement a server-side GitHub App token broker that holds the private key
+  and mints one-repository, permission-subset installation tokens per typed
+  operation.
 - Implement the agent-facing operation contract.
 - Implement the environment-snapshot validation contract and lifecycle.
 - Implement exact-SHA, stale-head, authorization, and idempotency validation.
@@ -120,9 +131,15 @@ Exit criteria:
 - Add the authenticated backend proxy that resolves `deploy-hub/main` to one
   exact SHA and serves its cached static UI files under `/deploy/ui/hub`.
 - Build the operational UI and deployment history in this repository.
-- Deliver state, queue, blocker, and deployed-version changes through a live
-  event channel with automatic reconnect, snapshot resynchronization, and
-  bounded automatic-polling fallback.
+- Deliver state, queue, blocker, and deployed-version changes through the
+  authenticated existing backend WebSocket runtime with a ledger cursor,
+  automatic reconnect, snapshot resynchronization, and bounded
+  automatic-polling fallback.
+- Verify signed GitHub webhooks over raw bytes and deduplicate deliveries.
+  Authenticate canonical workflow callbacks with request-bound GitHub OIDC
+  claims rather than a shared Release Bus bearer secret.
+- Use GitHub Actions OIDC with environment-/ref-bound AWS roles; add no
+  long-lived AWS deployment key.
 - Reconcile displayed state against GitHub and runtime version truth.
 - Attach immutable Deploy Hub authority/request context to canonical workflow
   notification evidence and observe the existing CI-drop and release-note
@@ -146,6 +163,9 @@ Explicit exclusions:
 ## Phase 4 — Shadow and staging pilot
 
 - Run contract and failure tests against fake adapters.
+- Register and install the organization-owned GitHub App with read-only
+  permissions first. Retain a machine-readable permission/installation
+  snapshot as evidence.
 - Create shadow requests for real PRs without dispatching deployment.
 - Create a long-lived frontend `1a-deploy-hub` branch that mirrors
   `1a-staging` integration behavior but triggers only a dedicated credentialless
@@ -155,6 +175,13 @@ Explicit exclusions:
 - Keep the shadow identity physically incapable of updating `1a-staging`,
   updating `main`, dispatching canonical deploy workflows, or assuming staging
   and production AWS roles.
+- Prove that boundary with denied workflow-dispatch, ref-update, Check Run,
+  Deployment, AWS, and real-notification attempts; a software shadow flag does
+  not count.
+- Elevate App permissions only in the documented sequence, with explicit
+  organization-owner approval and a fresh phase snapshot. Even after the App
+  registration gains writes, shadow workers receive narrowed tokens and never
+  receive the App private key.
 - Shadow backend operations directly from exact PR SHAs using a credentialless
   simulation workflow unless a backend integration branch is later justified.
 - Route every shadow notification and release-note event to fake or suppressed
@@ -177,6 +204,9 @@ Explicit exclusions:
   already-open browser without manual refresh.
 - Interrupt and restore the live event channel; prove automatic reconnect and
   snapshot resynchronization prevent missed or stale state.
+- Exercise OAuth scope/role denial, CSRF/session/WebSocket-ticket expiry,
+  webhook forgery/replay, OIDC wrong-workflow/wrong-request claims, moved refs,
+  token leakage canaries, and cross-repository escalation before a live canary.
 - Test restart reconstruction and missed-callback recovery.
 - Test duplicate, stale, cancellation, and bounded-retry behavior.
 

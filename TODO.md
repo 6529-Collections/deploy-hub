@@ -33,7 +33,7 @@ receive an evidence-based answer.
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
-| 3 | Authentication, permissions, and threat model | IN PROGRESS | 1, 2 |
+| 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
 | 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
@@ -182,9 +182,9 @@ Evidence:
   failure, gating communication, broken event predecessor, and acceptance
   without exact source were rejected.
 
-### [ ] Task 3 — Authentication, permissions, and threat model
+### [x] Task 3 — Authentication, permissions, and threat model
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Outcome: Human, Codex, backend, GitHub, and environment authority is explicit,
 least-privilege, and staged by rollout phase.
@@ -204,13 +204,24 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Every permission is mapped to a feature and rollout phase.
-- [ ] Read-only shadow is physically unable to dispatch or mutate.
-- [ ] Production authority is explicit, attributable, and request-bound.
-- [ ] Secrets never enter UI payloads, Check Runs, records, or logs.
-- [ ] Threats and mitigations receive security review before credentials exist.
+- [x] Every permission is mapped to a feature and rollout phase.
+- [x] Read-only shadow is physically unable to dispatch or mutate.
+- [x] Production authority is explicit, attributable, and request-bound.
+- [x] Secrets never enter UI payloads, Check Runs, records, or logs.
+- [x] Threats and mitigations receive security review before credentials exist.
 
-Evidence: Not yet available.
+Evidence:
+
+- `docs/security-model.md`
+- `docs/decisions/0007-authentication-permissions-and-live-transport.md`
+- `docs/diagrams/security-trust-boundaries.mmd`
+- Task 3 acceptance audit on 2026-08-03: the permission-to-feature table and
+  rollout matrix cover every requested App capability; read-only shadow has no
+  write/AWS credential and requires negative capability tests; production
+  requires current role, scope, explicit action, atomic exact-request
+  authorization, and a pre-mutation recheck; the secret inventory and canary
+  test policy exclude credentials from every visible/durable surface; 26 abuse
+  cases were reviewed before any credential or live permission existed.
 
 ### [ ] Task 4 — Executable Deploy Hub skeleton
 
@@ -714,4 +725,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 3 — Authentication, permissions, and threat model.
+Task 4 — Executable Deploy Hub skeleton.

@@ -1,0 +1,28 @@
+flowchart LR
+    U["Developer wallet identity"] -->|"OAuth 2.1 + PKCE"| O["Deploy Hub authorization server"]
+    C["Codex task"] -->|"OAuth-authenticated MCP tools"| M["Deploy Hub MCP/API"]
+    B["Browser UI"] -->|"HttpOnly session + CSRF"| M
+    B <-->|"One-time ticket + authenticated WebSocket"| W["Existing backend WebSocket runtime"]
+    O -->|"Short-lived scoped token"| C
+
+    subgraph T["Trusted backend boundary"]
+        M --> P["Policy engine"]
+        P --> L["Git ledger adapter"]
+        P --> G["GitHub App token broker"]
+        P --> E["Live-event publisher"]
+        E --> W
+        S["Secrets Manager"] --> G
+        S --> O
+    end
+
+    L -->|"Repo-scoped installation token"| DH["deploy-hub state/v1"]
+    G -->|"Repo + permission subset token"| GH["Frontend/backend GitHub APIs"]
+    GH -->|"Signed webhook + delivery ID"| M
+    GH --> R["Canonical repository workflow"]
+    R -->|"GitHub OIDC callback token"| M
+    R -->|"GitHub OIDC AssumeRole"| AWS["Environment-scoped AWS role"]
+
+    P --> A["Append-only authority and outcome events"]
+    A --> DH
+
+    X["Task ID, PR labels, branch names,<br/>contributors, webhook sender"] -. "Correlation/evidence only;<br/>never authority" .-> P

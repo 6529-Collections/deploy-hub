@@ -4,7 +4,7 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Authentication, permissions, and threat-model definition.
+Executable skeleton design and bootstrap preparation.
 
 ## Accepted direction
 
@@ -24,6 +24,12 @@ Authentication, permissions, and threat-model definition.
   ledger is introduced without demonstrated need.
 - An organization-owned GitHub App provides least-privilege authentication,
   beginning with a physically read-only shadow installation.
+- Wallet-backed OAuth 2.1/PKCE authenticates Codex MCP calls; task IDs are
+  correlation only. Browsers use short-lived `HttpOnly` sessions plus CSRF and
+  one-time WebSocket tickets and never hold GitHub credentials.
+- Canonical workflow callbacks and AWS role assumption use short-lived GitHub
+  OIDC identity; no shared Release Bus callback bearer or long-lived AWS key is
+  introduced.
 - Deployment health and exact-version proof are always required. Every staging
   and production outcome requires mandatory baseline read-only
   E2E bound to one exact environment snapshot. Coordinated deployments share
@@ -84,8 +90,8 @@ Authentication, permissions, and threat-model definition.
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Tasks 0–2 are
-  complete, Task 3 is next, and Task 25 owns the cross-cutting communications
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0–3 are
+  complete, Task 4 is next, and Task 25 owns the cross-cutting communications
   integration.
 - Task 2 completed the versioned deployment, validation, cancel, retry, ledger,
   task-event, communication-outcome, and safe-error schemas with normative
@@ -95,13 +101,16 @@ Authentication, permissions, and threat-model definition.
 - The Task 2 completion audit compiled all 14 schemas in strict JSON Schema
   2020-12 mode, validated 12 schema-backed objects across nine fixtures, and
   proved six key unsafe cases fail closed.
-- Task 3 authentication, permission-isolation, live-transport, and threat-model
-  definition is in progress; no identity, permission, credential, workflow, or
-  environment authority has been created.
+- Task 3 completed the wallet-backed OAuth/MCP and browser-session model,
+  role/scope policy, GitHub App token-broker and rollout permission matrix,
+  GitHub OIDC workflow/AWS trust, secured WebSocket transport, secret
+  boundaries, and 26-case threat review. No identity, permission, credential,
+  workflow, or environment authority was created.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
-- Three Mermaid diagrams saved as standalone source files.
+- Four Mermaid diagrams saved as standalone source files, including the
+  security trust boundaries.
 - Original handoff documents copied into `references/`.
 
 ## Resolved MVP decisions
@@ -113,9 +122,9 @@ Authentication, permissions, and threat-model definition.
 4. Use an organization-owned, least-privilege GitHub App with read-only shadow
    permissions first.
 5. Serve the static UI from the exact current `deploy-hub/main` commit through
-   the authenticated backend proxy. Deliver operational changes through a live
-   event stream with automatic reconnect, resynchronization, and polling
-   fallback.
+   the authenticated backend proxy. Deliver operational changes through the
+   existing authenticated WebSocket runtime with automatic reconnect,
+   resynchronization, and polling fallback.
 6. Keep automatic rollback out of MVP; redeploy a known-good exact version
    explicitly through canonical workflows.
 7. Reuse repository-owned CI posting and backend production release-note
@@ -126,11 +135,21 @@ Authentication, permissions, and threat-model definition.
    append-only ledger events, deterministic queue order, replayable snapshots,
    cancellation/retry intent, and restart recovery. GitHub Deployments and
    Check Runs remain visible projections, not the durable authority.
+9. Use wallet-backed OAuth for Codex, short-lived browser sessions, one
+   organization GitHub App with per-operation narrowed installation tokens,
+   GitHub OIDC for workflows/AWS, and the existing WebSocket stack with
+   snapshot/polling recovery.
 
 ## Remaining security and implementation work
 
-- Task 3 must select and secure the live transport. Existing WebSocket/JWT
-  infrastructure is present, SSE is not implemented, and polling is proven.
+- Task 4 must select the executable runtime/package structure, protect `main`,
+  and establish credentialless build, lint, type, unit, formatting, and CI
+  foundations before implementation grows.
+- Later rollout tasks must provide the phase-specific permission snapshots,
+  denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
+  evidence, secret-canary scans, and owner approvals required by
+  `docs/security-model.md`; Task 3 defines these gates but does not create or
+  prove live credentials.
 - Reinspect backend PR #1869 and frontend PR #3504 when they change or merge;
   at the Task 1 snapshot they remain open and unmerged, so repository `main`
   still has the older communication contract.
@@ -139,6 +158,7 @@ Authentication, permissions, and threat-model definition.
 
 ## Next recommended work
 
-Complete Task 3 in `TODO.md`: define authentication, authorization, the
-rollout-phase permission matrix, secret boundaries, and the threat model before
-creating any GitHub App, credential, workflow, state branch, or live transport.
+Complete Task 4 in `TODO.md`: protect `main`, choose the minimal runtime and
+package structure, and create the credentialless application/test skeleton. Do
+not create a GitHub App, OAuth client, state branch, workflow with deployment
+authority, AWS role, or live credential as part of that bootstrap.

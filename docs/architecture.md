@@ -191,22 +191,39 @@ never exposes its private-repository credential to the browser and never mixes
 assets from different commits. A merge to `deploy-hub/main` publishes a UI
 release without coupling it to a backend repository deployment.
 
-After loading an authoritative snapshot, the browser subscribes to a
-server-sent event stream. State transitions, new requests, queue changes,
-blockers, validation ownership, and deployed-version changes are emitted as
-events. CI-drop and release-note milestones use the same live path without
-becoming deployment-state transitions. HTTP remains the command path for retry
-and cancellation. On
-disconnect, the browser reconnects and reloads a snapshot before applying new
-events. Bounded automatic polling is the fallback, so a transport interruption
-never makes manual browser refresh part of normal operation.
+After loading an authoritative snapshot, the browser obtains a single-use,
+short-lived WebSocket ticket over authenticated HTTP and subscribes through the
+existing backend WebSocket runtime. State transitions, new requests, queue
+changes, blockers, validation ownership, and deployed-version changes are
+emitted as ordered, authorization-filtered summaries. CI-drop and release-note
+milestones use the same live path without becoming deployment-state
+transitions. HTTP remains authoritative for snapshots and commands. On a gap,
+disconnect, role change, or server restart, the browser obtains a fresh
+snapshot before applying more events. Authenticated polling at no more than
+five-second intervals is the fallback, so transport failure never makes manual
+browser refresh part of normal operation.
 
 ## Authentication and permissions
 
-An organization-owned GitHub App authenticates control-plane activity. Its
-first shadow installation is physically read-only. Contents read, Check Run
-write, workflow dispatch, repository mutation, and environment authority are
-separate permissions introduced only when the rollout phase needs each one.
+The existing wallet-authenticated 6529 profile is human authority. Codex uses
+OAuth 2.1 authorization-code with PKCE through an authenticated Streamable HTTP
+MCP surface; its task ID is correlation, not authority. The browser uses a
+short-lived `HttpOnly` session plus CSRF protection and never holds a GitHub
+token.
+
+An organization-owned GitHub App is the visible control-plane executor. Its
+private key remains inside a server-side token broker, which mints one
+repository- and operation-scoped installation token at a time. The first App
+registration and installation are physically read-only. Contents, Check Run,
+workflow-dispatch, repository-mutation, deployment, and AWS authority are
+separate capabilities introduced only when the rollout phase needs each one.
+Canonical workflows authenticate callbacks and AWS role assumption with
+short-lived GitHub OIDC tokens rather than shared deployment secrets.
+
+The normative scopes, phase permission matrix, repository protections, secret
+inventory, and threat review are in `security-model.md` and ADR 0007. The
+standalone trust-boundary diagram is
+`diagrams/security-trust-boundaries.mmd`.
 
 ## Deployment adapter mapping
 
