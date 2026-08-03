@@ -4,7 +4,7 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Initial specification and architecture definition.
+Exact control-plane contract definition.
 
 ## Accepted direction
 
@@ -24,9 +24,8 @@ Initial specification and architecture definition.
   ledger is introduced without demonstrated need.
 - An organization-owned GitHub App provides least-privilege authentication,
   beginning with a physically read-only shadow installation.
-- Deployment health and exact-version proof are always required. Targeted
-  staging validation is normal; full cross-system E2E is risk- or policy-based.
-- Every staging and production outcome requires mandatory baseline read-only
+- Deployment health and exact-version proof are always required. Every staging
+  and production outcome requires mandatory baseline read-only
   E2E bound to one exact environment snapshot. Coordinated deployments share
   one validation result after all intended components are deployed; deeper
   feature-specific and cross-system validation remains risk-based.
@@ -47,7 +46,8 @@ Initial specification and architecture definition.
 - Release Bus is OFF for staging and production.
 - Re-enabling Release Bus is not part of the intended migration or fallback.
 - Existing manual/canonical repository workflows are the operational fallback
-  while Deploy Hub is developed and tested.
+  while Deploy Hub is developed and tested. They currently still obtain
+  readiness from Release Bus even though its lanes are OFF.
 - Deploy Hub testing must begin offline and read-only, then use isolated
   execution before any controlled shared-staging canary.
 - Frontend shadow validation will use an explicitly opt-in `1a-deploy-hub`
@@ -70,14 +70,23 @@ Initial specification and architecture definition.
   E2E gates.
 - Current staging and production E2E workflows, coverage, integration gaps, and
   recent GitHub Actions durations analyzed in `docs/e2e-validation-analysis.md`.
+- Task 1 completed in `docs/current-system-inventory.md` against exact frontend
+  and backend `main` SHAs plus the authoritative live Release Bus status.
+- Both Release Bus lanes are confirmed OFF, but every canonical manual workflow
+  still depends on Release Bus manual readiness; this boundary must be
+  generalized before Release Bus removal.
+- Current backend manual deployments are globally serialized per environment,
+  and exact Lambda/API runtime proof is Release Bus-conditioned rather than
+  generic. Both are explicit adapter requirements.
 - Mandatory environment-snapshot E2E accepted in ADR 0004.
 - Source task `019faa0e-272b-7f62-843a-79fffb815a7e`, open backend PR #1869,
   and open frontend PR #3504 analyzed as the foundation for deployment
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Task 1 remains the
-  next task and Task 25 owns the cross-cutting communications integration.
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0 and 1 are
+  complete, Task 2 is next, and Task 25 owns the cross-cutting communications
+  integration.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -88,8 +97,8 @@ Initial specification and architecture definition.
 
 1. GitHub-native durable records first; no MVP database or S3 request ledger.
 2. Canonical manual workflows are the fallback; Release Bus remains OFF.
-3. Health and exact-version proof are universal; further validation is
-   risk-based.
+3. Health, exact-version proof, and baseline environment-snapshot E2E are
+   universal; deeper feature-specific validation is risk-based.
 4. Use an organization-owned, least-privilege GitHub App with read-only shadow
    permissions first.
 5. Serve the static UI from the exact current `deploy-hub/main` commit through
@@ -103,25 +112,22 @@ Initial specification and architecture definition.
    contributors separately; surface communication failures without making them
    environment-mutation or deployment/E2E gates.
 
-## Remaining verification work
+## Remaining contract work
 
-- Confirm the exact authoritative current OFF/manual-ownership state and prove
-  that all canonical manual workflows remain usable without re-enabling
-  Release Bus.
-- Verify that the existing backend serving stack can support the preferred
-  server-sent event channel; preserve the bounded automatic-polling fallback
-  regardless.
-- Define the exact GitHub-native representation for waiting order and
-  idempotency during implementation design.
-- After the source task completes, verify the final merge/deploy disposition of
-  backend PR #1869 and frontend PR #3504 and inspect the resulting exact
-  canonical communication contracts on repository `main`.
+- Define and accept the exact GitHub-native representation for immutable
+  requests, waiting order, idempotency, cancellation and restart recovery.
+- Define final deployment, validation, event and communication-outcome
+  contracts with valid, duplicate, stale, cancelled and failed fixtures.
+- Task 3 must select and secure the live transport. Existing WebSocket/JWT
+  infrastructure is present, SSE is not implemented, and polling is proven.
+- Reinspect backend PR #1869 and frontend PR #3504 when they change or merge;
+  at the Task 1 snapshot they remain open and unmerged, so repository `main`
+  still has the older communication contract.
 - Define how asynchronous release-note outcomes become machine-visible to
   Deploy Hub without introducing a second durable release-note state store.
 
 ## Next recommended work
 
-Execute Task 1 in `TODO.md`: inventory and verify the dormant Release Bus
-baseline, all four canonical deployment paths, both E2E workflows, and the
-existing backend capabilities needed by Deploy Hub. Make no live migration
-change during the inventory.
+Execute Task 2 in `TODO.md`: define the exact deployment, validation,
+GitHub-state, task-event, and communication-outcome contracts and accept the
+GitHub-native representation ADR. Make no live deployment or migration change.

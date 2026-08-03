@@ -31,7 +31,7 @@ receive an evidence-based answer.
 | Task | Deliverable | Status | Depends on |
 | ---: | --- | --- | --- |
 | 0 | Requirements and architecture baseline | DONE | — |
-| 1 | Dormant-state and canonical-workflow inventory | NOT STARTED | 0 |
+| 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | NOT STARTED | 1 |
 | 3 | Authentication, permissions, and threat model | NOT STARTED | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
@@ -91,9 +91,9 @@ Evidence:
 - `docs/deployment-communications-analysis.md`
 - ADRs 0001 through 0005 under `docs/decisions/`
 
-### [ ] Task 1 — Dormant-state and canonical-workflow inventory
+### [x] Task 1 — Dormant-state and canonical-workflow inventory
 
-Status: `NOT STARTED`
+Status: `DONE`
 
 Outcome: One exact, current inventory explains how deployments and E2E work
 today and identifies every Release Bus dependency that must be retained,
@@ -119,21 +119,25 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Inventory records the remote commit SHA inspected for every repository.
-- [ ] Each canonical path has trigger, inputs, mutation boundary, concurrency,
+- [x] Inventory records the remote commit SHA inspected for every repository.
+- [x] Each canonical path has trigger, inputs, mutation boundary, concurrency,
   runtime proof, output, and fallback documented.
-- [ ] Every Release Bus-specific dependency is named by file and purpose.
-- [ ] Deployment notification fields, authentication, contributor evidence,
+- [x] Every Release Bus-specific dependency is named by file and purpose.
+- [x] Deployment notification fields, authentication, contributor evidence,
   side-effect outcomes, release-note baselines, deduplication, and recovery are
   named by file and exact workflow path.
-- [ ] Backend-only, frontend-only, coordinated, staging, production, and E2E
+- [x] Backend-only, frontend-only, coordinated, staging, production, and E2E
   gaps are explicit.
-- [ ] No environment, workflow, branch, credential, or Release Bus control was
+- [x] No environment, workflow, branch, credential, or Release Bus control was
   mutated during the audit.
-- [ ] Follow-up requirements are separated from proposed implementation
+- [x] Follow-up requirements are separated from proposed implementation
   choices.
 
-Evidence: Not yet available.
+Evidence:
+
+- `docs/current-system-inventory.md`
+- Exact source and live-control snapshots recorded in that inventory on
+  2026-08-03.
 
 ### [ ] Task 2 — Exact deployment, validation, and GitHub-state contracts
 
@@ -700,4 +704,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 1 — Dormant-state and canonical-workflow inventory.
+Task 2 — Exact deployment, validation, and GitHub-state contracts.

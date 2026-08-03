@@ -13,12 +13,15 @@ This analysis incorporates the long-running Codex task:
 - Backend: [PR #1869](https://github.com/6529-Collections/6529seize-backend/pull/1869)
 - Frontend: [PR #3504](https://github.com/6529-Collections/6529seize-frontend/pull/3504)
 
-At the inspection snapshot, both PRs were open, mergeable, and unmerged. The
-backend head was `5b61104b94573f792559272da7db60fa03bbc0fc`; the frontend
-head was `b798c0d344b9c8ffaecc402c7f38f39bddd2df2a`. The source task
-was still active on a follow-up. These PRs are therefore implementation
-evidence and a likely foundation, not yet an authoritative deployed baseline.
-Task 1 must re-inspect their final disposition and the exact repository heads.
+Task 1 re-inspected them on 2026-08-03. Both PRs were open, ready-for-review,
+unmerged, and had no GitHub Deployment record for their exact heads. The
+backend head was `5b61104b94573f792559272da7db60fa03bbc0fc`, conflicting and
+five commits behind current backend `main`; the frontend head was
+`b798c0d344b9c8ffaecc402c7f38f39bddd2df2a`, mergeable and one commit behind
+current frontend `main`. The source task had no active turn. These PRs remain
+implementation evidence and a likely foundation, not an authoritative
+deployed baseline. See `docs/current-system-inventory.md` for the complete
+current-main path and exact source snapshot.
 
 ## Existing pipeline being established
 
@@ -134,8 +137,8 @@ machine terminals. Their exact machine schema belongs to Task 2.
 
 ## Verification still required
 
-- Reinspect both PRs after the source task finishes and record their final
-  heads, merge status, and deployed status.
+- Reinspect both PRs whenever their heads or merge state change, then repeat
+  the current-main contract audit after merge.
 - Confirm the final canonical workflow names, paths, inputs, outputs, and
   authentication rules at repository `main`.
 - Determine how the existing backend exposes asynchronous queue/generator

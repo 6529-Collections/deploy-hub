@@ -2,6 +2,18 @@
 
 ## 2026-08-03
 
+- Completed Task 1 with an exact current-system inventory covering live
+  Release Bus OFF state, all four canonical deploy paths, both E2E workflows,
+  deployment communications, backend hosting/auth/realtime capabilities, and
+  the per-file migration change map.
+- Confirmed the critical migration ordering constraint: Release Bus lanes are
+  OFF, but frontend and backend canonical manual workflows still require its
+  manual-readiness API; cleanup cannot precede a proven generic replacement.
+- Confirmed backend manual deploys are globally serialized per environment and
+  that strong backend exact-runtime proof is currently Release Bus-conditioned.
+- Re-inspected backend PR #1869 and frontend PR #3504 at their exact current
+  heads; both remain open and unmerged with no GitHub Deployment records for
+  those SHAs, so their stronger attribution/outcome behavior is not on `main`.
 - Inspected source task `019faa0e-272b-7f62-843a-79fffb815a7e` plus open backend
   PR #1869 and frontend PR #3504, capturing their CI-post attribution and
   production release-note contracts as unmerged implementation evidence.
