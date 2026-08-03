@@ -1,0 +1,13 @@
+flowchart LR
+    A["Drain and baseline Release Bus"] --> B["Manual ownership<br/>Release Bus dormant"]
+    B --> C["Burn in canonical workflows"]
+    C --> D["Build Deploy Hub MVP"]
+    D --> E["Shadow and staging pilots"]
+    E --> F["Production pilots"]
+    F --> G["Deploy Hub becomes default"]
+    G --> H["Deferred Release Bus cleanup"]
+
+    C -. "Fallback" .-> M["Manual canonical workflows"]
+    D -. "Fallback" .-> M
+    E -. "Fallback" .-> M
+    F -. "Fallback" .-> M

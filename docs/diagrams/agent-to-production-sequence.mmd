@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor D as Developer
+    participant A as Codex task
+    participant G as GitHub PR
+    participant H as Deploy Hub
+    participant W as Repository workflow
+    participant E as Environment
+
+    D->>A: Work on this and see it through to prod
+    A->>G: Implement and open or update PR
+    G-->>A: Exact-head CI and review result
+    A->>H: Deploy exact PR SHA to staging
+    H->>G: Create or update staging Check Run
+    H->>W: Start canonical staging path
+    W->>E: Deploy and health-check
+    W-->>H: Terminal workflow event
+    H-->>A: Staging succeeded
+    A->>E: Run required feature validation
+    A->>G: Merge exact approved result
+    A->>H: Deploy exact main SHA to production
+    H->>W: Start canonical production path
+    W->>E: Deploy and verify version
+    W-->>H: Production succeeded
+    H-->>A: Resume with final result
+    A-->>D: Feature is verified in production
