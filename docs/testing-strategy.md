@@ -37,6 +37,18 @@ Required scenarios:
 - Environment snapshot changes while E2E is running.
 - Product E2E failure is not retried automatically.
 - Retryable E2E workflow/setup failure preserves the validation identity.
+- Authenticated Deploy Hub authority is distinct from requester and
+  contributors.
+- Train-shaped metadata cannot label a Deploy Hub or manual request as Release
+  Train.
+- Frontend bounded-range and backend service-scoped contributor evidence.
+- Missing or timed-out contributor evidence omits contributors but still posts
+  the CI notification.
+- Duplicate CI notification, release-note queue, and publication delivery.
+- Same-SHA, unsafe-range, explicit no-PR, recovery, and rollback release-note
+  ineligibility.
+- Backend multi-service production uses one immutable release group and
+  publishes only after its intended service set completes.
 - Missed terminal callback with successful GitHub run.
 - Callback duplicated with identical result.
 - Callback duplicated with conflicting result.
@@ -71,6 +83,9 @@ Live behavior in an already-open browser:
 - Fall back to automatic polling at intervals no longer than five seconds while
   the live stream is unavailable.
 - Prevent duplicate or out-of-order events from regressing visible state.
+- Show CI-drop and release-note milestone changes without manual refresh.
+- Keep a healthy deployment visibly successful when a communication side
+  effect fails, while presenting the warning and exact recovery evidence.
 
 ## 3. Shadow tests
 
@@ -87,9 +102,11 @@ Prove:
   during initial shadowing.
 - UI projection.
 - Event delivery to the originating task.
+- Projected CI-drop and release-note outcomes through non-publishing fake sinks.
 
 The shadow identity must have no workflow-dispatch, repository-write, or AWS
-deployment capability. A software mode flag alone is not sufficient isolation.
+deployment capability. It must also be unable to publish real CI or release-note
+drops. A software mode flag alone is not sufficient isolation.
 
 ### Frontend `1a-deploy-hub` branch
 
@@ -133,6 +150,10 @@ Required cases:
   other-environment mutation, CI, preparation, and agent work continue.
 - Exact runtime version matches the requested SHA.
 - Failed health check produces a failed operation and truthful PR feedback.
+- Frontend and backend staging CI drops use exact operation evidence, show
+  Deploy Hub authority separately from the requester, and credit only verified
+  contributors.
+- Staging reports release-note ineligible and never enqueues generation.
 - Product E2E failure produces `deployed but validation failed`, blocks that
   result from production, and does not auto-retry.
 - Retryable workflow/setup failure receives only the bounded retry allowed by
@@ -152,6 +173,8 @@ estimate as a deadline.
 - Lose a validation event after E2E has reached a terminal GitHub state.
 - Create a duplicate dispatch signal.
 - Deliver duplicate and conflicting validation completion signals.
+- Drop, duplicate, and replay CI-alert receiver and release-note outcome events.
+- Reconcile an accepted CI drop with a missing asynchronous publication event.
 - Leave a waiting lock owner stale.
 - Cancel the underlying GitHub workflow directly.
 - Move `main` between request preparation and dispatch.
@@ -170,6 +193,11 @@ creating another logical deployment.
   production snapshot.
 - Verify production runtime identity, post-E2E snapshot identity, and Check Run
   outcome.
+- Verify frontend release-note baseline selection across approved historical
+  production workflows and exact deployed SHAs.
+- Verify backend per-PR contributor grouping and multi-service completion.
+- Exercise published, already-published, skipped, queue-failed, generation-
+  failed, and safe-recovery outcomes without changing deployment truth.
 - Exercise a controlled validation failure and prove production is reported as
   deployed but unvalidated until reconciliation, explicit acceptance, or
   known-good exact redeployment.
@@ -195,6 +223,10 @@ Deploy Hub becomes the default only when:
 - Duplicate and stale requests have been exercised.
 - A failure, retry, cancellation, and missed-event recovery have been exercised.
 - UI and PR status match GitHub and runtime truth.
+- UI, Check Run, and task events match authoritative CI-drop and release-note
+  outcomes without treating them as environment-mutation gates.
+- Canonical frontend/backend staging drops and production release notes have
+  correct authority, requester, PR, contributor, and service attribution.
 - An already-open UI receives new operations, queue changes, progress, and
   terminal results without manual browser refresh.
 - UI stream interruption recovers automatically without missing authoritative

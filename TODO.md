@@ -50,11 +50,12 @@ receive an evidence-based answer.
 | 17 | Mandatory production environment-snapshot E2E | NOT STARTED | 14–16 |
 | 18 | Audit, metrics, estimates, and operational diagnostics | NOT STARTED | 8, 9, 11, 14, 17 |
 | 19 | Cancellation, retry, reconciliation, and break-glass recovery | NOT STARTED | 8, 9, 12–17 |
-| 20 | Permission-isolated frontend and backend shadow validation | NOT STARTED | 5–14, 19 |
+| 20 | Permission-isolated frontend and backend shadow validation | NOT STARTED | 5–14, 19, 25 |
 | 21 | Isolated real-execution canaries | NOT STARTED | 15–20 |
 | 22 | Controlled shared-staging pilot and burn-in | NOT STARTED | 21 |
-| 23 | Production pilot and Deploy Hub establishment | NOT STARTED | 22 |
+| 23 | Production pilot and Deploy Hub establishment | NOT STARTED | 22, 25 |
 | 24 | Deferred Release Bus removal and cleanup | NOT STARTED | 23 |
+| 25 | Deployment communications, attribution, and release-note integration | NOT STARTED | 2, 3, 5, 9, 11–19 |
 
 ## Task details
 
@@ -63,7 +64,8 @@ receive an evidence-based answer.
 Status: `DONE`
 
 Outcome: The project has an agreed product boundary, migration direction,
-safety model, UI model, E2E policy, and durable implementation tracker.
+safety model, UI model, E2E and deployment-communications policies, and durable
+implementation tracker.
 
 Acceptance criteria:
 
@@ -74,6 +76,8 @@ Acceptance criteria:
   recorded.
 - [x] GitHub-backed static UI and automatic live-update requirements recorded.
 - [x] Mandatory staging and production environment-snapshot E2E accepted.
+- [x] Repository-owned CI posting, exact attribution, and asynchronous
+  production release-note boundary accepted.
 - [x] Shadow-to-isolated-to-shared rollout strategy recorded.
 - [x] Numbered implementation tracker established.
 
@@ -84,7 +88,8 @@ Evidence:
 - `docs/migration-plan.md`
 - `docs/testing-strategy.md`
 - `docs/e2e-validation-analysis.md`
-- ADRs 0001 through 0004 under `docs/decisions/`
+- `docs/deployment-communications-analysis.md`
+- ADRs 0001 through 0005 under `docs/decisions/`
 
 ### [ ] Task 1 — Dormant-state and canonical-workflow inventory
 
@@ -101,8 +106,13 @@ Scope:
 - Inspect all four canonical deployment paths at current remote `main`.
 - Inspect staging and production E2E triggers, inputs, evidence, concurrency,
   credentials, callbacks, and failure semantics.
+- Reinspect backend PR #1869, frontend PR #3504, and source task
+  `019faa0e-272b-7f62-843a-79fffb815a7e`; record final heads, merge/deploy
+  status, and which changes are actually present on repository `main`.
 - Trace current workflow readiness gates, environment locks, exact-version
-  endpoints, GitHub Deployments, release-note behavior, and manual fallback.
+  endpoints, GitHub Deployments, manual fallback, and the complete canonical
+  workflow → notifier → CI-alert receiver → release-note queue/generator
+  path.
 - Inventory the existing backend hosting/auth/realtime capabilities relevant to
   the UI proxy, API, and live updates.
 - Produce an exact change map per repository and workflow; do not implement it.
@@ -113,6 +123,9 @@ Acceptance criteria:
 - [ ] Each canonical path has trigger, inputs, mutation boundary, concurrency,
   runtime proof, output, and fallback documented.
 - [ ] Every Release Bus-specific dependency is named by file and purpose.
+- [ ] Deployment notification fields, authentication, contributor evidence,
+  side-effect outcomes, release-note baselines, deduplication, and recovery are
+  named by file and exact workflow path.
 - [ ] Backend-only, frontend-only, coordinated, staging, production, and E2E
   gaps are explicit.
 - [ ] No environment, workflow, branch, credential, or Release Bus control was
@@ -137,6 +150,8 @@ Scope:
   order, idempotency, cancellation intent, and terminal evidence.
 - Stale-head, moved-main, duplicate, conflicting duplicate, and restart rules.
 - Versioned event envelope for resuming the initiating Codex task.
+- Immutable deployment-communication provenance and a versioned non-gating
+  side-effect outcome envelope.
 
 Acceptance criteria:
 
@@ -147,6 +162,8 @@ Acceptance criteria:
 - [ ] Competing requests have deterministic waiting order and ownership.
 - [ ] Contract fixtures cover valid, duplicate, stale, cancelled, and failed
   examples.
+- [ ] Requester, authenticated authority, CI-drop contributors, and per-PR
+  release-note contributors are represented as separate identities.
 - [ ] An accepted ADR records the chosen GitHub-native representation.
 
 Evidence: Not yet available.
@@ -168,7 +185,8 @@ Scope:
 - Private UI-file access, browser authentication, webhook verification, secret
   handling, and audit attribution.
 - Abuse cases: forged callbacks, replay, moved refs, confused deputy,
-  cross-repository escalation, and unauthorized production intent.
+  cross-repository escalation, unauthorized production intent, spoofed Release
+  Train/Deploy Hub identity, and caller-supplied contributor claims.
 
 Acceptance criteria:
 
@@ -213,6 +231,8 @@ Acceptance criteria:
 
 - [ ] Fake frontend/backend deploy and E2E adapters support success, delay,
   product failure, infrastructure failure, cancellation, and stale outcomes.
+- [ ] Fake communication sinks support CI-drop acceptance/failure and
+  production release-note enqueue/publish/skip/failure without real posts.
 - [ ] A deterministic clock and event fixtures make retries reproducible.
 - [ ] Contract tests cover every operation state and transition.
 - [ ] Duplicate dispatch and duplicate/conflicting callback scenarios are
@@ -291,6 +311,8 @@ Acceptance criteria:
 - [ ] GitHub Deployment records preserve environment and exact version history.
 - [ ] Moved PR heads are visibly stale without rewriting accepted identity.
 - [ ] Terminal task events are attributable, idempotent, and resumable.
+- [ ] Non-gating CI-drop and release-note milestone events are linked to the
+  exact deployment without changing its terminal truth.
 - [ ] Missed or duplicate event delivery is recoverable from GitHub truth.
 
 Evidence: Not yet available.
@@ -333,6 +355,8 @@ Acceptance criteria:
 - [ ] Duplicate/out-of-order events cannot regress the UI.
 - [ ] UI shows exact versions, request/PR/task identity, elapsed time, ETA,
   workflow links, and scoped waiting reason.
+- [ ] UI shows CI-drop and production release-note milestones, warnings, links,
+  and recovery evidence separately from deployment and E2E state.
 - [ ] Authorization is enforced by APIs, never by hidden/disabled controls.
 
 Evidence: Not yet available.
@@ -470,6 +494,9 @@ Acceptance criteria:
 - [ ] Structured failure classes distinguish source, policy, deployment,
   product E2E, infrastructure, and control-plane failures.
 - [ ] Diagnostic links reach the exact GitHub run and evidence artifact.
+- [ ] Diagnostics distinguish CI-drop acceptance, attribution omission,
+  release-note ineligibility, enqueue, skip, deduplication, publication, queue
+  failure, and generation failure.
 
 Evidence: Not yet available.
 
@@ -489,6 +516,8 @@ Acceptance criteria:
   truthfully.
 - [ ] Known-good exact redeployment is documented for staging and production.
 - [ ] Manual canonical break-glass paths are proven independently.
+- [ ] Communication replay and recovery cannot duplicate a CI drop or release
+  note and never require redeploying the application.
 - [ ] No automatic cross-repository rollback is introduced.
 
 Evidence: Not yet available.
@@ -506,7 +535,7 @@ Acceptance criteria:
   triggers only a credentialless shadow workflow.
 - [ ] Backend shadow uses exact PR SHAs and simulated selected services.
 - [ ] Shadow identity cannot update `1a-staging`/`main`, dispatch real deploys,
-  or assume staging/production roles.
+  assume staging/production roles, or publish real CI/release-note drops.
 - [ ] Initial Check Runs are projected; later writes target only opted-in test
   PRs.
 - [ ] Success, failure, waiting, duplicate, stale, cancel, retry, callbacks, UI,
@@ -548,6 +577,8 @@ Acceptance criteria:
 - [ ] Frontend and unrelated backend work are not globally serialized.
 - [ ] Waiting, UI, Check Runs, task events, retry, cancel, and failure behavior
   match authoritative GitHub/runtime truth.
+- [ ] Staging CI drops show exact Deploy Hub authority/requester/contributor
+  attribution and remain release-note-ineligible.
 - [ ] A burn-in window and success/failure acceptance record are complete.
 - [ ] Manual canonical staging remains immediately usable.
 
@@ -564,6 +595,10 @@ Acceptance criteria:
 
 - [ ] Explicitly authorized low-risk backend and frontend pilots succeed.
 - [ ] Exact runtime proof and production-safe E2E are terminal and green.
+- [ ] Frontend and backend CI drops and production release notes have exact
+  authority, requester, PR, contributor, service, and release-group scope.
+- [ ] Release-note publication, skip, deduplication, and failure are visible and
+  do not alter healthy deployment/E2E truth.
 - [ ] At least one production failure/recovery or controlled equivalent is
   proven without fabricating success.
 - [ ] Codex deployment tooling routes normal requests to Deploy Hub.
@@ -587,12 +622,81 @@ Acceptance criteria:
   reconciler scheduling are removed.
 - [ ] Release Bus-specific frontend workflows and backend workflow inputs,
   callbacks, guards, credentials, alarms, and AWS resources are removed.
+- [ ] Release Train authority and train/operation notification contracts are
+  removed only after canonical Deploy Hub/manual CI posting and release notes
+  pass acceptance.
 - [ ] Canonical manual and Deploy Hub paths no longer import or call Release Bus.
 - [ ] Obsolete docs, skills, and terminology are removed or archived.
 - [ ] Staging and production deployment/E2E paths pass final acceptance without
   Release Bus infrastructure.
 
 Evidence: Not yet available.
+
+### [ ] Task 25 — Deployment communications, attribution, and release-note integration
+
+Status: `NOT STARTED`
+
+Outcome: Every canonical Deploy Hub deployment reuses the existing
+repository/backend communications pipeline to produce correctly attributed CI
+drops and production release notes with observable, idempotent, non-gating
+outcomes.
+
+Scope:
+
+- Finalize the Deploy Hub authority and immutable notification evidence
+  contract using the source task and PRs as implementation input.
+- Preserve repository-owned contributor derivation, backend CI-alert rendering,
+  production eligibility, queue/generator, deduplication, and publication.
+- Integrate communication outcomes into adapters, Check Runs, task events,
+  audit history, recovery, and the live UI.
+- Preserve explicit no-PR/internal/recovery behavior and backend multi-service
+  release grouping.
+- Remove Release Bus-specific identity assumptions without discarding the
+  secure attribution and release-note behavior they helped establish.
+
+Acceptance criteria:
+
+- [ ] Backend PR #1869 and frontend PR #3504 final disposition is recorded, and
+  the implementation uses only behavior verified on the exact deployed/main
+  heads rather than assuming open-PR code exists.
+- [ ] `Deploy Hub` is authenticated as its own authority and cannot be spoofed
+  by workflow inputs, train-like strings, requester fields, or contributor
+  metadata.
+- [ ] Requester, authority, operation-scoped CI contributors, and per-PR
+  release-note contributors remain separate and correctly attributed.
+- [ ] Frontend contributor evidence is bounded to exact workflow/run/ref/SHA
+  and deployed-range/PR evidence; backend evidence is exact-PR and
+  service-scoped.
+- [ ] Evidence timeout or unavailability omits contributors with a diagnostic
+  but does not prevent the CI deployment drop.
+- [ ] All four canonical deployment adapters produce exact, idempotent CI-drop
+  outcomes; staging never requests a release note.
+- [ ] Frontend production selects only approved exact production baselines and
+  safely handles historical manual/Release Bus transitions and same-SHA
+  redeployment.
+- [ ] Backend production preserves per-PR contributors and one immutable
+  multi-service release group that publishes only after its intended service
+  set completes.
+- [ ] Duplicate, rollback, recovery, unsafe-range, explicit no-PR, queue
+  failure, generation failure, already-published, and successful publication
+  outcomes are covered and truthful.
+- [ ] Communication milestones update the UI, Check Run, audit history, and
+  originating task without holding environment locks or changing deployment
+  and E2E terminal truth.
+- [ ] Shadow and fake modes are physically unable to publish real CI or
+  release-note drops.
+- [ ] Focused cross-repository contract tests and isolated/canary evidence prove
+  backend-first compatibility and canonical manual fallback.
+
+Input evidence:
+
+- `docs/deployment-communications-analysis.md`
+- ADR 0005 under `docs/decisions/`
+- Source task `019faa0e-272b-7f62-843a-79fffb815a7e`
+- [Backend PR #1869](https://github.com/6529-Collections/6529seize-backend/pull/1869)
+- [Frontend PR #3504](https://github.com/6529-Collections/6529seize-frontend/pull/3504)
+
+Completion evidence: Not yet available.
 
 ## Current next task
 

@@ -2,6 +2,23 @@
 
 ## 2026-08-03
 
+- Inspected source task `019faa0e-272b-7f62-843a-79fffb815a7e` plus open backend
+  PR #1869 and frontend PR #3504, capturing their CI-post attribution and
+  production release-note contracts as unmerged implementation evidence.
+- Accepted ADR 0005: Deploy Hub reuses repository-owned notification and
+  backend release-note automation, supplies immutable authenticated operation
+  context, and observes communication outcomes without duplicating the
+  generator or making publication a deployment gate.
+- Added deployment-communications analysis covering authority/requester/
+  contributor separation, exact evidence, bounded attribution, asynchronous
+  outcomes, deduplication, same-SHA and unsafe-range behavior, multi-service
+  grouping, and recovery.
+- Added stable Task 25 for deployment communications, attribution, and
+  release-note integration; updated Tasks 0–3, 5, 9, 11, and 18–24 with the
+  cross-cutting acceptance criteria and retained Task 1 as the next task.
+- Updated the saved architecture diagrams, migration plan, and testing strategy
+  to show the existing communications pipeline beside—not inside—the Deploy
+  Hub deployment and validation success path.
 - Finalized the v1 requirements and target architecture, including the exact
   deployment-versus-validation boundary and terminal failure semantics.
 - Accepted mandatory full baseline E2E for every staging and production

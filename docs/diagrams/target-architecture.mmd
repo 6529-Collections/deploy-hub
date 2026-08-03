@@ -16,6 +16,12 @@ flowchart LR
         V["Frontend-owned<br/>E2E workflows"]
     end
 
+    subgraph C["Existing deployment communications"]
+        N["Backend CI-alert receiver"]
+        R["Release-note queue<br/>and generator"]
+        D["CI and release-note drops"]
+    end
+
     subgraph E["Runtime environments"]
         STG["Staging"]
         PROD["Production"]
@@ -37,6 +43,14 @@ flowchart LR
     BE --> PROD
     V -. "Snapshot-bound read-only tests" .-> STG
     V -. "Snapshot-bound read-only tests" .-> PROD
+
+    FE -->|"Exact deployment evidence"| N
+    BE -->|"Exact deployment evidence"| N
+    N -->|"CI deployment drop"| D
+    N -->|"Production-only async request"| R
+    R -->|"Release-note drop"| D
+    N -->|"Notification outcomes"| API
+    R -->|"Publication outcomes"| API
 
     FE -->|"Workflow events"| PR
     BE -->|"Workflow events"| PR

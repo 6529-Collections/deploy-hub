@@ -30,6 +30,10 @@ Initial specification and architecture definition.
   E2E bound to one exact environment snapshot. Coordinated deployments share
   one validation result after all intended components are deployed; deeper
   feature-specific and cross-system validation remains risk-based.
+- Canonical workflows and the existing backend retain CI deployment posting,
+  exact initiator/contributor attribution, and production release-note
+  automation. Deploy Hub supplies immutable request/authority context and
+  observes their non-gating outcomes instead of rebuilding that pipeline.
 - MVP rollback is an explicit agent-guided or manual exact-version redeployment
   through the canonical repository workflow.
 - Release Bus is already OFF for both staging and production and is not
@@ -67,7 +71,13 @@ Initial specification and architecture definition.
 - Current staging and production E2E workflows, coverage, integration gaps, and
   recent GitHub Actions durations analyzed in `docs/e2e-validation-analysis.md`.
 - Mandatory environment-snapshot E2E accepted in ADR 0004.
-- Root implementation tracker created in `TODO.md`; Task 1 is the next task.
+- Source task `019faa0e-272b-7f62-843a-79fffb815a7e`, open backend PR #1869,
+  and open frontend PR #3504 analyzed as the foundation for deployment
+  communications.
+- Deployment communications boundary accepted in ADR 0005 and documented in
+  `docs/deployment-communications-analysis.md`.
+- Root implementation tracker contains stable Tasks 0–25; Task 1 remains the
+  next task and Task 25 owns the cross-cutting communications integration.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -88,6 +98,10 @@ Initial specification and architecture definition.
    fallback.
 6. Keep automatic rollback out of MVP; redeploy a known-good exact version
    explicitly through canonical workflows.
+7. Reuse repository-owned CI posting and backend production release-note
+   automation. Treat requester, authenticated Deploy Hub authority, and exact
+   contributors separately; surface communication failures without making them
+   environment-mutation or deployment/E2E gates.
 
 ## Remaining verification work
 
@@ -99,6 +113,11 @@ Initial specification and architecture definition.
   regardless.
 - Define the exact GitHub-native representation for waiting order and
   idempotency during implementation design.
+- After the source task completes, verify the final merge/deploy disposition of
+  backend PR #1869 and frontend PR #3504 and inspect the resulting exact
+  canonical communication contracts on repository `main`.
+- Define how asynchronous release-note outcomes become machine-visible to
+  Deploy Hub without introducing a second durable release-note state store.
 
 ## Next recommended work
 

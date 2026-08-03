@@ -8,7 +8,9 @@ Last updated: 2026-08-03
 The Codex task is the feature-lifecycle orchestrator. Deploy Hub accepts and
 finishes one exact deployment or environment-snapshot validation operation.
 Repository workflows execute builds, deployments, and baseline E2E. GitHub and
-runtime version endpoints provide authoritative execution evidence.
+runtime version endpoints provide authoritative execution evidence. Existing
+repository notifiers and backend services continue to own deployment drops and
+production release notes.
 
 The canonical source for the following diagram is
 `diagrams/target-architecture.mmd`.
@@ -30,6 +32,12 @@ flowchart LR
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
         V["Frontend-owned<br/>E2E workflows"]
+    end
+
+    subgraph C["Existing deployment communications"]
+        N["Backend CI-alert receiver"]
+        R["Release-note queue<br/>and generator"]
+        D["CI and release-note drops"]
     end
 
     subgraph E["Runtime environments"]
@@ -54,6 +62,14 @@ flowchart LR
     V -. "Snapshot-bound read-only tests" .-> STG
     V -. "Snapshot-bound read-only tests" .-> PROD
 
+    FE -->|"Exact deployment evidence"| N
+    BE -->|"Exact deployment evidence"| N
+    N -->|"CI deployment drop"| D
+    N -->|"Production-only async request"| R
+    R -->|"Release-note drop"| D
+    N -->|"Notification outcomes"| API
+    R -->|"Publication outcomes"| API
+
     FE -->|"Workflow events"| PR
     BE -->|"Workflow events"| PR
     V -->|"Validation events"| PR
@@ -75,6 +91,7 @@ sequenceDiagram
     participant W as Repository workflow
     participant E as Environment
     participant V as Frontend E2E workflow
+    participant C as Existing communications pipeline
 
     D->>A: Work on this and see it through to prod
     A->>G: Implement and open or update PR
@@ -83,6 +100,8 @@ sequenceDiagram
     H->>G: Create or update staging Check Run
     H->>W: Start canonical staging path
     W->>E: Deploy and health-check
+    W->>C: Post exact staging deployment evidence
+    C-->>W: CI-drop outcome; release note ineligible
     W-->>H: Deployed with exact runtime identity
     H->>E: Capture exact staging snapshot
     H->>V: Run mandatory staging baseline E2E
@@ -96,6 +115,9 @@ sequenceDiagram
     A->>H: Deploy exact main SHA to production
     H->>W: Start canonical production path
     W->>E: Deploy and verify version
+    W->>C: Post exact production deployment evidence
+    C-->>W: CI-drop and release-note enqueue outcomes
+    Note over H,C: Release-note publication is observable but does not gate the environment
     W-->>H: Deployed with exact runtime identity
     H->>E: Capture exact production snapshot
     H->>V: Run mandatory production-safe E2E
@@ -105,6 +127,10 @@ sequenceDiagram
     H->>G: Conclude production Check Run
     H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production
+    opt Later asynchronous communication outcome
+        C-->>H: Release note published, skipped, or failed
+        H-->>A: Non-gating communication event
+    end
 ```
 
 ## State ownership
@@ -120,6 +146,9 @@ sequenceDiagram
 - PR-visible progress: GitHub Check Run.
 - Actual deployed identity: environment-specific runtime version endpoint or
   infrastructure version identifier.
+- Deployment-drop and release-note truth: the existing backend CI-alert
+  receiver, release-note queue/generator, deduplication evidence, and published
+  drops.
 
 ### Minimal Deploy Hub state
 
@@ -132,6 +161,8 @@ Deploy Hub may persist only what cannot be derived reliably:
 - Cancellation intent not yet reflected in a workflow.
 - Validation ID, immutable environment snapshot, pack policy, and links to the
   linked deployment and E2E runs.
+- Communication identity and links to the exact notification, queue/generator
+  outcome, and published drop when available.
 
 The MVP uses GitHub-native records for durable evidence and reconstructs state
 from GitHub and runtime truth. It does not add a database or S3 request ledger.
@@ -157,7 +188,9 @@ release without coupling it to a backend repository deployment.
 After loading an authoritative snapshot, the browser subscribes to a
 server-sent event stream. State transitions, new requests, queue changes,
 blockers, validation ownership, and deployed-version changes are emitted as
-events. HTTP remains the command path for retry and cancellation. On
+events. CI-drop and release-note milestones use the same live path without
+becoming deployment-state transitions. HTTP remains the command path for retry
+and cancellation. On
 disconnect, the browser reconnects and reloads a snapshot before applying new
 events. Bounded automatic polling is the fallback, so a transport interruption
 never makes manual browser refresh part of normal operation.
@@ -177,6 +210,40 @@ separate permissions introduced only when the rollout phase needs each one.
 | Frontend | Production | `build-upload-deploy-prod.yml` from exact `main` |
 | Backend | Staging | `deploy.yml` with exact SHA and selected services |
 | Backend | Production | `deploy.yml` with exact `main` SHA and selected services |
+
+## Deployment communications and release notes
+
+Deploy Hub reuses the repository-owned pipeline analyzed in
+`deployment-communications-analysis.md` and accepted in ADR 0005:
+
+```text
+canonical workflow
+→ exact request, run, SHA, environment, PR, and service evidence
+→ existing backend CI-alert receiver
+→ CI deployment drop
+→ production-only asynchronous release-note queue/generator
+→ published, skipped, deduplicated, or failed release-note outcome
+```
+
+The Hub contributes immutable request identity, requester/task attribution, and
+its authenticated GitHub App authority. Repository workflows retain contributor
+evidence collection because the correct scope depends on repository-specific
+PR, commit-range, and backend-service facts. The backend retains rendering,
+profile mapping, release-note comparison, queueing, deduplication, and
+publication.
+
+Deployment authority, requester, and contributors are separate. `Deploy Hub`
+is a distinct authenticated initiator classification; it is neither `Release
+Train` nor the requesting human. Contributor evidence failure omits the
+contributor row with a diagnostic instead of guessing or preventing the CI
+drop.
+
+Communication outcomes are linked side effects, not deployment state-machine
+terminals. The UI, Check Run, audit history, and task event distinguish CI-drop
+acceptance from release-note eligibility, enqueueing, skipping,
+already-published, publication, and failure. A failure produces a visible
+warning and recovery path but does not hold an environment lock or override
+health, exact-version, and mandatory E2E truth.
 
 ## Environment-snapshot E2E
 

@@ -8,7 +8,8 @@ Last updated: 2026-08-03
 Deploy Hub is the deployment execution and observability layer used by Codex
 tasks and humans. It accepts exact deployment operations, enforces deployment
 policy, invokes repository-owned deployment workflows, reports progress to the
-pull request and UI, and returns a terminal result to the initiating agent.
+pull request and UI, preserves repository-owned deployment communications, and
+returns a terminal result to the initiating agent.
 
 Deploy Hub is not an autonomous release manager. The initiating Codex task owns
 implementation, pull requests, CI and review handling, staging validation,
@@ -51,6 +52,10 @@ a genuine blocker requires user input.
 - Dispatching the canonical repository workflow.
 - Observing workflow and runtime results.
 - GitHub Deployment and Check Run updates.
+- Supplying immutable request and authority context to repository-owned
+  deployment communications.
+- Observing and linking CI-drop and production release-note side-effect
+  outcomes without making them environment-mutation gates.
 - Operational UI state.
 - Terminal events and callbacks to the initiating task.
 
@@ -60,6 +65,9 @@ a genuine blocker requires user input.
 - Build and package implementation.
 - Environment-specific deployment implementation.
 - Component health and deployed-version verification.
+- Operation-scoped contributor evidence and deployment notification payloads.
+- CI deployment-drop rendering and production-only release-note eligibility,
+  queueing, generation, deduplication, and publication.
 - Component-level rollback implementation where supported.
 
 ## 4. Agent-facing operation contract
@@ -115,6 +123,14 @@ Requirements:
   logical validation; conflicting reuse is rejected.
 - A coordinated frontend/backend deployment uses one validation after every
   intended component is deployed and links that result to each request.
+- `requestedBy`, authenticated deployment authority, and verified contributors
+  are separate identities and cannot be inferred from one another.
+- Canonical workflows receive enough immutable request context to bind
+  notification evidence to the exact request, PR, SHA, environment, workflow
+  run, and selected backend services.
+- Caller-supplied contributor names are not authoritative deployment evidence.
+- Retry preserves the same notification and release-group identity instead of
+  recalculating from a moved branch or mutable contributor population.
 
 ## 5. Canonical deployment adapters
 
@@ -249,6 +265,7 @@ The Check Run must expose:
 - Request ID and originating task identity.
 - Links to Deploy Hub and the canonical workflow run.
 - Baseline validation identity, environment snapshot, E2E phase, and E2E run.
+- CI-drop and production release-note side-effect milestones and links.
 - Stale-head status.
 - Terminal conclusion and concise failure information.
 
@@ -259,6 +276,7 @@ The operational UI must update without a browser refresh when:
 - Queue order or a scoped blocker changes.
 - A deployed environment version changes.
 - Shared integration-validation ownership changes.
+- A CI-drop or production release-note milestone changes.
 
 The browser first loads an authoritative snapshot, then consumes a live event
 channel. It must reconnect automatically and resynchronize from a fresh
@@ -269,6 +287,33 @@ temporarily unavailable.
 
 PR Check Runs update from the same operation transitions. Developers must not
 need to monitor Actions logs to understand progress.
+
+### Deployment communications and release notes
+
+- Canonical repository workflows submit exact deployment evidence to the
+  existing backend CI-alert receiver. Deploy Hub does not implement a parallel
+  notifier.
+- The authenticated organization-owned Deploy Hub GitHub App is a distinct
+  deployment authority. It must never be rendered as `Release Train` or as the
+  requesting human.
+- CI-drop attribution is scoped to the exact deployment operation. Frontend
+  evidence uses a bounded deployed range and PR evidence; backend evidence is
+  narrowed to the exact PRs and deployed services.
+- Contributor evidence collection is bounded. When GitHub evidence is
+  unavailable, the workflow emits a diagnostic, omits contributors, and still
+  submits the deployment notification.
+- Staging is release-note-ineligible. Production release notes are generated
+  asynchronously by the existing backend queue and generator from approved
+  production workflow history.
+- CI notification acceptance, release-note eligibility, enqueueing, skipping,
+  deduplication, publication, and failure are distinct observable milestones.
+- Same-SHA redeployment, unsafe comparison ranges, duplicates, explicit
+  no-PR/internal operations, rollback, and recovery fail closed according to
+  repository-owned policy; Deploy Hub never invents contributor or release-note
+  evidence.
+- Communication failures never hold an environment lock or change a healthy,
+  exact, E2E-validated deployment into a failed deployment. They remain visible
+  warnings with an attributable follow-up event and recovery evidence.
 
 ## 10. Operational UI
 
@@ -302,6 +347,10 @@ The UI must show:
 - Shared integration-validation ownership.
 - Validation phase, exact environment snapshot, pack policy, elapsed time, and
   rolling estimated completion time.
+- CI-drop status and link, including whether attribution evidence was complete
+  or safely omitted.
+- Production release-note eligibility, queue, generation, deduplication,
+  publication, failure status, and recovery link.
 
 The UI must not expose release trains or a single opaque global lane.
 Static files from GitHub never serve as operational state; the authenticated
@@ -318,6 +367,12 @@ Deploy Hub API supplies snapshots, live events, history, and commands.
 - Stale SHAs fail closed.
 - One failed operation does not pause unrelated environments or repositories.
 - Failed component deployment wakes the owning agent with structured evidence.
+- CI-drop and release-note side effects are idempotent and separately
+  recoverable; a retry cannot duplicate a previously accepted drop or
+  published note.
+- A communication-side-effect failure does not fabricate deployment failure or
+  success. The terminal deployment result carries a visible warning and the
+  owning task receives the exact side-effect outcome.
 - A staging E2E failure is reported as `deployed but validation failed` and
   prevents that exact result from progressing to production.
 - A production E2E failure is reported as `deployed but validation failed` and
@@ -338,7 +393,10 @@ Deploy Hub API supplies snapshots, live events, history, and commands.
 - Repository and environment permissions use least privilege.
 - AWS access uses GitHub Actions OIDC where practical.
 - Every request records requester, task reference, PR, exact SHA, target,
-  workflow run, deployed version, timestamps, and terminal result.
+  authenticated deployment authority, workflow run, deployed version,
+  notification/release-note identities, timestamps, and terminal result.
+- Requester, deployment authority, CI-drop contributors, and per-PR
+  release-note contributors remain separately attributable.
 - Secret values never enter request records, Check Runs, or UI payloads.
 
 ## 13. MVP
@@ -355,6 +413,8 @@ The MVP includes:
 - GitHub-native durable evidence without an MVP database or S3 request ledger.
 - Scoped concurrency.
 - GitHub Deployments and Check Runs.
+- Repository-owned CI deployment-drop and production release-note integration,
+  with machine-visible non-gating outcomes.
 - Terminal events for Codex tasks.
 - Operational UI and history.
 - GitHub-backed static UI delivery and automatic live state updates.
@@ -379,7 +439,8 @@ The MVP includes:
 - A complete mirror of GitHub workflow state in a database.
 - A continuously running reconciler unless later evidence proves it necessary.
 - Automatic cross-repository rollback or transaction semantics.
-- Release note generation.
+- Deploy Hub-owned release-note content generation, queue, deduplication, or
+  publication implementation.
 
 ## 16. Remaining verification
 

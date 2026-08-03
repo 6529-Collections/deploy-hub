@@ -6,6 +6,7 @@ sequenceDiagram
     participant W as Repository workflow
     participant E as Environment
     participant V as Frontend E2E workflow
+    participant C as Existing communications pipeline
 
     D->>A: Work on this and see it through to prod
     A->>G: Implement and open or update PR
@@ -14,6 +15,8 @@ sequenceDiagram
     H->>G: Create or update staging Check Run
     H->>W: Start canonical staging path
     W->>E: Deploy and health-check
+    W->>C: Post exact staging deployment evidence
+    C-->>W: CI-drop outcome; release note ineligible
     W-->>H: Deployed with exact runtime identity
     H->>E: Capture exact staging snapshot
     H->>V: Run mandatory staging baseline E2E
@@ -27,6 +30,9 @@ sequenceDiagram
     A->>H: Deploy exact main SHA to production
     H->>W: Start canonical production path
     W->>E: Deploy and verify version
+    W->>C: Post exact production deployment evidence
+    C-->>W: CI-drop and release-note enqueue outcomes
+    Note over H,C: Release-note publication is observable but does not gate the environment
     W-->>H: Deployed with exact runtime identity
     H->>E: Capture exact production snapshot
     H->>V: Run mandatory production-safe E2E
@@ -36,3 +42,7 @@ sequenceDiagram
     H->>G: Conclude production Check Run
     H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production
+    opt Later asynchronous communication outcome
+        C-->>H: Release note published, skipped, or failed
+        H-->>A: Non-gating communication event
+    end

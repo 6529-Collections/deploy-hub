@@ -30,6 +30,9 @@ against isolated execution infrastructure before any shared-staging canary.
 - Record current `main` and `1a-staging` heads.
 - Inventory current Release Bus triggers, credentials, AWS resources, tables,
   alarms, and workflow dependencies.
+- Reinspect backend PR #1869 and frontend PR #3504, then trace the final
+  canonical workflow → notifier → CI-alert receiver → release-note
+  queue/generator path at the exact repository heads.
 - Prove current manual/canonical workflow readiness without mutating
   production.
 - Establish canonical manual workflows as the emergency deployment path.
@@ -73,6 +76,11 @@ Exercise the normal repository paths without Deploy Hub orchestration:
 - Exact environment-snapshot capture before and after every baseline E2E run.
 - Manual retry and previous-version redeployment.
 - Concurrent frontend and unrelated backend staging operations where safe.
+- Operation-scoped CI deployment drops for all four canonical paths.
+- Production-only release-note generation, including frontend/manual baseline
+  transitions and backend multi-service grouping.
+- Distinct observable outcomes for CI-drop acceptance, release-note
+  eligibility, enqueueing, generation, deduplication, publication, and failure.
 
 Generalize the two E2E workflows so a Deploy Hub validation identity and exact
 environment snapshot replace Release Bus train and manifest assumptions. The
@@ -89,6 +97,10 @@ Exit criteria:
 - All four canonical adapters are proven independently.
 - Both baseline E2E workflows can validate a generic exact environment snapshot
   without Release Bus ownership or callbacks.
+- Canonical notifications attribute the authenticated authority, requester, and
+  exact contributors separately without Release Bus train-wide scope.
+- Production release-note automation succeeds from canonical workflow evidence
+  and remains asynchronous and non-gating.
 - Release Bus is not needed to execute a normal deployment.
 
 ## Phase 3 — Build Deploy Hub MVP
@@ -112,6 +124,11 @@ Exit criteria:
   event channel with automatic reconnect, snapshot resynchronization, and
   bounded automatic-polling fallback.
 - Reconcile displayed state against GitHub and runtime version truth.
+- Attach immutable Deploy Hub authority/request context to canonical workflow
+  notification evidence and observe the existing CI-drop and release-note
+  pipeline without reimplementing it.
+- Surface communication milestones in Check Runs, task events, history, and the
+  UI while keeping them outside environment locks and deployment success gates.
 - Use GitHub-native records for MVP durable evidence; do not add a database or
   S3 request ledger without demonstrated need.
 
@@ -138,9 +155,13 @@ Explicit exclusions:
   and production AWS roles.
 - Shadow backend operations directly from exact PR SHAs using a credentialless
   simulation workflow unless a backend integration branch is later justified.
+- Route every shadow notification and release-note event to fake or suppressed
+  sinks; shadow must be physically unable to publish real drops or notes.
 - Prove the shadow path before isolated execution. Treat shadow success as
   control-plane evidence only, not deployment evidence.
 - Run controlled frontend and backend staging canaries.
+- Verify staging CI drops show the Deploy Hub authority, requesting identity,
+  and exact scoped contributors, and remain release-note-ineligible.
 - Run the complete mandatory staging E2E baseline for frontend-only,
   backend-only, and coordinated exact snapshots.
 - Prove that a coordinated deployment produces one linked validation rather
@@ -172,6 +193,10 @@ Exit criteria:
 - Run low-risk production pilots for frontend and backend.
 - Require the complete production-safe E2E baseline against each resulting
   exact production snapshot before reporting success.
+- Verify frontend and backend production CI drops and production release notes
+  carry exact operation-/PR-/service-scoped attribution.
+- Prove release-note publication success, duplicate suppression, explicit skip,
+  and observable failure without blocking deployment or E2E completion.
 - Exercise and reconcile a controlled production-validation failure without
   hiding the fact that deployment already occurred.
 - Route Codex deployment tools to Deploy Hub.
@@ -200,6 +225,9 @@ Deploy Hub acceptance gate.
 - Remove candidate, train, operation, manifest, lock, control, and UI routes.
 - Remove the reconciler Lambda and scheduled triggers.
 - Remove Release Bus-specific frontend workflows.
+- Remove Release Train authority and train/operation notification contracts
+  only after the canonical manual and authenticated Deploy Hub authority paths
+  preserve CI posting and release-note automation.
 - Remove Release Bus-only E2E train/manifest inputs, authorization, and
   callbacks after the generic environment-snapshot paths are established.
 - Remove Release Bus-only inputs, authorization, and callbacks from canonical
@@ -210,6 +238,8 @@ Deploy Hub acceptance gate.
 - Remove unused AWS resources, alarms, credentials, and GitHub App permissions.
 - Remove obsolete operator skills, documentation, and terminology.
 - Verify no production or staging path imports or calls Release Bus code.
+- Verify canonical Deploy Hub/manual deployment drops and production release
+  notes still work after Release Bus-specific identities are removed.
 
 ## Migration diagram
 

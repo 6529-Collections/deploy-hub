@@ -18,6 +18,9 @@ The intended operating model is:
   automatically without manual browser refresh.
 - Every staging and production outcome passes the full baseline read-only E2E
   suite against an unchanged exact environment snapshot.
+- Canonical workflows retain repository-owned CI deployment posts and
+  production release-note automation with exact, operation-scoped attribution;
+  Deploy Hub observes those non-gating outcomes instead of duplicating them.
 - Frontend and backend deployment capacity is independent; baseline E2E blocks
   mutation only to the environment being validated for its short test window.
 
@@ -42,6 +45,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [E2E validation analysis](docs/e2e-validation-analysis.md)
+- [Deployment communications analysis](docs/deployment-communications-analysis.md)
 - [Architecture decisions](docs/decisions/)
 - [Saved diagrams](docs/diagrams/)
 - [Original handoff references](docs/references/)
