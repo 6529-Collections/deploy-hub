@@ -28,12 +28,15 @@ The intended operating model is:
 
 ## Current status
 
-**Credentialless executable skeleton; Task 7 has not started.**
+**Documentation and static UI foundation; Task 7 has not started.**
 
-Tasks 4–6 establish a minimal Node/TypeScript package, static UI shell, and
-credentialless prototypes. The loopback API server, callback/event fake model,
-and Git ledger are retired from the live plan; Task 7 belongs in the existing
-6529 backend. The repo contains no live GitHub token handling, GitHub App, OAuth
+The rejected loopback server, callback/event model, strict ledger contracts,
+and Git-ledger prototype have been removed from the active tree. Git history
+and retired ADRs preserve why they were rejected. This repository contains the
+plain static UI and project documentation; Task 7's authenticated HTTP API is
+explicitly owned by the existing `6529seize-backend` repository.
+
+This repository contains no live GitHub-token handling, GitHub App, OAuth
 client, AWS credential, repository environment, staging access, production
 access, live state branch, or deployment implementation.
 
@@ -56,7 +59,6 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [Current deployment-system inventory](docs/current-system-inventory.md)
-- [Control-plane contracts and fixtures](docs/contracts/README.md)
 - [E2E validation analysis](docs/e2e-validation-analysis.md)
 - [Deployment communications analysis](docs/deployment-communications-analysis.md)
 - [Architecture decisions](docs/decisions/)
@@ -73,22 +75,16 @@ npm install --ignore-scripts
 npm run check
 ```
 
-The project uses Node.js 22.17.1. `npm run check` runs formatting verification,
-lint, type checking, build, and unit tests. `npm start` runs the historical
-loopback-only status prototype after `npm run build`; it has no deployment
-operations and is not the production API plan.
+The project uses Node.js 22.17.1 for its small formatting and lint toolchain.
+`npm run check` validates the static UI and repository configuration. There is
+no server or production runtime in this repository.
 
 Project boundaries:
 
 ```text
-src/api/       historical loopback status boundary; not production API
-src/domain/    prototype dependency-free domain values
-src/adapters/  prototype fake/disabled deployment boundary
-src/github/    disabled live GitHub boundary
-src/ledger/    historical in-memory Git-ledger prototype; not live architecture
-src/config/    offline-only configuration
-ui/            plain static UI files
-test/          Node built-in unit tests
+ui/             plain static UI files
+docs/           requirements, architecture, decisions, migration, and testing
+.github/        credentialless read-only CI
 ```
 
 During the current credentialless bootstrap, changes are pushed directly to
@@ -98,9 +94,9 @@ authority, or additional write actor is introduced.
 
 ## Safety boundary
 
-The executable skeleton is physically incapable of changing `1a-staging`,
-`main`, shared staging, production, or AWS infrastructure. Its adapters and
-historical ledger tests have no live credentials or external mutation path.
+This repository is physically incapable of changing `1a-staging`, `main`,
+shared staging, production, or AWS infrastructure. It contains no API server,
+deployment adapter, GitHub client, credential, or external mutation path.
 
 `1a-deploy-hub` is only an optional credentialless shadow trigger if real
 branch-trigger behavior must be tested. It is not a second staging lane and

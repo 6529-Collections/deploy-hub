@@ -37,10 +37,9 @@ intended components are deployed and links the same result to every deployment
 request. The environment snapshot records the frontend runtime SHA and backend
 runtime versions by service.
 
-The environment mutation lock is held only while the exact snapshot is
-verified and E2E is running. It blocks mutation to that same environment but
-does not block PR CI, non-mutating preparation, agent development, or the other
-environment.
+Deploy Hub does not add an environment mutation lock. The workflow records the
+exact snapshot before and after E2E. If another deployment changes that
+snapshot, validation is stale and can be rerun without blocking colleagues.
 
 The current full 12-pack staging read-only inventory and full 11-pack
 production-safe inventory are the initial mandatory baselines. Deeper
@@ -69,5 +68,5 @@ risk-based and owned by the initiating Codex task.
 - An operation may be visibly `deployed but validating` or `deployed but
   validation failed`; the UI and PR checks must not collapse deployment and
   validation into an ambiguous success/failure label.
-- Shared-environment mutation can wait for the short E2E window, with the exact
-  blocker and expected duration visible in Deploy Hub.
+- GitHub workflow state and snapshot drift remain visible without a custom
+  cross-repository lock.

@@ -4,13 +4,14 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Tasks 0–6 are complete. Task 7, the small authenticated API in the existing
-6529 backend, is next and has not started.
+Tasks 0, 1, 3, and 4 are complete. Tasks 2, 5, and 6 are `RETIRED`; their
+overbuilt contracts, server, callback/event fakes, and Git-ledger code have
+been removed from the active tree. Task 7, the authenticated API in the
+existing `6529seize-backend` repository, is next and has not started as an
+accepted implementation task.
 
-Tasks 4–6 built credentialless prototypes. Their tooling and static UI shell
-remain useful, but their standalone server, callback/event model, and Git
-ledger are not the live architecture. No `state/v1` branch or Git adapter will
-be created, and Task 7 does not depend on those prototypes.
+This repository now contains documentation, development tooling, and the plain
+static UI only. It has no API server or deployment runtime.
 
 ## Accepted direction
 
@@ -66,25 +67,20 @@ be created, and Task 7 does not depend on those prototypes.
 
 - Task 1 inventoried the exact current workflows, Release Bus dependencies,
   E2E, and communication pipeline in `docs/current-system-inventory.md`.
-- Tasks 2 and 6 produced strict contract and Git-ledger prototype evidence.
-  Their event-ledger/callback/projection design is now explicitly retired from
-  the live architecture.
+- Tasks 2, 5, and 6 are retired experiments preserved only in Git history and
+  retired ADRs. Their active code, tests, schemas, and fixtures were removed by
+  ADR 0010.
 - Task 3 settled GitHub Bearer-token authentication in ADR 0009 and
   `docs/security-model.md`; no credential or authority was created.
-- Task 4 created one credentialless Node/TypeScript package with zero runtime
-  dependencies, a static UI shell, and read-only CI. Its loopback status server
-  is not the production API foundation.
-- Task 5 created deterministic fakes for deploy, E2E, and communications. Its
-  callbacks/events are test history, not live contracts.
-- Task 6's 22-test exact-head CI passed, but the code remains a historical
-  prototype only.
+- Task 4 now consists only of the repository toolchain, static UI shell, and
+  read-only CI. The superseded loopback TypeScript server was removed.
 - The requirements, architecture, tracker, migration, testing, E2E, and
   communications documents are stored in this repository.
 
 ## Next work
 
-Implement Task 7 as a small endpoint set in the existing backend. Before any
-live credential or permission is added, perform the documented pre-live gate
-and reconsider direct-to-main development. Do not create a new runtime, live
-ledger, state branch, database, scheduler, callback system, GitHub App, or
-realtime transport as part of Task 7.
+Confirm the Task 7 repository boundary with the owner, then implement its small
+endpoint set in `6529seize-backend`. Before any live credential or permission
+is added, perform the documented pre-live gate. Do not create a server in this
+repository, live ledger, state branch, database, scheduler, callback system,
+GitHub App, or realtime transport as part of Task 7.

@@ -76,10 +76,10 @@ material.
   do not recreate Release Bus trains or autonomous candidate claiming under new
   terminology.
 
-## Credentialless bootstrap commands
+## Static UI bootstrap commands
 
 - Install: `npm install --ignore-scripts`
 - Full check: `npm run check`
-- Individual checks: `npm run format:check`, `npm run lint`,
-  `npm run typecheck`, `npm run build`, and `npm test`
-- Do not start the local status server unless the user explicitly asks.
+- Individual checks: `npm run format:check` and `npm run lint`
+- There is no Deploy Hub server in this repository. The existing 6529 backend
+  owns authenticated API and static-file proxy behavior.

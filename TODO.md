@@ -8,9 +8,14 @@ receive an evidence-based answer.
 
 ## Tracker rules
 
-- Status values are `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, and `DONE`.
-- The default next task is the lowest-numbered non-done task whose dependencies
-  are complete. Work may overlap only when explicitly useful and safe.
+- Status values are `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, `DONE`, and
+  `RETIRED`. `RETIRED` means an experiment was completed historically but is
+  deliberately absent from the current design and active code.
+- Retired tasks do not block the next task, and active tasks must not depend on
+  their removed implementation.
+- The default next task is the lowest-numbered `NOT STARTED` or `IN PROGRESS`
+  task whose active dependencies are complete. Work may overlap only when
+  explicitly useful and safe.
 - A checkbox is a summary, not proof. Before answering whether a task is done,
   inspect every acceptance criterion and the exact evidence linked under that
   task.
@@ -24,6 +29,9 @@ receive an evidence-based answer.
 - Never reinterpret an existing task number silently. The owner explicitly
   amended Tasks 7–25 on 2026-08-03 before implementation to remove speculative
   machinery and apply KISS; their stable numbers remain unchanged.
+- On 2026-08-03 the owner also explicitly requested cleanup of the rejected
+  prototype work: Tasks 2, 5, and 6 became `RETIRED`, while Task 4 was narrowed
+  to the repository/static-UI foundation. ADR 0010 records that amendment.
 - Direct pushes to `main` are permitted only during the owner-approved private,
   credentialless bootstrap recorded in `STATUS.md`. Reconsider protection
   before Task 7 handles a live GitHub token or any live permission, deployment
@@ -41,12 +49,12 @@ existing GitHub/backend primitives cannot meet a requirement.
 | ---: | --- | --- | --- |
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
-| 2 | Exact deployment and validation contracts (prototype baseline) | DONE | 1 |
-| 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
-| 4 | Credentialless repo/UI skeleton (standalone API retired) | DONE | 2, 3 |
-| 5 | Deterministic fake prototype (not a live state contract) | DONE | 4 |
-| 6 | Credentialless Git-ledger prototype (retired from live plan) | DONE | 2, 4 |
-| 7 | Small authenticated API in the existing backend | NOT STARTED | 1, 3 |
+| 2 | Overbuilt state-contract experiment | RETIRED | 1 |
+| 3 | Authentication, permissions, and threat model | DONE | 1 |
+| 4 | Repository tooling and static UI foundation | DONE | 3 |
+| 5 | Callback/event fake experiment | RETIRED | 4 |
+| 6 | Git-ledger experiment | RETIRED | 4 |
+| 7 | Authenticated API in `6529seize-backend` | NOT STARTED | 1, 3 |
 | 8 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 7 |
 | 9 | PR feedback and GitHub run lookup | NOT STARTED | 7 |
 | 10 | GitHub-backed static UI delivery | NOT STARTED | 3, 4, 7 |
@@ -150,47 +158,24 @@ Evidence:
 - Exact source and live-control snapshots recorded in that inventory on
   2026-08-03.
 
-### [x] Task 2 — Exact deployment and validation contracts (prototype baseline)
+### Task 2 — Overbuilt state-contract experiment
 
-Status: `DONE`
+Status: `RETIRED`
 
-Outcome: Exact-SHA operation and validation contracts were explored and
-tested. They are useful prototype evidence, but their event-ledger, callback,
-and projection mechanisms are not live requirements.
+Outcome: This experiment specified a ledger, callback envelopes, projections,
+and a separate validation lifecycle that the simplified architecture does not
+need. Its schemas and fixtures have been removed from the active tree.
 
-Scope:
+What survives:
 
-- Final request/status/cancel/retry deployment schemas.
-- Final environment-snapshot validation schema and lifecycle.
-- Prototype GitHub-native representation for request identity, waiting order,
-  idempotency, cancellation intent, and terminal evidence.
-- Stale-head, moved-main, duplicate, conflicting duplicate, and restart rules.
-- Prototype event and deployment-communication envelopes.
+- Exact immutable SHA, explicit environment, fail-closed authorization,
+  requester/authority/contributor separation, and truthful partial outcomes
+  remain requirements in `docs/requirements.md`.
+- Live request and response types will be added only to the owning backend
+  OpenAPI endpoints as those endpoints are implemented.
 
-Acceptance criteria:
-
-- [x] Every field, validation rule, state transition, and terminal result is
-  specified.
-- [x] Coordinated operations remain agent-owned and do not become trains.
-- [x] The prototype reconstructs state after process loss.
-- [x] The prototype demonstrated deterministic waiting order and ownership.
-- [x] Contract fixtures cover valid, duplicate, stale, cancelled, and failed
-  examples.
-- [x] Requester, authenticated authority, CI-drop contributors, and per-PR
-  release-note contributors are represented as separate identities.
-- [x] ADR 0006 records the prototype and its retirement from the live plan.
-
-Evidence:
-
-- `docs/contracts/README.md`
-- Fourteen strict JSON Schema 2020-12 contracts and nine fixtures under
-  `docs/contracts/`
-- `docs/decisions/0006-git-ledger-control-records.md`
-- Completion audit on 2026-08-03: all schema and fixture JSON parsed; all
-  schemas compiled in strict mode; 12 schema-backed fixture objects validated;
-  unauthorized production, success without validation, contradictory terminal
-  failure, gating communication, broken event predecessor, and acceptance
-  without exact source were rejected.
+Historical evidence remains in Git history and retired ADR 0006. Task 2 is not
+a dependency of any active implementation task.
 
 ### [x] Task 3 — Authentication, permissions, and threat model
 
@@ -232,32 +217,26 @@ Evidence:
   credential from every visible/durable surface. No credential or live
   permission was created.
 
-### [x] Task 4 — Credentialless repo/UI skeleton (standalone API retired)
+### [x] Task 4 — Repository tooling and static UI foundation
 
 Status: `DONE`
 
-Outcome: The repository has the credentialless package/tooling, static UI
-shell, and test setup it needs. Its loopback read-only API/server proved the
-skeleton but is not the live API architecture; Task 7 belongs in the existing
-6529 backend.
+Outcome: This repository has the small development toolchain, read-only CI,
+documentation, and plain static UI shell it needs. It has no API server or
+deployment runtime; Task 7 belongs in `6529seize-backend`.
 
 Acceptance criteria:
 
-- [x] Runtime and package choices are recorded with a concise rationale.
-- [x] API, domain, adapter, GitHub, UI, configuration, and test boundaries are
-  explicit.
-- [x] Local build, lint, type, unit-test, and formatting commands are defined.
-- [x] Safe sample configuration contains no secrets.
+- [x] Package and plain static UI choices are recorded with a concise
+  rationale.
+- [x] Local formatting and lint commands are defined.
 - [x] CI validates the repository without deployment credentials or mutation.
+- [x] No second API server, runtime dependency, credential, or deployment
+  adapter exists in this repository.
 - [x] The approved direct-to-`main` credentialless workflow and remote-head
   safety checks are documented; protected-main/PR workflow remains a mandatory
   reconsideration before any credential or deployment authority.
 - [x] README and agent instructions explain how to develop and verify it.
-
-Live-use correction: retain the small tooling/UI pieces that remain useful, but
-do not extend `src/server.ts` or `src/api/` into a second production runtime.
-Remove those prototype-only files when the backend API/UI integration no longer
-uses their tests.
 
 2026-08-03 workflow amendment: the repository owner explicitly retained direct
 pushes to `main` for the current private, credentialless bootstrap. Enforced
@@ -267,107 +246,61 @@ write actor is introduced.
 
 Evidence:
 
-- `docs/decisions/0008-keep-the-executable-skeleton-small.md`
-- `package.json`, `tsconfig*.json`, `eslint.config.mjs`, and
-  `.prettierrc.json`
-- `src/`, `ui/`, and `test/skeleton.test.ts`
-- `.env.example` and `.github/workflows/ci.yml`
+- ADR 0010 (`docs/decisions/0010-remove-retired-prototypes.md`)
+- `package.json`, `eslint.config.mjs`, `.prettierrc.json`, `ui/`, and
+  `.github/workflows/ci.yml`
 - Commit `a84041a226affd6b8e1e34aa04dd840cd1e2256d`.
 - GitHub Actions run
   `https://github.com/6529-Collections/deploy-hub/actions/runs/30818122104`
   passed on that exact head with read-only `contents` permission and no secrets.
-- Completion audit on 2026-08-03: local formatting, lint, type checking, build,
-  and four unit tests passed; production dependency inventory was empty;
-  source/config/workflow scans found no GitHub/AWS SDK, external API endpoint,
-  write permission, workflow dispatch, credential, database, or cache path.
+- The original completion evidence remains historical. ADR 0010 removed its
+  superseded server/TypeScript prototype and left only the useful static
+  foundation.
 
-### [x] Task 5 — Deterministic fake prototype (not a live state contract)
+### Task 5 — Callback/event fake experiment
 
-Status: `DONE`
+Status: `RETIRED`
 
-Outcome: Credentialless fakes proved offline deployment/E2E/communication
-scenarios. Their callback and event-state abstractions are historical test
-models, not requirements for the live polling/workflow-run architecture.
+Outcome: This experiment modeled deployment, validation, communication,
+callbacks, and events as a separate fake state system. The live design instead
+reads canonical workflow runs and runtime evidence, so the implementation and
+tests have been removed.
 
-Acceptance criteria:
+What survives:
 
-- [x] Fake frontend/backend deploy and E2E adapters support success, delay,
-  product failure, infrastructure failure, cancellation, and stale outcomes.
-- [x] Fake communication sinks support CI-drop acceptance/failure and
-  production release-note enqueue/publish/skip/failure without real posts.
-- [x] A deterministic clock and event fixtures make retries reproducible.
-- [x] Contract tests cover every operation state and transition.
-- [x] Duplicate dispatch and duplicate/conflicting callback scenarios are
-  proven safe.
-- [x] Test configuration is physically incapable of live mutation.
+- Later tasks may add small fakes for exact workflow responses, runtime
+  identity, snapshot drift, cancellation, and retry when those tests are
+  actually needed.
+- No callback/event state model survives.
 
-Evidence:
+Historical evidence remains in commit
+`54077fb04d025b7a4d6879d49834a9fd52aaac80` and its exact-head CI run. Task 5
+is not a dependency of any active implementation task.
 
-- `src/domain/operation-state.ts`
-- `src/testing/`
-- `test/fake-adapters.test.ts`
-- Completion audit on 2026-08-03: all six scenarios passed for each frontend,
-  backend, and E2E fake; all eight states and 18 allowed transitions were
-  asserted; before/after-dispatch cancellation, deterministic delayed replay,
-  duplicate/conflicting dispatch and callback, and all requested CI-drop and
-  release-note outcomes passed. Local format, lint, type, build, and 12 tests
-  passed; the production dependency tree was empty and the fake source had no
-  network, GitHub SDK, AWS SDK, workflow-dispatch, or external-posting path.
-- Commit `54077fb04d025b7a4d6879d49834a9fd52aaac80`; exact-head GitHub
-  Actions run `https://github.com/6529-Collections/deploy-hub/actions/runs/30818825768`
-  passed.
-- Live-use correction: future tasks may reuse small deterministic helpers, but
-  do not implement fake callback/event machinery in production and do not
-  treat Task 5 as a dependency for the canonical adapters.
+### Task 6 — Git-ledger experiment
 
-### [x] Task 6 — Credentialless Git-ledger prototype (retired from live plan)
+Status: `RETIRED`
 
-Status: `DONE`
+Outcome: This experiment implemented a 1,146-line event ledger, snapshots,
+compare-and-swap writes, queue ownership, and reconciliation. The owner
+rejected that control plane. Its code, tests, schemas, fixtures, and
+implementation document have been removed from the active tree.
 
-Outcome: A credentialless in-memory prototype proved Git-ledger semantics. The
-owner's subsequent KISS decision retired that design from the live architecture:
-Task 7 will derive status from GitHub workflow/run/runtime evidence instead.
+GitHub workflow runs, canonical concurrency, and runtime evidence are the live
+sources of truth. Historical evidence remains in retired ADR 0006, commit
+`ec725aacf0edf25dc7bc819f9803e536bdcf377a`, and Git history. Task 6 is not a
+dependency of any active implementation task.
 
-Acceptance criteria:
-
-- [x] Identical request ID/payload returns one logical operation.
-- [x] Conflicting payload reuse fails closed.
-- [x] Waiting ownership survives restart and has deterministic order.
-- [x] Accepted immutable SHA never silently follows a branch.
-- [x] Reconciliation rebuilds state from GitHub evidence after interruption.
-- [x] Retention and audit-history behavior are documented and tested.
-
-Evidence:
-
-- `src/ledger/`
-- `src/testing/in-memory-git-ledger-repository.ts`
-- `test/request-ledger.test.ts`
-- `docs/ledger-implementation.md`
-- Commit `ec725aacf0edf25dc7bc819f9803e536bdcf377a`; exact-head GitHub
-  Actions run `https://github.com/6529-Collections/deploy-hub/actions/runs/30819637476`
-  passed.
-- Completion audit on 2026-08-03: deployment and validation replay performed
-  no duplicate commit; conflicting ID and evidence reuse failed closed;
-  compare-and-swap conflicts reread safely; queue ownership survived a fresh
-  ledger instance; moved-SHA and changed-snapshot evidence was rejected;
-  exact GitHub evidence reconstructed terminal deployment and validation state
-  after interruption; request/event immutability, snapshot byte replay, global
-  sequences, tamper detection, 50-subject linear tree growth, and zero-write
-  replay behavior passed. Local and exact-head CI format, lint, type, build,
-  and all 22 tests passed with zero production dependencies. No GitHub App,
-  credential, live state branch, SDK, workflow, AWS, or external mutation path
-  was created.
-- Live-use decision: do not create `state/v1`, a Git ledger adapter, or a
-  ledger-backed API. The code and contracts are retained temporarily as
-  historical prototype evidence; they are not dependencies of Tasks 7–25 and
-  can be removed during ordinary cleanup once no useful tests rely on them.
-
-### [ ] Task 7 — Small authenticated API in the existing backend
+### [ ] Task 7 — Authenticated API in `6529seize-backend`
 
 Status: `NOT STARTED`
 
-Outcome: Codex tasks and authorized humans use a small HTTP boundary in the
-existing 6529 backend to dispatch and inspect exact canonical workflow runs.
+Repository boundary: this task changes the existing
+`6529-Collections/6529seize-backend` repository. It does not add a server to
+`deploy-hub`.
+
+Outcome: Codex tasks and authorized humans use a small HTTP boundary in that
+existing backend to dispatch and inspect exact canonical workflow runs.
 
 Acceptance criteria:
 
@@ -841,4 +774,5 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 7 — Small authenticated API in the existing backend.
+Task 7 — Authenticated API in `6529seize-backend`, pending explicit owner
+confirmation of that repository boundary.

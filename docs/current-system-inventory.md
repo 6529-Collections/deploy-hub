@@ -389,8 +389,8 @@ These are required outcomes, not optional designs:
 
 ## Proposed implementation choices, not audit facts
 
-The following accepted direction still requires Task 2 and Task 3 contracts or
-prototypes before it becomes implementation truth:
+The following direction came from the audit and is now governed by the active
+requirements and ADRs rather than a separate prototype contract system:
 
 - GitHub-native Deploy Hub records instead of a new application database;
 - existing workflow checks or commit statuses as the first PR progress surface,
@@ -404,8 +404,8 @@ prototypes before it becomes implementation truth:
 - explicit known-good redeployment rather than automatic rollback in MVP.
 
 Task 2 selected a durable Git representation, but the later owner KISS decision
-retired that custom event ledger before live use. ADR 0009
-selects polling-first delivery and existing GitHub-token authentication.
+retired and removed that custom event ledger before live use. ADR 0009 selects
+polling-first delivery and existing GitHub-token authentication.
 
 ## Task 1 conclusion
 

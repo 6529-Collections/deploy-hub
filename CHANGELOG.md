@@ -2,6 +2,14 @@
 
 ## 2026-08-03
 
+- Applied the owner-requested KISS cleanup instead of retaining rejected
+  prototypes: marked Tasks 2, 5, and 6 `RETIRED`; removed the loopback server,
+  TypeScript runtime/domain/adapters, callback/event fakes, 1,146-line Git
+  ledger, strict ledger/state contracts, fixtures, and related tests; and
+  reduced this repository to documentation, plain static UI, and its small
+  format/lint toolchain. ADR 0010 records the boundary. Task 4 remains `DONE`
+  only as the repository/static-UI foundation, and Task 7 now states plainly
+  that its API implementation belongs in `6529seize-backend`.
 - Corrected the KISS follow-up after owner clarification: removed the separate
   `docs/kiss-architecture-review.md` layer and applied the decisions directly
   to requirements, architecture, migration, testing, status, and Tasks 7–25.

@@ -16,8 +16,9 @@ The existing 6529 backend owns the small authenticated HTTP boundary. The
 helpers that remain useful. The MVP does not deploy another server, Lambda,
 container, database, queue, scheduler, or reconciler.
 
-The credentialless loopback server and event/ledger fakes already present in
-this repository are completed prototypes, not a production runtime foundation.
+The rejected loopback server and event/ledger prototypes have been removed
+from the active repository. Git history preserves them; live code must not
+reintroduce or extend them.
 
 The canonical source for this diagram is `diagrams/target-architecture.mmd`.
 
@@ -99,9 +100,8 @@ UI recover status using that operation ID or run ID.
 
 There is no MVP `state/v1` branch, database, append-only event journal, global
 sequence, snapshot cache, queue table, task callback store, or continuously
-running reconciler. Tasks 4–6 remain completed credentialless prototypes, but
-their standalone server, event/callback model, and ledger are not live
-architecture.
+running reconciler. The retired prototype code and contracts are absent from
+the active tree.
 
 Duplicate detection is intentionally proportional: before dispatch, the API
 looks for an existing matching operation/run; canonical workflow concurrency

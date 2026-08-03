@@ -31,9 +31,9 @@ Use small deterministic fakes only where they exercise current architecture:
 - communication link present, absent, published, skipped, and failed without
   changing deployment truth.
 
-The Task 4–6 standalone server, callback/event fakes, ledger tests, and strict
-ledger contracts remain historical prototype evidence. Do not extend them as
-the live test architecture.
+The retired standalone server, callback/event fakes, ledger tests, and strict
+ledger contracts have been removed. Add only the smallest fakes needed to test
+the current workflow-run/runtime architecture.
 
 ## 2. Authentication and security tests
 

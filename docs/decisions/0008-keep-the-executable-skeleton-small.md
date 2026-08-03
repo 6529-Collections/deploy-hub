@@ -1,8 +1,12 @@
 # ADR 0008: Keep the executable skeleton small
 
-Status: Accepted
+Status: Superseded in part by ADR 0010
 
 Date: 2026-08-03
+
+The loopback server and TypeScript prototype boundaries described below were
+removed before live use. ADR 0010 keeps only the repository tooling and static
+UI outcome.
 
 ## Context
 

@@ -37,9 +37,9 @@ recreate Release Bus complexity or make shadow testing unsafe.
 ## Consequences
 
 - The MVP has no separate deployment-state database or S3 request ledger.
-- ADR 0006 and `docs/contracts/README.md` define the retired Task 6 Git-ledger
-  prototype. Live MVP state comes from workflow-run/status/runtime evidence and
-  canonical GitHub concurrency; no live ledger or duplicate projection is
+- ADR 0006 and repository history preserve the retired Task 6 Git-ledger
+  experiment. Live MVP state comes from workflow-run/status/runtime evidence
+  and canonical GitHub concurrency; no live ledger or duplicate projection is
   approved.
 - Baseline snapshot E2E is universal; deeper validation is proportional to risk
   without allowing any deployment to claim success without runtime identity
