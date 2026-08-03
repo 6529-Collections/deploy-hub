@@ -34,7 +34,7 @@ receive an evidence-based answer.
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
 | 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
-| 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
+| 4 | Executable Deploy Hub skeleton | BLOCKED | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
 | 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
@@ -225,7 +225,7 @@ Evidence:
 
 ### [ ] Task 4 — Executable Deploy Hub skeleton
 
-Status: `NOT STARTED`
+Status: `BLOCKED`
 
 Outcome: The repository contains the minimal production-quality application
 structure needed for API, static UI, adapters, and tests, with no deployment
@@ -243,7 +243,15 @@ Acceptance criteria:
   this task introduces executable application code or GitHub Actions.
 - [ ] README and agent instructions explain how to develop and verify it.
 
-Evidence: Not yet available.
+Blocking evidence:
+
+- On 2026-08-03, authenticated GitHub REST reads confirmed the private
+  repository has no `main` protection or ruleset. Both the branch-protection
+  and repository-rulesets endpoints returned HTTP 403 with GitHub's requirement
+  to upgrade the plan or make the repository public.
+- Executable code and GitHub Actions remain intentionally uncreated. Task 4 can
+  resume when private-repository branch protection is available, or only after
+  an explicit reviewed change to the accepted safety requirement.
 
 ### [ ] Task 5 — Fake adapters and deterministic contract suite
 
@@ -725,4 +733,5 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 4 — Executable Deploy Hub skeleton.
+Task 4 — Executable Deploy Hub skeleton (`BLOCKED` on private-repository
+`main` protection availability).

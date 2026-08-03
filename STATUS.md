@@ -4,7 +4,8 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Executable skeleton design and bootstrap preparation.
+Executable skeleton blocked before code by unavailable private-repository
+`main` protection.
 
 ## Accepted direction
 
@@ -67,6 +68,10 @@ Executable skeleton design and bootstrap preparation.
 - Before executable application code, GitHub Actions, permissions,
   credentials, or deployment authority are added, protect `main` and use
   task-owned branches with ready-for-review pull requests.
+- An authenticated check on 2026-08-03 found no existing protection and GitHub
+  returned HTTP 403 for both branch protection and repository rulesets, asking
+  for a plan upgrade or a public repository. The repository remains private,
+  and no executable code or Actions were added.
 
 ## Current documents
 
@@ -142,9 +147,11 @@ Executable skeleton design and bootstrap preparation.
 
 ## Remaining security and implementation work
 
-- Task 4 must select the executable runtime/package structure, protect `main`,
-  and establish credentialless build, lint, type, unit, formatting, and CI
-  foundations before implementation grows.
+- Task 4 is blocked at its first gate: the current GitHub plan does not expose
+  branch protection or rulesets for this private repository. A plan that
+  supports private-repository protection is the recommended resolution; making
+  the repository public or weakening the safety gate requires an explicit
+  separate decision.
 - Later rollout tasks must provide the phase-specific permission snapshots,
   denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
   evidence, secret-canary scans, and owner approvals required by
@@ -158,7 +165,8 @@ Executable skeleton design and bootstrap preparation.
 
 ## Next recommended work
 
-Complete Task 4 in `TODO.md`: protect `main`, choose the minimal runtime and
-package structure, and create the credentialless application/test skeleton. Do
-not create a GitHub App, OAuth client, state branch, workflow with deployment
-authority, AWS role, or live credential as part of that bootstrap.
+Enable branch protection/rulesets for the private repository, then resume Task
+4: protect `main`, create `agent-prxt/executable-skeleton`, choose the minimal
+runtime/package structure, and build the credentialless application/test
+skeleton through a ready-for-review pull request. Do not create a GitHub App,
+OAuth client, state branch, deployment authority, AWS role, or live credential.

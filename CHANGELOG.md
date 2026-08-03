@@ -2,6 +2,11 @@
 
 ## 2026-08-03
 
+- Started Task 4's prerequisite audit and found it blocked before executable
+  code: the private repository has no `main` protection, and GitHub returned
+  HTTP 403 for both branch-protection and repository-ruleset APIs under the
+  current plan. Kept the repository private and specification-only and added
+  no code, Actions, credentials, or deployment authority.
 - Completed Task 3 after its acceptance audit: every requested GitHub
   capability maps to a feature and rollout phase, read-only shadow is enforced
   by absent credential capabilities, production authority is exact and
