@@ -95,6 +95,9 @@ Authentication, permissions, and threat-model definition.
 - The Task 2 completion audit compiled all 14 schemas in strict JSON Schema
   2020-12 mode, validated 12 schema-backed objects across nine fixtures, and
   proved six key unsafe cases fail closed.
+- Task 3 authentication, permission-isolation, live-transport, and threat-model
+  definition is in progress; no identity, permission, credential, workflow, or
+  environment authority has been created.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -136,6 +139,6 @@ Authentication, permissions, and threat-model definition.
 
 ## Next recommended work
 
-Execute Task 3 in `TODO.md`: define authentication, authorization, the
+Complete Task 3 in `TODO.md`: define authentication, authorization, the
 rollout-phase permission matrix, secret boundaries, and the threat model before
 creating any GitHub App, credential, workflow, state branch, or live transport.

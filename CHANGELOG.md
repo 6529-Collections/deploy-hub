@@ -2,6 +2,8 @@
 
 ## 2026-08-03
 
+- Started Task 3 authentication, permissions, secured live-transport, and
+  threat-model definition without creating credentials or live authority.
 - Completed Task 2 after an acceptance audit of every criterion; Tasks 0–2 are
   now done and Task 3 is next.
 - Accepted ADR 0006: one protected non-default `state/v1` Git branch is the

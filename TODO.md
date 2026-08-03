@@ -33,7 +33,7 @@ receive an evidence-based answer.
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
-| 3 | Authentication, permissions, and threat model | NOT STARTED | 1, 2 |
+| 3 | Authentication, permissions, and threat model | IN PROGRESS | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
 | 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
@@ -184,7 +184,7 @@ Evidence:
 
 ### [ ] Task 3 — Authentication, permissions, and threat model
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Human, Codex, backend, GitHub, and environment authority is explicit,
 least-privilege, and staged by rollout phase.
