@@ -35,7 +35,37 @@ Required scenarios:
 - Callback duplicated with conflicting result.
 - Agent task reference is preserved through completion.
 
-## 2. Shadow tests
+## 2. UI delivery and live-update tests
+
+Static delivery:
+
+- Resolve `deploy-hub/main` once and serve HTML, CSS, and JavaScript from that
+  exact commit SHA.
+- Never mix assets when `main` advances during a page load.
+- Cache commit-addressed files without serving stale mutable `main` resolution
+  indefinitely.
+- Reject unauthenticated UI access and never expose the private-repository
+  credential to the browser.
+- Display the exact UI source SHA.
+- Publish a new UI release by advancing `deploy-hub/main` without deploying the
+  backend.
+
+Live behavior in an already-open browser:
+
+- Show a newly accepted deployment without manual refresh.
+- Update operation state, queue order, blocker, validation owner, and deployed
+  version without manual refresh.
+- Show accepted or observed changes within two seconds during normal live
+  operation.
+- Reconnect automatically after a dropped event stream.
+- Fetch a fresh authoritative snapshot before applying events after reconnect.
+- Exercise a missed event and prove that snapshot resynchronization repairs the
+  screen.
+- Fall back to automatic polling at intervals no longer than five seconds while
+  the live stream is unavailable.
+- Prevent duplicate or out-of-order events from regressing visible state.
+
+## 3. Shadow tests
 
 Use real repositories, PRs, workflow history, and authorization evidence
 without allowing cloud or ref mutation.
@@ -79,7 +109,7 @@ Shadow acceptance proves control-plane behavior only. AWS deployment, runtime
 health, rollback, and actual shared-environment concurrency require a separate
 isolated execution environment before shared-staging use.
 
-## 3. Staging canaries
+## 4. Staging canaries
 
 Run controlled real deployments through canonical workflows.
 
@@ -93,7 +123,7 @@ Required cases:
 - Exact runtime version matches the requested SHA.
 - Failed health check produces a failed operation and truthful PR feedback.
 
-## 4. Recovery drills
+## 5. Recovery drills
 
 - Stop Deploy Hub after accepting but before dispatching a request.
 - Stop it after dispatch while the workflow is running.
@@ -102,11 +132,14 @@ Required cases:
 - Leave a waiting lock owner stale.
 - Cancel the underlying GitHub workflow directly.
 - Move `main` between request preparation and dispatch.
+- Advance `deploy-hub/main` while browsers are open and while static assets are
+  being requested.
+- Interrupt the live UI event stream while deployment state changes.
 
 After restart, Deploy Hub must reconcile from GitHub and runtime truth without
 creating another logical deployment.
 
-## 5. Production pilots
+## 6. Production pilots
 
 - Start with a low-risk exact backend service release.
 - Perform a low-risk exact frontend release.
@@ -114,7 +147,7 @@ creating another logical deployment.
 - Exercise the documented break-glass manual path separately.
 - Confirm unrelated staging activity remains independent.
 
-## 6. Acceptance gate
+## 7. Acceptance gate
 
 Deploy Hub becomes the default only when:
 
@@ -123,6 +156,10 @@ Deploy Hub becomes the default only when:
 - Duplicate and stale requests have been exercised.
 - A failure, retry, cancellation, and missed-event recovery have been exercised.
 - UI and PR status match GitHub and runtime truth.
+- An already-open UI receives new operations, queue changes, progress, and
+  terminal results without manual browser refresh.
+- UI stream interruption recovers automatically without missing authoritative
+  state.
 - No unexplained environment drift occurred.
 - FE and unrelated BE work are not globally serialized.
 - Manual canonical deployment remains documented and usable.

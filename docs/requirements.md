@@ -1,7 +1,7 @@
 # Deploy Hub Requirements
 
-Status: Draft v0.1
-Last updated: 2026-07-31
+Status: Agreed v1.0
+Last updated: 2026-08-03
 
 ## 1. Product definition
 
@@ -159,7 +159,9 @@ every workflow step as Deploy Hub state.
 - Exact-head PR CI qualifies the source before deployment.
 - Repository workflows perform build, deployment, health, and exact-version
   checks.
-- The Codex task selects feature-specific staging validation.
+- Health and exact-version proof are required for every real deployment.
+- The Codex task selects targeted feature-specific staging validation by
+  default.
 - Full cross-system E2E is required only by explicit policy or change risk.
 - Validation failure affects the owning operation and does not stop unrelated
   targets unless the environment itself is unsafe.
@@ -189,7 +191,7 @@ every workflow step as Deploy Hub state.
   rollback, or real shared-environment concurrency. Those require isolated
   execution infrastructure before a shared-staging canary.
 
-## 9. Pull request feedback
+## 9. Pull request feedback and live updates
 
 Every request creates or updates one Check Run for its exact SHA and target.
 
@@ -204,10 +206,43 @@ The Check Run must expose:
 - Stale-head status.
 - Terminal conclusion and concise failure information.
 
-Status changes must appear without requiring the developer to refresh Deploy
-Hub manually or monitor Actions logs.
+The operational UI must update without a browser refresh when:
+
+- A deployment operation is created.
+- An operation changes state or reaches a terminal result.
+- Queue order or a scoped blocker changes.
+- A deployed environment version changes.
+- Shared integration-validation ownership changes.
+
+The browser first loads an authoritative snapshot, then consumes a live event
+channel. It must reconnect automatically and resynchronize from a fresh
+snapshot after any interruption. Under normal operation, accepted or observed
+changes appear within two seconds. A fallback polling path must preserve
+automatic updates at least every five seconds if the live channel is
+temporarily unavailable.
+
+PR Check Runs update from the same operation transitions. Developers must not
+need to monitor Actions logs to understand progress.
 
 ## 10. Operational UI
+
+### Delivery
+
+- Static UI files are owned by this repository on `deploy-hub/main`.
+- The existing backend exposes the UI at `/deploy/ui/hub` through an
+  authenticated proxy; UI source and build output are not copied into the
+  backend repository.
+- The proxy resolves `deploy-hub/main` to an exact commit SHA and serves all
+  files for one page load from that SHA so releases cannot mix assets.
+- UI releases become available after merging to `deploy-hub/main` without a
+  backend deployment.
+- The proxy caches immutable commit-addressed files and switches to a new
+  resolved `main` release atomically.
+- The UI displays the exact `deploy-hub` commit SHA it is running.
+- The private-repository credential remains server-side and has read access
+  only to the UI content it needs.
+
+### Operational data
 
 The UI must show:
 
@@ -221,6 +256,8 @@ The UI must show:
 - Shared integration-validation ownership.
 
 The UI must not expose release trains or a single opaque global lane.
+Static files from GitHub never serve as operational state; the authenticated
+Deploy Hub API supplies snapshots, live events, history, and commands.
 
 ## 11. Failure and recovery
 
@@ -233,11 +270,17 @@ The UI must not expose release trains or a single opaque global lane.
 - Stale SHAs fail closed.
 - One failed operation does not pause unrelated environments or repositories.
 - Failed component deployment wakes the owning agent with structured evidence.
+- A known-good exact version can be redeployed explicitly through the
+  repository-owned canonical workflow.
 - Automatic cross-repository rollback is not part of the MVP.
 
 ## 12. Security and audit
 
 - Human and agent callers are authenticated and attributable.
+- An organization-owned GitHub App is the control-plane identity.
+- Shadow begins with a physically read-only installation. Repository writes,
+  workflow dispatch, Check Run writes, and environment authority are granted
+  separately and only when the corresponding rollout phase requires them.
 - Production authority is explicit and bound to the initiating request.
 - Repository and environment permissions use least privilege.
 - AWS access uses GitHub Actions OIDC where practical.
@@ -254,10 +297,12 @@ The MVP includes:
 - Exact-SHA validation and deployed-version proof.
 - Idempotent request/status/cancel/retry operations.
 - Minimal durable request tracking.
+- GitHub-native durable evidence without an MVP database or S3 request ledger.
 - Scoped concurrency.
 - GitHub Deployments and Check Runs.
 - Terminal events for Codex tasks.
 - Operational UI and history.
+- GitHub-backed static UI delivery and automatic live state updates.
 - Manual canonical workflows as break-glass fallback.
 
 ## 14. Later capabilities
@@ -280,7 +325,7 @@ The MVP includes:
 - Automatic cross-repository rollback or transaction semantics.
 - Release note generation.
 
-## 16. Open decisions
+## 16. Remaining verification
 
-See `../STATUS.md` for the active decision list. Each resolved architecture choice
-must be captured in `decisions/`.
+See `../STATUS.md` for implementation facts that still require verification.
+Accepted architecture choices are recorded in `decisions/`.

@@ -16,6 +16,18 @@ Initial specification and architecture definition.
 - Frontend and backend deployment capacity is independent.
 - GitHub Check Runs provide real-time PR feedback.
 - A dedicated operational UI is mandatory.
+- The first UI version is stored on `deploy-hub/main` and served through an
+  authenticated backend proxy from one resolved exact commit SHA.
+- The operational UI updates deployments, queues, and blockers automatically;
+  users never refresh the browser to obtain current state.
+- GitHub-native records are the MVP durable evidence; no database or S3 request
+  ledger is introduced without demonstrated need.
+- An organization-owned GitHub App provides least-privilege authentication,
+  beginning with a physically read-only shadow installation.
+- Deployment health and exact-version proof are always required. Targeted
+  staging validation is normal; full cross-system E2E is risk- or policy-based.
+- MVP rollback is an explicit agent-guided or manual exact-version redeployment
+  through the canonical repository workflow.
 - Release Bus is already OFF for both staging and production and is not
   expected to be re-enabled.
 - Release Bus code and infrastructure remain in place during Deploy Hub
@@ -41,27 +53,38 @@ Initial specification and architecture definition.
 - Migration and test strategies drafted.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
-- Initial architecture decision recorded.
+- Initial architecture and MVP foundation decisions recorded.
 - Three Mermaid diagrams saved as standalone source files.
 - Original handoff documents copied into `references/`.
 
-## Open decisions
+## Resolved MVP decisions
 
-1. Durable request ledger: GitHub-native records only or GitHub plus minimal S3
-   request objects.
-2. Confirm the exact authoritative current OFF/manual-ownership state and prove
-   that all canonical manual workflows remain usable without re-enabling
-   Release Bus.
-3. Required staging validation policy for frontend-only, backend-only, and
-   coordinated changes.
-4. Authentication model for the agent-facing API and cross-repository Check
-   Runs.
-5. Static UI hosting and authenticated read access.
-6. Whether automatic component rollback is required for MVP or remains a later
-   repo-owned capability.
+1. GitHub-native durable records first; no MVP database or S3 request ledger.
+2. Canonical manual workflows are the fallback; Release Bus remains OFF.
+3. Health and exact-version proof are universal; further validation is
+   risk-based.
+4. Use an organization-owned, least-privilege GitHub App with read-only shadow
+   permissions first.
+5. Serve the static UI from the exact current `deploy-hub/main` commit through
+   the authenticated backend proxy. Deliver operational changes through a live
+   event stream with automatic reconnect, resynchronization, and polling
+   fallback.
+6. Keep automatic rollback out of MVP; redeploy a known-good exact version
+   explicitly through canonical workflows.
+
+## Remaining verification work
+
+- Confirm the exact authoritative current OFF/manual-ownership state and prove
+  that all canonical manual workflows remain usable without re-enabling
+  Release Bus.
+- Verify that the existing backend serving stack can support the preferred
+  server-sent event channel; preserve the bounded automatic-polling fallback
+  regardless.
+- Define the exact GitHub-native representation for waiting order and
+  idempotency during implementation design.
 
 ## Next recommended work
 
-Turn `requirements.md` into an agreed v1 specification by resolving the six
-open decisions above. After that, inventory the exact changes required in the
-frontend and backend canonical workflows before any live migration action.
+Inventory the exact changes required in the frontend and backend canonical
+workflows, verify the backend's live-stream support, and define the
+GitHub-native request representation before any live migration action.

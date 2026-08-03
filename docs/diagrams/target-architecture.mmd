@@ -1,13 +1,15 @@
 flowchart LR
     U["Developer"] --> A["Codex task<br/>Feature lifecycle orchestrator"]
+    U --> UI["Deploy Hub browser UI"]
 
     subgraph H["Deploy Hub — control and visibility"]
         API["Agent-facing deployment API"]
-        L["Minimal request ledger<br/>and scoped locks"]
-        UI["Operational UI"]
+        L["GitHub-native request evidence<br/>and scoped locks"]
+        P["Authenticated static-file proxy"]
     end
 
     subgraph G["GitHub and repositories"]
+        UIS["deploy-hub/main<br/>static UI files"]
         PR["PR Check Runs<br/>and Deployments"]
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
@@ -19,6 +21,10 @@ flowchart LR
     end
 
     A -->|"Exact deployment operation"| API
+    UI -->|"Snapshots and commands"| API
+    API -->|"Live state events<br/>plus reconnect and resync"| UI
+    UIS -->|"Files from one resolved SHA"| P
+    P -->|"Serve /deploy/ui/hub"| UI
     API --> L
     API --> FE
     API --> BE
@@ -30,6 +36,5 @@ flowchart LR
 
     FE -->|"Workflow events"| PR
     BE -->|"Workflow events"| PR
-    PR --> UI
+    PR --> API
     PR -->|"Resume or notify"| A
-    UI --> U

@@ -88,8 +88,15 @@ Exit criteria:
 - Add minimal durable request tracking and scoped waiting.
 - Create GitHub Deployments and Check Runs.
 - Emit terminal events carrying the originating Codex task reference.
-- Build the operational UI and deployment history.
+- Add the authenticated backend proxy that resolves `deploy-hub/main` to one
+  exact SHA and serves its cached static UI files under `/deploy/ui/hub`.
+- Build the operational UI and deployment history in this repository.
+- Deliver state, queue, blocker, and deployed-version changes through a live
+  event channel with automatic reconnect, snapshot resynchronization, and
+  bounded automatic-polling fallback.
 - Reconcile displayed state against GitHub and runtime version truth.
+- Use GitHub-native records for MVP durable evidence; do not add a database or
+  S3 request ledger without demonstrated need.
 
 Explicit exclusions:
 
@@ -119,6 +126,10 @@ Explicit exclusions:
 - Run controlled frontend and backend staging canaries.
 - Prove frontend activity does not globally block unrelated backend work.
 - Verify Check Run and UI state against the exact GitHub workflow and runtime.
+- Verify that new operations and every queue or state transition appear in an
+  already-open browser without manual refresh.
+- Interrupt and restore the live event channel; prove automatic reconnect and
+  snapshot resynchronization prevent missed or stale state.
 - Test restart reconstruction and missed-callback recovery.
 - Test duplicate, stale, cancellation, and bounded-retry behavior.
 
@@ -135,6 +146,8 @@ Exit criteria:
 - Run low-risk production pilots for frontend and backend.
 - Route Codex deployment tools to Deploy Hub.
 - Make Deploy Hub the normal deployment entry point.
+- Verify that a merge to `deploy-hub/main` publishes one internally consistent
+  UI release without requiring a backend deployment.
 - Keep canonical manual workflows as break-glass fallback.
 - Disable the old Release Bus request UI and operator route.
 - Complete an agreed burn-in covering all four deployment adapters and at least

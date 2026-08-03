@@ -12,6 +12,10 @@ The intended operating model is:
 - Frontend and backend repositories retain ownership of their canonical build
   and deployment workflows.
 - GitHub Check Runs provide real-time pull-request feedback.
+- The browser UI is served from the exact current `deploy-hub/main` commit
+  through the authenticated backend proxy.
+- New deployments, queue changes, progress, and results appear in an open UI
+  automatically without manual browser refresh.
 - Frontend and backend deployment capacity is independent except during an
   explicitly protected shared-integration validation window.
 

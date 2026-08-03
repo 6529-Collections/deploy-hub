@@ -2,6 +2,16 @@
 
 ## 2026-08-03
 
+- Agreed the v1 requirements and resolved the six initial MVP decisions.
+- Selected GitHub-native durable evidence, canonical manual workflow fallback,
+  risk-based staging validation, a least-privilege organization GitHub App, and
+  explicit exact-version redeployment instead of automatic MVP rollback.
+- Selected a GitHub-backed static UI owned by `deploy-hub/main` and exposed
+  through an authenticated exact-SHA backend proxy.
+- Made no-refresh operational updates a hard requirement, using a live event
+  stream with automatic reconnect, snapshot resynchronization, and bounded
+  polling fallback.
+- Added ADRs for the MVP control-plane foundations and live operational UI.
 - Bootstrapped the private Deploy Hub specification repository with a clean,
   documentation-only project structure and no operational deployment
   capability.
