@@ -10,6 +10,11 @@
   authentication with local token storage, a forget action, CSP, fixed safe
   errors, and token-canary tests; Codex continues using its existing GitHub
   authentication directly.
+- Completed Task 7 at commit
+  `c2bbb7a5458ef6c556b7f70447dc75fe2d03de06`; exact-head CI run
+  `30827998834` passed formatting, lint, and all eight direct-GitHub auth tests.
+  GitHub's response confirmed cross-origin browser access, while backend PR
+  #1900 remains closed/unmerged and its remote branch is absent. Task 8 is next.
 - Applied the owner-requested KISS cleanup instead of retaining rejected
   prototypes: marked Tasks 2, 5, and 6 `RETIRED`; removed the loopback server,
   TypeScript runtime/domain/adapters, callback/event fakes, 1,146-line Git

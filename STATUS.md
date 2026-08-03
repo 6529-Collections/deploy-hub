@@ -4,10 +4,9 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Tasks 0, 1, 3, and 4 are complete. Tasks 2, 5, and 6 are `RETIRED`; their
+Tasks 0, 1, 3, 4, and 7 are complete. Tasks 2, 5, and 6 are `RETIRED`; their
 overbuilt contracts, server, callback/event fakes, and Git-ledger code have
-been removed from the active tree. Task 7 is now the small direct-GitHub browser
-authentication slice in this repository and is under completion audit.
+been removed from the active tree. Task 8 is next.
 
 This repository owns the entire portable static app. It has no API server or
 deployment runtime.
@@ -72,11 +71,15 @@ deployment runtime.
   `docs/security-model.md`; no Deploy Hub credential or backend exists.
 - Task 4 now consists only of the repository toolchain, static UI shell, and
   read-only CI. The superseded loopback TypeScript server was removed.
+- Task 7 added direct browser-to-GitHub identity/operator authentication,
+  local token storage and forgetting, CSP, and eight focused tests. Exact-head
+  CI run `30827998834` passed. Mistaken backend PR #1900 is closed unmerged and
+  its branch is deleted.
 - The requirements, architecture, tracker, migration, testing, E2E, and
   communications documents are stored in this repository.
 
 ## Next work
 
-Complete Task 7's audit and exact-head CI. Then proceed to Task 8 without adding
-a backend, proxy API, live ledger, state branch, database, scheduler, callback
-system, GitHub App, or realtime transport.
+Proceed to Task 8 using GitHub Actions' existing concurrency and waiting state.
+Do not add a backend, proxy API, live ledger, state branch, database, scheduler,
+callback system, GitHub App, or realtime transport.

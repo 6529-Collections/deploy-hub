@@ -53,7 +53,7 @@ existing GitHub/backend primitives cannot meet a requirement.
 | 4 | Repository tooling and static UI foundation | DONE | 3 |
 | 5 | Callback/event fake experiment | RETIRED | 4 |
 | 6 | Git-ledger experiment | RETIRED | 4 |
-| 7 | Static GitHub authentication | IN PROGRESS | 3, 4 |
+| 7 | Static GitHub authentication | DONE | 3, 4 |
 | 8 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 7 |
 | 9 | PR feedback and GitHub run lookup | NOT STARTED | 7 |
 | 10 | Portable static UI publishing | NOT STARTED | 4, 7 |
@@ -288,9 +288,9 @@ sources of truth. Historical evidence remains in retired ADR 0006, commit
 `ec725aacf0edf25dc7bc819f9803e536bdcf377a`, and Git history. Task 6 is not a
 dependency of any active implementation task.
 
-### [ ] Task 7 — Static GitHub authentication
+### [x] Task 7 — Static GitHub authentication
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Repository boundary: all implementation is in `deploy-hub`. The page works
 from any ordinary static host and calls GitHub directly. No backend repository,
@@ -301,32 +301,39 @@ Codex continues to use its existing GitHub authentication directly.
 
 Acceptance criteria:
 
-- [ ] The browser sends the supplied token directly to GitHub `/user` and
+- [x] The browser sends the supplied token directly to GitHub `/user` and
   derives the login from GitHub.
-- [ ] Active organization-admin or existing deployment-operator team
+- [x] Active organization-admin or existing deployment-operator team
   membership is required.
-- [ ] The token is stored only in the page origin's `localStorage`; a visible
+- [x] The token is stored only in the page origin's `localStorage`; a visible
   forget action removes it.
-- [ ] Missing, invalid, insufficiently scoped, and non-operator tokens fail
+- [x] Missing, invalid, insufficiently scoped, and non-operator tokens fail
   closed with fixed messages that never echo GitHub response content.
-- [ ] The static app uses no third-party scripts and restricts connections to
+- [x] The static app uses no third-party scripts and restricts connections to
   GitHub with CSP.
-- [ ] Token-canary tests prove the token is absent from returned identity and
+- [x] Token-canary tests prove the token is absent from returned identity and
   errors.
-- [ ] Codex needs no Deploy Hub credential or auth flow.
-- [ ] No backend/proxy API, Lambda, OAuth service, GitHub App, database, ledger,
+- [x] Codex needs no Deploy Hub credential or auth flow.
+- [x] No backend/proxy API, Lambda, OAuth service, GitHub App, database, ledger,
   queue, scheduler, callback system, SSE, or WebSocket is introduced.
-- [ ] The mistaken backend PR #1900 is closed unmerged and its remote feature
+- [x] The mistaken backend PR #1900 is closed unmerged and its remote feature
   branch is deleted.
-- [ ] Focused tests, lint, formatting, and exact-head CI pass.
+- [x] Focused tests, lint, formatting, and exact-head CI pass.
 
-Evidence in progress:
+Evidence:
 
 - `ui/github-auth.js`
 - `ui/app.js`
 - `test/github-auth.test.js`
 - ADR 0011 (`docs/decisions/0011-portable-static-app.md`)
-- Closed backend PR #1900
+- Commit `c2bbb7a5458ef6c556b7f70447dc75fe2d03de06`
+- Exact-head GitHub Actions run
+  `https://github.com/6529-Collections/deploy-hub/actions/runs/30827998834`
+  passed formatting, lint, and all eight focused tests.
+- GitHub API response audit confirmed `access-control-allow-origin: *` for
+  direct cross-origin browser use.
+- Backend PR #1900 is closed with `mergedAt: null`; its remote branch returns
+  GitHub `404`.
 
 ### [ ] Task 8 — Canonical workflow concurrency and waiting visibility
 
@@ -773,4 +780,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Complete the Task 7 audit and exact-head CI, then start Task 8.
+Task 8 — Canonical workflow concurrency and waiting visibility.

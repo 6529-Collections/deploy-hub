@@ -27,7 +27,7 @@ The intended operating model is:
 
 ## Current status
 
-**Portable static app; Task 7 browser authentication is implemented locally.**
+**Portable static app; Task 7 browser authentication is complete.**
 
 The rejected loopback server, callback/event model, strict ledger contracts,
 and Git-ledger prototype have been removed from the active tree. Git history
