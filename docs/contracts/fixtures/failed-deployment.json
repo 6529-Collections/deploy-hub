@@ -1,0 +1,86 @@
+{
+  "fixture_version": "deploy-hub.fixture.v1",
+  "scenario": "deployed_runtime_passes_but_product_e2e_fails",
+  "terminal_status": {
+    "schema_version": "deploy-hub.deployment-status.v1",
+    "request_id": "88888888-8888-4888-8888-888888888888",
+    "request_digest": "9999999999999999999999999999999999999999999999999999999999999999",
+    "state": "failed",
+    "phase": "terminal",
+    "state_version": 11,
+    "event_sequence": 11,
+    "attempt": 1,
+    "accepted_at": "2026-08-03T13:00:00.000Z",
+    "updated_at": "2026-08-03T13:10:00.000Z",
+    "terminal_at": "2026-08-03T13:10:00.000Z",
+    "queue": {
+      "order_key": "00000000000000000005/88888888-8888-4888-8888-888888888888",
+      "resource_keys": [
+        "staging:backend:api"
+      ],
+      "position": 1,
+      "owner_request_id": "88888888-8888-4888-8888-888888888888",
+      "blocked_by": []
+    },
+    "projections": {
+      "github_deployment_id": 9101,
+      "check_run_id": 9102,
+      "workflow": {
+        "repository": "6529-Collections/6529seize-backend",
+        "workflow_path": ".github/workflows/deploy.yml",
+        "run_id": 9103,
+        "run_attempt": 1,
+        "sha": "8888888888888888888888888888888888888888",
+        "url": "https://github.com/6529-Collections/6529seize-backend/actions/runs/9103"
+      }
+    },
+    "mutation": {
+      "state": "completed",
+      "claimed_at": "2026-08-03T13:01:00.000Z",
+      "started_at": "2026-08-03T13:01:05.000Z",
+      "completed_at": "2026-08-03T13:02:00.000Z"
+    },
+    "runtime_proof": {
+      "source_sha": "8888888888888888888888888888888888888888",
+      "verified_at": "2026-08-03T13:02:10.000Z",
+      "evidence_url": "https://github.com/6529-Collections/6529seize-backend/actions/runs/9103"
+    },
+    "validation": {
+      "state": "failed",
+      "validation_id": "99999999-9999-4999-8999-999999999999"
+    },
+    "failure": {
+      "code": "PRODUCT_E2E_FAILED",
+      "class": "product_e2e",
+      "message": "The exact staging environment failed a baseline product assertion after deployment.",
+      "retryable": false,
+      "details_url": "https://github.com/6529-Collections/6529seize-frontend/actions/runs/9110"
+    },
+    "warnings": [
+      {
+        "code": "CI_DROP_FAILED",
+        "message": "The non-gating deployment notification failed and needs retry.",
+        "details_url": "https://api.6529.io/deploy-hub/deployments/88888888-8888-4888-8888-888888888888"
+      }
+    ],
+    "evidence": [
+      {
+        "kind": "runtime_proof",
+        "url": "https://github.com/6529-Collections/6529seize-backend/actions/runs/9103"
+      },
+      {
+        "kind": "validation",
+        "url": "https://github.com/6529-Collections/6529seize-frontend/actions/runs/9110",
+        "external_id": "99999999-9999-4999-8999-999999999999"
+      }
+    ]
+  },
+  "expected": {
+    "terminal_state": "failed",
+    "environment_mutated": true,
+    "runtime_verified": true,
+    "validation_succeeded": false,
+    "communication_changed_terminal": false,
+    "automatic_retry": false
+  }
+}

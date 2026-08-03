@@ -2,6 +2,23 @@
 
 ## 2026-08-03
 
+- Completed Task 2 after an acceptance audit of every criterion; Tasks 0–2 are
+  now done and Task 3 is next.
+- Accepted ADR 0006: one protected non-default `state/v1` Git branch is the
+  authoritative request/event ledger; GitHub Deployments and Check Runs are
+  exact-SHA operational projections.
+- Added strict versioned schemas for deployment and validation requests,
+  statuses, cancellation, retry, ledger metadata/events, Codex task delivery,
+  communication outcomes, and safe API errors.
+- Added nine normative fixtures covering success, validation, duplicate,
+  stale, cancellation, failed E2E, communication identity, task-event delivery,
+  and safe idempotency conflict behavior.
+- Closed an audit-found gap by defining the authoritative ledger-event shape
+  separately from its post-commit task-delivery envelope.
+- Compiled all 14 schemas in strict JSON Schema 2020-12 mode, validated 12
+  schema-backed fixture objects, and verified six unsafe cases are rejected.
+- Made no runtime, workflow, state-branch, credential, GitHub App, or
+  environment change while completing Tasks 1 and 2.
 - Started Task 2 contract definition after Task 1 passed its acceptance audit.
 - Completed Task 1 with an exact current-system inventory covering live
   Release Bus OFF state, all four canonical deploy paths, both E2E workflows,

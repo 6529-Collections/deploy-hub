@@ -32,7 +32,7 @@ receive an evidence-based answer.
 | ---: | --- | --- | --- |
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
-| 2 | Exact deployment, validation, and GitHub-state contracts | IN PROGRESS | 1 |
+| 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
 | 3 | Authentication, permissions, and threat model | NOT STARTED | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
@@ -139,9 +139,9 @@ Evidence:
 - Exact source and live-control snapshots recorded in that inventory on
   2026-08-03.
 
-### [ ] Task 2 — Exact deployment, validation, and GitHub-state contracts
+### [x] Task 2 — Exact deployment, validation, and GitHub-state contracts
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Outcome: Implementation-ready contracts define the smallest durable control
 plane without a release train or database state machine.
@@ -159,18 +159,28 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Every field, validation rule, state transition, and terminal result is
+- [x] Every field, validation rule, state transition, and terminal result is
   specified.
-- [ ] Coordinated operations remain agent-owned and do not become trains.
-- [ ] State can be reconstructed after process loss from named durable evidence.
-- [ ] Competing requests have deterministic waiting order and ownership.
-- [ ] Contract fixtures cover valid, duplicate, stale, cancelled, and failed
+- [x] Coordinated operations remain agent-owned and do not become trains.
+- [x] State can be reconstructed after process loss from named durable evidence.
+- [x] Competing requests have deterministic waiting order and ownership.
+- [x] Contract fixtures cover valid, duplicate, stale, cancelled, and failed
   examples.
-- [ ] Requester, authenticated authority, CI-drop contributors, and per-PR
+- [x] Requester, authenticated authority, CI-drop contributors, and per-PR
   release-note contributors are represented as separate identities.
-- [ ] An accepted ADR records the chosen GitHub-native representation.
+- [x] An accepted ADR records the chosen GitHub-native representation.
 
-Evidence: Not yet available.
+Evidence:
+
+- `docs/contracts/README.md`
+- Fourteen strict JSON Schema 2020-12 contracts and nine fixtures under
+  `docs/contracts/`
+- `docs/decisions/0006-git-ledger-control-records.md`
+- Completion audit on 2026-08-03: all schema and fixture JSON parsed; all
+  schemas compiled in strict mode; 12 schema-backed fixture objects validated;
+  unauthorized production, success without validation, contradictory terminal
+  failure, gating communication, broken event predecessor, and acceptance
+  without exact source were rejected.
 
 ### [ ] Task 3 — Authentication, permissions, and threat model
 
@@ -704,4 +714,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 2 — Exact deployment, validation, and GitHub-state contracts.
+Task 3 — Authentication, permissions, and threat model.

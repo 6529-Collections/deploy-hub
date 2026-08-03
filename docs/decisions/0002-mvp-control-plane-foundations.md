@@ -24,9 +24,9 @@ recreate Release Bus complexity or make shadow testing unsafe.
   safely from GitHub.
 - Keep the canonical manual repository workflows as the operational and
   break-glass fallback. Release Bus remains OFF and is not the fallback.
-- Always require deployment health and exact-version proof. Normally require
-  targeted, feature-specific staging validation; require full cross-system E2E
-  only when policy or change risk warrants it.
+- Always require deployment health, exact-version proof, and the full baseline
+  read-only environment-snapshot E2E policy for staging and production. Deeper
+  authenticated, mutating, or feature-specific validation remains risk-based.
 - Authenticate Deploy Hub with an organization-owned GitHub App. Begin with a
   physically read-only shadow installation and add narrowly scoped write and
   workflow permissions only as each rollout phase requires them.
@@ -38,10 +38,12 @@ recreate Release Bus complexity or make shadow testing unsafe.
 ## Consequences
 
 - The MVP has no separate deployment-state database or S3 request ledger.
-- Durable waiting, idempotency, and recovery designs must be demonstrably
-  reconstructable from GitHub evidence before implementation is accepted.
-- Validation is proportional to risk without allowing any deployment to claim
-  success without runtime identity proof.
+- ADR 0006 and `docs/contracts/README.md` define durable waiting, idempotency,
+  cancellation, recovery, and GitHub projection behavior on a protected Git
+  ledger branch. Tasks 5 and 6 must prove it before live use.
+- Baseline snapshot E2E is universal; deeper validation is proportional to risk
+  without allowing any deployment to claim success without runtime identity
+  proof and unchanged-environment validation.
 - Shadow permissions cannot mutate repositories, workflows, or AWS resources.
 - Rollback remains explicit, attributable, and exact-version based rather than
   pretending that a multi-repository deployment is transactional.

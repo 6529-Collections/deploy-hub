@@ -45,6 +45,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [Current deployment-system inventory](docs/current-system-inventory.md)
+- [Control-plane contracts and fixtures](docs/contracts/README.md)
 - [E2E validation analysis](docs/e2e-validation-analysis.md)
 - [Deployment communications analysis](docs/deployment-communications-analysis.md)
 - [Architecture decisions](docs/decisions/)

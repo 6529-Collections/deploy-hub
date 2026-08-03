@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/6529-Collections/deploy-hub/schemas/deployment-status.v1.schema.json",
+  "title": "Deploy Hub deployment status snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "request_digest",
+    "state",
+    "phase",
+    "state_version",
+    "event_sequence",
+    "attempt",
+    "accepted_at",
+    "updated_at",
+    "queue",
+    "mutation",
+    "validation",
+    "warnings",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deploy-hub.deployment-status.v1"
+    },
+    "request_id": {
+      "$ref": "common.v1.schema.json#/$defs/uuidV4"
+    },
+    "request_digest": {
+      "$ref": "common.v1.schema.json#/$defs/sha256"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "waiting",
+        "dispatched",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "stale"
+      ]
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "waiting_for_resource",
+        "dispatching",
+        "workflow_queued",
+        "building",
+        "waiting_for_mutation_claim",
+        "mutating",
+        "verifying_runtime",
+        "waiting_for_validation",
+        "validating_environment",
+        "terminal"
+      ]
+    },
+    "state_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "event_sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "accepted_at": {
+      "$ref": "common.v1.schema.json#/$defs/timestamp"
+    },
+    "updated_at": {
+      "$ref": "common.v1.schema.json#/$defs/timestamp"
+    },
+    "terminal_at": {
+      "$ref": "common.v1.schema.json#/$defs/timestamp"
+    },
+    "queue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order_key", "resource_keys", "blocked_by"],
+      "properties": {
+        "order_key": {
+          "type": "string",
+          "pattern": "^[0-9]{20}/[0-9a-f-]{36}$",
+          "maxLength": 57
+        },
+        "resource_keys": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "owner_request_id": {
+          "$ref": "common.v1.schema.json#/$defs/uuidV4"
+        },
+        "blocked_by": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "common.v1.schema.json#/$defs/uuidV4"
+          }
+        }
+      }
+    },
+    "projections": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "github_deployment_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "check_run_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "workflow": {
+          "$ref": "common.v1.schema.json#/$defs/workflowEvidence"
+        }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["not_started", "claimed", "in_progress", "completed", "unknown"]
+        },
+        "claimed_at": {
+          "$ref": "common.v1.schema.json#/$defs/timestamp"
+        },
+        "started_at": {
+          "$ref": "common.v1.schema.json#/$defs/timestamp"
+        },
+        "completed_at": {
+          "$ref": "common.v1.schema.json#/$defs/timestamp"
+        }
+      }
+    },
+    "runtime_proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_sha", "verified_at", "evidence_url"],
+      "properties": {
+        "source_sha": {
+          "$ref": "common.v1.schema.json#/$defs/gitSha"
+        },
+        "verified_at": {
+          "$ref": "common.v1.schema.json#/$defs/timestamp"
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 1000
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["not_started", "waiting", "running", "succeeded", "failed"]
+        },
+        "validation_id": {
+          "$ref": "common.v1.schema.json#/$defs/uuidV4"
+        }
+      }
+    },
+    "failure": {
+      "$ref": "common.v1.schema.json#/$defs/failure"
+    },
+    "cancel_reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "common.v1.schema.json#/$defs/warning"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "common.v1.schema.json#/$defs/evidenceLink"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": ["succeeded", "failed", "cancelled", "stale"]
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "required": ["terminal_at"],
+        "properties": {
+          "terminal_at": {
+            "$ref": "common.v1.schema.json#/$defs/timestamp"
+          },
+          "phase": {
+            "const": "terminal"
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "type": "object",
+          "required": ["terminal_at"],
+          "properties": {
+            "terminal_at": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": ["failed", "stale"]
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "required": ["failure"],
+        "properties": {
+          "failure": {
+            "$ref": "common.v1.schema.json#/$defs/failure"
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "type": "object",
+          "required": ["failure"],
+          "properties": {"failure": true}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "cancelled"
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "required": ["cancel_reason"],
+        "properties": {
+          "cancel_reason": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "type": "object",
+          "required": ["cancel_reason"],
+          "properties": {"cancel_reason": true}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "succeeded"
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "required": ["runtime_proof"],
+        "properties": {
+          "runtime_proof": {
+            "type": "object"
+          },
+          "validation": {
+            "type": "object",
+            "required": ["validation_id"],
+            "properties": {
+              "validation_id": {
+                "$ref": "common.v1.schema.json#/$defs/uuidV4"
+              },
+              "state": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "mutation": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "completed"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

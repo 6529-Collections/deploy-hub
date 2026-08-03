@@ -4,7 +4,7 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Exact control-plane contract definition.
+Authentication, permissions, and threat-model definition.
 
 ## Accepted direction
 
@@ -84,9 +84,17 @@ Exact control-plane contract definition.
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Tasks 0 and 1 are
-  complete, Task 2 is next, and Task 25 owns the cross-cutting communications
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0–2 are
+  complete, Task 3 is next, and Task 25 owns the cross-cutting communications
   integration.
+- Task 2 completed the versioned deployment, validation, cancel, retry, ledger,
+  task-event, communication-outcome, and safe-error schemas with normative
+  fixtures under `docs/contracts/`.
+- ADR 0006 accepts one protected `refs/heads/state/v1` Git ledger as durable
+  authority, with GitHub Deployments and Check Runs as exact-SHA projections.
+- The Task 2 completion audit compiled all 14 schemas in strict JSON Schema
+  2020-12 mode, validated 12 schema-backed objects across nine fixtures, and
+  proved six key unsafe cases fail closed.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -111,13 +119,13 @@ Exact control-plane contract definition.
    automation. Treat requester, authenticated Deploy Hub authority, and exact
    contributors separately; surface communication failures without making them
    environment-mutation or deployment/E2E gates.
+8. Use one protected non-default `state/v1` Git branch for immutable requests,
+   append-only ledger events, deterministic queue order, replayable snapshots,
+   cancellation/retry intent, and restart recovery. GitHub Deployments and
+   Check Runs remain visible projections, not the durable authority.
 
-## Remaining contract work
+## Remaining security and implementation work
 
-- Define and accept the exact GitHub-native representation for immutable
-  requests, waiting order, idempotency, cancellation and restart recovery.
-- Define final deployment, validation, event and communication-outcome
-  contracts with valid, duplicate, stale, cancelled and failed fixtures.
 - Task 3 must select and secure the live transport. Existing WebSocket/JWT
   infrastructure is present, SSE is not implemented, and polling is proven.
 - Reinspect backend PR #1869 and frontend PR #3504 when they change or merge;
@@ -128,7 +136,6 @@ Exact control-plane contract definition.
 
 ## Next recommended work
 
-Execute Task 2 in `TODO.md`: define the exact deployment, validation,
-GitHub-state, task-event, and communication-outcome contracts and accept the
-GitHub-native representation ADR. Task 2 is in progress; make no live
-deployment or migration change.
+Execute Task 3 in `TODO.md`: define authentication, authorization, the
+rollout-phase permission matrix, secret boundaries, and the threat model before
+creating any GitHub App, credential, workflow, state branch, or live transport.

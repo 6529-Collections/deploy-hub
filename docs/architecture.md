@@ -137,12 +137,16 @@ sequenceDiagram
 
 ### Authoritative state
 
+- Deploy Hub request, command, claim, event, and terminal truth: the protected
+  `refs/heads/state/v1` Git ledger in the private Deploy Hub repository.
 - Pull-request identity and head SHA: GitHub Pull Requests.
 - CI and review readiness: GitHub checks and reviews.
 - Deployment execution: canonical GitHub Actions workflow run.
 - Baseline validation execution and evidence: frontend-owned GitHub Actions E2E
   workflow run bound to an exact environment snapshot.
-- Deployment history: GitHub Deployment and Deployment Status records.
+- Deployment projection and recent status history: GitHub Deployment and
+  Deployment Status records. The Git ledger remains authoritative because old
+  status history has limited retention.
 - PR-visible progress: GitHub Check Run.
 - Actual deployed identity: environment-specific runtime version endpoint or
   infrastructure version identifier.
@@ -164,10 +168,12 @@ Deploy Hub may persist only what cannot be derived reliably:
 - Communication identity and links to the exact notification, queue/generator
   outcome, and published drop when available.
 
-The MVP uses GitHub-native records for durable evidence and reconstructs state
-from GitHub and runtime truth. It does not add a database or S3 request ledger.
-The exact GitHub representation for waiting order and idempotency must be
-validated during implementation design. A database-backed release state
+The MVP stores these records as immutable requests and append-only event files
+on one protected `refs/heads/state/v1` branch. Each event and derived snapshot
+is committed with a non-force compare-and-swap update. GitHub Deployments,
+Check Runs, workflow runs, runtime proof, and communication evidence are linked
+projections and external truth. See `docs/contracts/README.md` and ADR 0006.
+No database or S3 request ledger is added; a database-backed release state
 machine remains explicitly excluded.
 
 ## UI delivery and live state
@@ -208,8 +214,8 @@ separate permissions introduced only when the rollout phase needs each one.
 | --- | --- | --- |
 | Frontend | Staging | Non-force integration into `1a-staging`, triggering `deploy-staging.yml` |
 | Frontend | Production | `build-upload-deploy-prod.yml` from exact `main` |
-| Backend | Staging | `deploy.yml` with exact SHA and selected services |
-| Backend | Production | `deploy.yml` with exact `main` SHA and selected services |
+| Backend | Staging | `deploy.yml` with exact SHA and one selected service per atomic request |
+| Backend | Production | `deploy.yml` with exact `main` SHA and one selected service per atomic request |
 
 ## Deployment communications and release notes
 

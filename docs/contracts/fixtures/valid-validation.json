@@ -1,0 +1,157 @@
+{
+  "fixture_version": "deploy-hub.fixture.v1",
+  "scenario": "valid_staging_snapshot_validation",
+  "request": {
+    "schema_version": "deploy-hub.validation-request.v1",
+    "validation_id": "22222222-2222-4222-8222-222222222222",
+    "acceptance_sequence": 2,
+    "accepted_at": "2026-08-03T10:02:20.000Z",
+    "requester": {
+      "kind": "codex_task",
+      "subject": "codex-task:019faa0e-example",
+      "github_login": "prxt6529",
+      "task": {
+        "task_id": "019faa0e-example"
+      }
+    },
+    "authority": {
+      "kind": "wallet_jwt",
+      "subject": "profile:prxt0",
+      "authenticated_at": "2026-08-03T10:02:18.000Z",
+      "profile_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "github_login": "prxt6529"
+    },
+    "executor": {
+      "kind": "github_app",
+      "slug": "6529-deploy-hub",
+      "installation_id": 12345678
+    },
+    "environment": "staging",
+    "resource_key": "staging:validation",
+    "linked_deployment_request_ids": [
+      "11111111-1111-4111-8111-111111111111"
+    ],
+    "snapshot_before": {
+      "schema_version": "deploy-hub.environment-snapshot.v1",
+      "environment": "staging",
+      "observed_at": "2026-08-03T10:02:15.000Z",
+      "components": [
+        {
+          "component_key": "backend:api",
+          "repository": "6529-Collections/6529seize-backend",
+          "unit": "api",
+          "source_sha": "2222222222222222222222222222222222222222",
+          "runtime_identity": {
+            "kind": "http_version_sha",
+            "value": "2222222222222222222222222222222222222222"
+          },
+          "observed_at": "2026-08-03T10:02:14.000Z",
+          "evidence_url": "https://staging-api.6529.io/health"
+        },
+        {
+          "component_key": "frontend:web",
+          "repository": "6529-Collections/6529seize-frontend",
+          "unit": "web",
+          "source_sha": "1111111111111111111111111111111111111111",
+          "runtime_identity": {
+            "kind": "http_version_sha",
+            "value": "1111111111111111111111111111111111111111"
+          },
+          "observed_at": "2026-08-03T10:02:13.000Z",
+          "evidence_url": "https://staging.6529.io/api/version"
+        }
+      ],
+      "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "test_tooling": {
+      "repository": "6529-Collections/6529seize-frontend",
+      "sha": "1111111111111111111111111111111111111111"
+    },
+    "pack_policy": {
+      "policy_id": "staging-baseline-v1",
+      "packs": [
+        "admin-guards:readonly",
+        "collections:readonly",
+        "core",
+        "delegation:readonly",
+        "input-detection:readonly",
+        "media:readonly",
+        "network-open-data:readonly",
+        "profile-deep-links:readonly",
+        "public-content:readonly",
+        "public-groups-tools:readonly",
+        "search-waves:readonly",
+        "social:readonly"
+      ],
+      "read_only": true
+    }
+  },
+  "terminal_status": {
+    "schema_version": "deploy-hub.validation-status.v1",
+    "validation_id": "22222222-2222-4222-8222-222222222222",
+    "request_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "state": "succeeded",
+    "phase": "terminal",
+    "state_version": 7,
+    "event_sequence": 7,
+    "attempt": 1,
+    "accepted_at": "2026-08-03T10:02:20.000Z",
+    "updated_at": "2026-08-03T10:09:00.000Z",
+    "terminal_at": "2026-08-03T10:09:00.000Z",
+    "queue_order_key": "00000000000000000002/22222222-2222-4222-8222-222222222222",
+    "owner_validation_id": "22222222-2222-4222-8222-222222222222",
+    "workflow": {
+      "repository": "6529-Collections/6529seize-frontend",
+      "workflow_path": ".github/workflows/staging-e2e.yml",
+      "run_id": 9010,
+      "run_attempt": 1,
+      "sha": "1111111111111111111111111111111111111111",
+      "url": "https://github.com/6529-Collections/6529seize-frontend/actions/runs/9010"
+    },
+    "snapshot_after": {
+      "schema_version": "deploy-hub.environment-snapshot.v1",
+      "environment": "staging",
+      "observed_at": "2026-08-03T10:08:58.000Z",
+      "components": [
+        {
+          "component_key": "backend:api",
+          "repository": "6529-Collections/6529seize-backend",
+          "unit": "api",
+          "source_sha": "2222222222222222222222222222222222222222",
+          "runtime_identity": {
+            "kind": "http_version_sha",
+            "value": "2222222222222222222222222222222222222222"
+          },
+          "observed_at": "2026-08-03T10:08:57.000Z",
+          "evidence_url": "https://staging-api.6529.io/health"
+        },
+        {
+          "component_key": "frontend:web",
+          "repository": "6529-Collections/6529seize-frontend",
+          "unit": "web",
+          "source_sha": "1111111111111111111111111111111111111111",
+          "runtime_identity": {
+            "kind": "http_version_sha",
+            "value": "1111111111111111111111111111111111111111"
+          },
+          "observed_at": "2026-08-03T10:08:56.000Z",
+          "evidence_url": "https://staging.6529.io/api/version"
+        }
+      ],
+      "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "warnings": [],
+    "evidence": [
+      {
+        "kind": "workflow_run",
+        "url": "https://github.com/6529-Collections/6529seize-frontend/actions/runs/9010",
+        "external_id": "9010"
+      }
+    ]
+  },
+  "expected": {
+    "snapshot_digests_equal": true,
+    "full_baseline_green": true,
+    "terminal_state": "succeeded"
+  }
+}

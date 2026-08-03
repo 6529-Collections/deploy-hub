@@ -1,0 +1,58 @@
+{
+  "fixture_version": "deploy-hub.fixture.v1",
+  "scenario": "pull_request_head_moves_before_mutation",
+  "accepted_source": {
+    "request_id": "33333333-3333-4333-8333-333333333333",
+    "repository": "6529-Collections/6529seize-backend",
+    "ref": "agent-prxt/example-api",
+    "sha": "3333333333333333333333333333333333333333",
+    "pull_request_number": 1869,
+    "pull_request_head_sha": "3333333333333333333333333333333333333333"
+  },
+  "pre_mutation_observation": {
+    "pull_request_head_sha": "4444444444444444444444444444444444444444",
+    "environment_mutation_started": false
+  },
+  "terminal_status": {
+    "schema_version": "deploy-hub.deployment-status.v1",
+    "request_id": "33333333-3333-4333-8333-333333333333",
+    "request_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "state": "stale",
+    "phase": "terminal",
+    "state_version": 4,
+    "event_sequence": 4,
+    "attempt": 1,
+    "accepted_at": "2026-08-03T11:00:00.000Z",
+    "updated_at": "2026-08-03T11:01:00.000Z",
+    "terminal_at": "2026-08-03T11:01:00.000Z",
+    "queue": {
+      "order_key": "00000000000000000003/33333333-3333-4333-8333-333333333333",
+      "resource_keys": [
+        "staging:backend:api"
+      ],
+      "position": 1,
+      "owner_request_id": "33333333-3333-4333-8333-333333333333",
+      "blocked_by": []
+    },
+    "mutation": {
+      "state": "not_started"
+    },
+    "validation": {
+      "state": "not_started"
+    },
+    "failure": {
+      "code": "STALE_PR_HEAD",
+      "class": "stale_source",
+      "message": "PR #1869 moved from the accepted exact head before mutation.",
+      "retryable": false,
+      "details_url": "https://github.com/6529-Collections/6529seize-backend/pull/1869"
+    },
+    "warnings": [],
+    "evidence": []
+  },
+  "expected": {
+    "replacement_sha_dispatched": false,
+    "environment_mutated": false,
+    "new_request_id_required": true
+  }
+}

@@ -81,7 +81,7 @@ requestDeployment({
   pullRequest,
   sourceSha,
   environment,
-  services?,
+  targetUnit,
   requestedBy,
   taskReference
 })
@@ -152,8 +152,9 @@ Requirements:
 ### Backend staging and production
 
 - Deploy Hub invokes `.github/workflows/deploy.yml`.
-- The operation specifies the exact source SHA, environment, and affected
-  service or services.
+- Each atomic operation specifies the exact source SHA, environment, and one
+  affected service. An agent-owned coordinated plan may create several
+  independent service requests.
 - Unaffected services are not built or deployed merely because they share the
   backend repository.
 
@@ -254,7 +255,9 @@ Check Runs must show phases such as `deploying`, `deployed; validating`, and
 
 ## 9. Pull request feedback and live updates
 
-Every request creates or updates one Check Run for its exact SHA and target.
+Every request attempt creates one Check Run for its exact SHA and target. A
+retry creates a new attempt Check Run and the logical request links all
+attempts.
 
 The Check Run must expose:
 

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/6529-Collections/deploy-hub/schemas/ledger-meta.v1.schema.json",
+  "title": "Deploy Hub Git ledger metadata v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "ledger_sequence",
+    "last_acceptance_sequence",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deploy-hub.ledger-meta.v1"
+    },
+    "ledger_sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "last_acceptance_sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "created_at": {
+      "$ref": "common.v1.schema.json#/$defs/timestamp"
+    },
+    "updated_at": {
+      "$ref": "common.v1.schema.json#/$defs/timestamp"
+    }
+  }
+}

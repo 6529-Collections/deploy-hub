@@ -129,8 +129,10 @@ Exit criteria:
   pipeline without reimplementing it.
 - Surface communication milestones in Check Runs, task events, history, and the
   UI while keeping them outside environment locks and deployment success gates.
-- Use GitHub-native records for MVP durable evidence; do not add a database or
-  S3 request ledger without demonstrated need.
+- Implement the accepted protected `state/v1` Git ledger for immutable
+  requests, append-only events, deterministic waiting, commands, and replayable
+  snapshots; project state to GitHub Deployments and Check Runs.
+- Do not add a database or S3 request ledger without demonstrated need.
 
 Explicit exclusions:
 
