@@ -4,7 +4,7 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Credentialless executable skeleton implementation.
+Deterministic fake-adapter and contract-suite preparation.
 
 ## Accepted direction
 
@@ -93,8 +93,8 @@ Credentialless executable skeleton implementation.
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Tasks 0–3 are
-  complete, Task 4 is next, and Task 25 owns the cross-cutting communications
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0–4 are
+  complete, Task 5 is next, and Task 25 owns the cross-cutting communications
   integration.
 - Task 2 completed the versioned deployment, validation, cancel, retry, ledger,
   task-event, communication-outcome, and safe-error schemas with normative
@@ -109,11 +109,11 @@ Credentialless executable skeleton implementation.
   GitHub OIDC workflow/AWS trust, secured WebSocket transport, secret
   boundaries, and 26-case threat review. No identity, permission, credential,
   workflow, or environment authority was created.
-- Task 4 credentialless skeleton is implemented with one Node/TypeScript
-  package, zero runtime dependencies, a read-only status API, disabled GitHub
-  and deployment boundaries, a plain static UI shell, four unit tests, and a
-  read-only CI workflow. Local checks pass; exact-head GitHub CI and the final
-  acceptance audit remain.
+- Task 4 completed the credentialless skeleton with one Node/TypeScript package,
+  zero runtime dependencies, a read-only status API, disabled GitHub and
+  deployment boundaries, a plain static UI shell, four unit tests, and a
+  read-only CI workflow. Local checks and exact-head GitHub Actions run
+  `30818122104` passed.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -150,8 +150,8 @@ Credentialless executable skeleton implementation.
 
 ## Remaining security and implementation work
 
-- Task 4 is in progress pending exact-head GitHub CI and its final acceptance
-  audit.
+- Task 5 must add deterministic fake deployment, validation, and communication
+  adapters without adding live permissions or external side effects.
 - Later rollout tasks must provide the phase-specific permission snapshots,
   denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
   evidence, secret-canary scans, and owner approvals required by
@@ -165,7 +165,7 @@ Credentialless executable skeleton implementation.
 
 ## Next recommended work
 
-Complete and audit Task 4 directly on `main`: add the minimal runtime/package
-structure and credentialless application/test/CI skeleton. Do not create a
-GitHub App, OAuth client, state branch, deployment authority, AWS role, live
-permission, or credential.
+Complete Task 5 directly on `main`: add deterministic fake adapters and the
+contract suite for success, delay, failure, cancellation, stale, duplicate, and
+conflicting-callback behavior. Do not create a GitHub App, OAuth client, state
+branch, deployment authority, AWS role, live permission, or credential.

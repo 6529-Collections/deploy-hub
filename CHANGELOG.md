@@ -9,6 +9,10 @@
   dependencies, read-only status API, offline-only configuration, disabled
   GitHub/deployment boundaries, plain static UI shell, four unit tests, and a
   credentialless read-only CI workflow.
+- Completed Task 4 after its acceptance audit and exact-head GitHub Actions run
+  `30818122104` passed. Confirmed there are no production dependencies, live
+  permissions, credentials, external API clients, databases, caches, workflow
+  dispatches, or environment-mutation paths. Task 5 is next.
 - Completed Task 3 after its acceptance audit: every requested GitHub
   capability maps to a feature and rollout phase, read-only shadow is enforced
   by absent credential capabilities, production authority is exact and

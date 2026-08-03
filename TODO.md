@@ -34,7 +34,7 @@ receive an evidence-based answer.
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
 | 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
-| 4 | Executable Deploy Hub skeleton | IN PROGRESS | 2, 3 |
+| 4 | Executable Deploy Hub skeleton | DONE | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
 | 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
@@ -223,9 +223,9 @@ Evidence:
   test policy exclude credentials from every visible/durable surface; 26 abuse
   cases were reviewed before any credential or live permission existed.
 
-### [ ] Task 4 — Executable Deploy Hub skeleton
+### [x] Task 4 — Executable Deploy Hub skeleton
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Outcome: The repository contains the minimal production-quality application
 structure needed for API, static UI, adapters, and tests, with no deployment
@@ -233,16 +233,16 @@ authority.
 
 Acceptance criteria:
 
-- [ ] Runtime and package choices are recorded with a concise rationale.
-- [ ] API, domain, adapter, GitHub, UI, configuration, and test boundaries are
+- [x] Runtime and package choices are recorded with a concise rationale.
+- [x] API, domain, adapter, GitHub, UI, configuration, and test boundaries are
   explicit.
-- [ ] Local build, lint, type, unit-test, and formatting commands are defined.
-- [ ] Safe sample configuration contains no secrets.
-- [ ] CI validates the repository without deployment credentials or mutation.
-- [ ] The approved direct-to-`main` credentialless workflow and remote-head
+- [x] Local build, lint, type, unit-test, and formatting commands are defined.
+- [x] Safe sample configuration contains no secrets.
+- [x] CI validates the repository without deployment credentials or mutation.
+- [x] The approved direct-to-`main` credentialless workflow and remote-head
   safety checks are documented; protected-main/PR workflow remains a mandatory
   reconsideration before any credential or deployment authority.
-- [ ] README and agent instructions explain how to develop and verify it.
+- [x] README and agent instructions explain how to develop and verify it.
 
 2026-08-03 workflow amendment: the repository owner explicitly retained direct
 pushes to `main` for the current private, credentialless bootstrap. Enforced
@@ -250,16 +250,21 @@ protection is deferred rather than required by Task 4; it must be reconsidered
 before any credential, live permission, deployment authority, or additional
 write actor is introduced.
 
-Progress evidence:
+Evidence:
 
 - `docs/decisions/0008-keep-the-executable-skeleton-small.md`
 - `package.json`, `tsconfig*.json`, `eslint.config.mjs`, and
   `.prettierrc.json`
 - `src/`, `ui/`, and `test/skeleton.test.ts`
 - `.env.example` and `.github/workflows/ci.yml`
-- Local `npm run check` on 2026-08-03: formatting, lint, type checking, build,
-  and four unit tests passed. Completion remains pending the first exact-head
-  GitHub CI result and final acceptance audit.
+- Commit `a84041a226affd6b8e1e34aa04dd840cd1e2256d`.
+- GitHub Actions run
+  `https://github.com/6529-Collections/deploy-hub/actions/runs/30818122104`
+  passed on that exact head with read-only `contents` permission and no secrets.
+- Completion audit on 2026-08-03: local formatting, lint, type checking, build,
+  and four unit tests passed; production dependency inventory was empty;
+  source/config/workflow scans found no GitHub/AWS SDK, external API endpoint,
+  write permission, workflow dispatch, credential, database, or cache path.
 
 ### [ ] Task 5 — Fake adapters and deterministic contract suite
 
@@ -741,4 +746,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 4 — Executable Deploy Hub skeleton.
+Task 5 — Fake adapters and deterministic contract suite.
