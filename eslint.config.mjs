@@ -9,7 +9,8 @@ export default [
     files: ['ui/**/*.js'],
     languageOptions: {
       globals: {
-        document: 'readonly'
+        document: 'readonly',
+        localStorage: 'readonly'
       }
     }
   }

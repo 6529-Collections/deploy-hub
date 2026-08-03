@@ -1,165 +1,101 @@
 # Deploy Hub Architecture
 
-Status: Agreed simplified MVP
+Status: Agreed portable static MVP
 
 Last updated: 2026-08-03
 
 ## Core boundary
 
-The Codex task owns the feature lifecycle. Deploy Hub starts and observes one
-exact repository deployment through the repository's canonical workflow. It
-does not discover candidates, create release trains, build artifacts, deploy to
-AWS itself, or maintain a second release state machine.
+Deploy Hub is plain static HTML, CSS, and JavaScript owned entirely by this
+repository. A human uses the page; a Codex task uses its existing GitHub tools.
+Both talk directly to GitHub and operate the same allowlisted canonical
+workflows.
 
-The existing 6529 backend owns the small authenticated HTTP boundary. The
-`deploy-hub` repository owns the static UI, documentation, and any small pure
-helpers that remain useful. The MVP does not deploy another server, Lambda,
-container, database, queue, scheduler, or reconciler.
-
-The rejected loopback server and event/ledger prototypes have been removed
-from the active repository. Git history preserves them; live code must not
-reintroduce or extend them.
+The static host serves files only. It may be `api.6529.io`, another internal
+host, or any ordinary static host. Deploy Hub has no backend, API proxy,
+Lambda, database, queue, scheduler, callback receiver, or reconciler.
 
 The canonical source for this diagram is `diagrams/target-architecture.mmd`.
 
 ```mermaid
 flowchart LR
-    U["Developer"] --> C["Codex task"]
-    U --> UI["Deploy Hub UI"]
+    U["Developer"] --> UI["Deploy Hub static page"]
+    U --> C["Codex task"]
+    H["Any static-file host"] -->|"HTML, CSS, JavaScript"| UI
 
-    subgraph B["Existing 6529 backend"]
-        API["Small Deploy Hub HTTP API<br/>GitHub Bearer auth"]
-        S["Polled status snapshot"]
-        P["Private-repository UI proxy"]
-    end
+    UI -->|"User GitHub token"| GH["GitHub API"]
+    C -->|"Existing GitHub auth"| GH
 
-    subgraph G["GitHub and repositories"]
-        UIS["deploy-hub/main UI files"]
-        PR["Workflow check or commit status"]
-        FE["Frontend canonical workflows"]
-        BE["Backend canonical workflow"]
-        E2E["Frontend-owned E2E workflows"]
-    end
+    GH --> FE["Frontend canonical workflows"]
+    GH --> BE["Backend canonical workflow"]
+    GH --> E2E["Frontend-owned E2E workflows"]
+    GH --> PR["Workflow check or commit status"]
 
-    subgraph E["Runtime environments"]
-        STG["Staging"]
-        PROD["Production"]
-    end
-
-    subgraph N["Existing communications"]
-        CI["CI deployment drop"]
-        RN["Production release note"]
-    end
-
-    C -->|"Exact SHA deployment request"| API
-    UI -->|"Authenticated commands and polling"| API
-    API --> S
-    UIS -->|"Files from one resolved SHA"| P
-    P --> UI
-
-    API --> FE
-    API --> BE
-    API --> E2E
-    FE --> STG
-    FE --> PROD
+    FE --> STG["Staging"]
+    FE --> PROD["Production"]
     BE --> STG
     BE --> PROD
     E2E -. "Read-only validation" .-> STG
     E2E -. "Read-only validation" .-> PROD
 
-    FE --> PR
-    BE --> PR
-    E2E --> PR
-    FE --> CI
-    BE --> CI
-    CI --> RN
+    FE --> COMM["Existing CI-drop and release-note pipeline"]
+    BE --> COMM
 
-    G -->|"Workflow/run state"| S
-    E -->|"Runtime version"| S
-    N -->|"Available links/outcomes"| S
+    GH -->|"Run/check/artifact state"| UI
+    GH -->|"Run/check/artifact state"| C
 ```
+
+## Authentication
+
+The browser stores the supplied GitHub token in its own origin's
+`localStorage` and sends it only to `https://api.github.com`.
+
+Authentication is deliberately small:
+
+1. call GitHub `/user` and derive the login;
+2. accept an active organization admin or active member of the existing
+   deployment-operator team;
+3. show the resolved login;
+4. provide a visible forget action; and
+5. recheck action-specific repository permission before every later mutation.
+
+The static bundle uses no third-party scripts, never logs the token, renders
+untrusted values with text-only DOM APIs, and restricts network connections
+with CSP. Codex requires no new auth flow because it already has GitHub auth.
 
 ## Source of truth
 
-Deploy Hub reads existing authoritative sources instead of creating a new
-ledger:
+Deploy Hub reads existing sources instead of creating a ledger:
 
 | Fact | Source of truth |
 | --- | --- |
 | PR and exact head SHA | GitHub Pull Request |
 | CI/review readiness | Existing GitHub checks and reviews |
-| Deployment execution, queue, logs, cancellation and retry | Canonical GitHub Actions workflow run |
-| Actual deployed identity | Runtime version endpoint or existing infrastructure proof |
-| Baseline E2E execution | Frontend-owned E2E workflow run and its snapshot evidence |
-| PR progress | Existing workflow check or one commit status; use a Check Run only if proven necessary |
-| CI drop and release note | Existing backend communication pipeline and published links |
+| Deployment execution, waiting, logs, cancel, retry | Canonical GitHub Actions run |
+| Actual deployed identity | Repository workflow evidence and runtime-version proof |
+| Baseline E2E | Frontend-owned E2E workflow run and snapshot evidence |
+| CI drop and release note | Existing communication pipeline and available link/outcome |
 
-The operation ID is correlation metadata included in allowlisted workflow input
-and visible run metadata. The API returns the GitHub run ID/URL. Agents and the
-UI recover status using that operation ID or run ID.
+The GitHub workflow run ID/URL is the operation identity. An operation ID is
+only correlation metadata placed in fixed workflow inputs or run metadata.
+Page reload and polling reconstruct the current view directly from GitHub.
 
-There is no MVP `state/v1` branch, database, append-only event journal, global
-sequence, snapshot cache, queue table, task callback store, or continuously
-running reconciler. The retired prototype code and contracts are absent from
-the active tree.
+## GitHub operation boundary
 
-Duplicate detection is intentionally proportional: before dispatch, the API
-looks for an existing matching operation/run; canonical workflow concurrency
-and exact-SHA checks make accidental duplicate calls safe. Add stronger durable
-idempotency only after a real duplicate cannot be handled safely this way.
+There is no Deploy Hub HTTP API. Static UI modules and agent commands issue the
+smallest fixed GitHub API requests needed for the current task:
 
-## Authentication and authorization
+- resolve identity and permission;
+- resolve pull request, exact SHA, refs, and canonical workflow;
+- dispatch or observe an allowlisted workflow;
+- integrate the approved frontend staging ref through a non-force GitHub path;
+- find the exact correlated run;
+- read run/check/artifact evidence; and
+- cancel or retry that exact run.
 
-Humans and Codex tasks use their existing GitHub token as a Bearer credential.
-The backend resolves the token through GitHub `/user` and checks current
-repository access and deployment-operator policy for every protected request.
-
-The resolved GitHub login is the authenticated authority and GitHub executor.
-The Codex task ID is requester/correlation metadata only. Production is a
-separate explicit action and rechecks the current exact `main` SHA immediately
-before dispatch.
-
-No wallet OAuth, PKCE, refresh-token store, GitHub App token broker, callback
-identity service, WebSocket authentication, or AWS credential is introduced.
-Canonical workflows retain their existing cloud authentication.
-
-## Agent-facing API
-
-The MVP API is ordinary versioned HTTP in the existing backend:
-
-```text
-POST /deploy/hub/staging
-POST /deploy/hub/production
-GET  /deploy/hub/operations/:operationId
-POST /deploy/hub/operations/:operationId/cancel
-POST /deploy/hub/operations/:operationId/retry
-POST /deploy/hub/validations
-GET  /deploy/hub/snapshot
-```
-
-`POST /deploy/hub/validations` is a thin dispatch for the canonical E2E
-workflow. Validation is not a second durable state machine: its state is the
-E2E workflow run, and deployments link to that run.
-
-Every mutation uses fixed repository, workflow, ref, environment, and backend
-service allowlists. The API never accepts an arbitrary workflow path, callback
-URL, AWS target, or contributor list.
-
-## UI delivery and updates
-
-The backend proxies the secret-free static UI from one resolved exact
-`deploy-hub/main` SHA. Operational data and commands require the user's GitHub
-Bearer token. The private-repository UI-read credential remains server-side and
-is not deployment authority.
-
-The open UI polls `GET /deploy/hub/snapshot` at least every five seconds and
-uses conditional requests when nothing changed. Each response replaces the
-view, so a failed poll needs no cursor, event replay, or resynchronization
-protocol. Add SSE or WebSockets only if measured polling behavior is inadequate.
-
-The UI shows current deployed versions, queued/running workflows, exact SHA and
-PR, elapsed time, concise failure, validation result, and links to GitHub and
-available communication outcomes. Rolling ETA analytics are later work.
+Every mutation fixes the repository, workflow/ref, environment, and input
+shape in code. It rechecks current authority and exact source immediately
+before mutation. Production is a separate explicit action.
 
 ## Canonical adapters
 
@@ -167,104 +103,79 @@ available communication outcomes. Rolling ETA analytics are later work.
 | --- | --- | --- |
 | Frontend | Staging | Non-force integration into `1a-staging`; push triggers `deploy-staging.yml` |
 | Frontend | Production | `build-upload-deploy-prod.yml` from exact current `main` |
-| Backend | Staging | `deploy.yml` with exact SHA and selected service |
-| Backend | Production | `deploy.yml` with exact current `main` SHA and selected service |
+| Backend | Staging | `deploy.yml` with exact SHA and selected services |
+| Backend | Production | `deploy.yml` with exact current `main` SHA and selected services |
 
-Deploy Hub supplies exact intent and observes these workflows. It does not copy
-their build, packaging, deployment, health-check, version-proof, notification,
-or release-note implementation.
+Deploy Hub supplies exact intent and observes these workflows. It never copies
+their build, packaging, AWS deployment, health check, version proof,
+notification, or release-note implementation.
 
 ## Concurrency and waiting
 
-Canonical GitHub Actions workflows own mutation concurrency. Concurrency groups
-are scoped to the actual environment/component or backend service so frontend
-work does not globally block unrelated backend work and staging does not block
-production.
+Canonical GitHub Actions concurrency owns conflicting mutations. Groups should
+be scoped so frontend activity does not globally block unrelated backend work
+and staging does not block production.
 
-Deploy Hub does not implement queue ownership, claims, global acceptance order,
-heartbeats, stale-lock recovery, or a scheduler. The UI reports GitHub's queued
-or running workflow and the known concurrency group.
+Deploy Hub has no queue ownership, claims, acceptance sequence, heartbeat,
+lock recovery, or scheduler. The UI shows GitHub's queued or running state and
+the known concurrency reason.
 
-The baseline E2E workflow records the environment versions before and after the
-suite. The MVP does not create a cross-repository environment lock. If another
-deployment changes the environment during E2E, validation reports snapshot
-drift and can be rerun; unrelated developers are not blocked by Deploy Hub.
+E2E records the environment versions before and after the suite. Snapshot
+drift produces a stale result and rerun; Deploy Hub does not create a
+cross-repository environment lock.
 
-## Validation
+## UI delivery and updates
 
-Every requested staging and production outcome retains the accepted baseline
-read-only E2E requirement after health and exact-version proof. The frontend
-repository owns the Playwright implementation and workflow.
+The page is a self-contained static release from one `deploy-hub` commit. It
+displays its source version and works independently of the chosen static host.
 
-For a single deployment, validation is the final phase of that operation. For
-coordinated frontend/backend work, the Codex task deploys the intended
-components in order and triggers one baseline E2E run against the final exact
-environment snapshot. The same run link is reported for each participating
-deployment.
+After authentication, the page polls GitHub at least every five seconds for
+relevant workflow state. Each complete read replaces the displayed view, so a
+failed poll needs no cursor, event replay, or resynchronization protocol.
 
-A product failure is not automatically retried. A workflow/setup failure may be
-rerun explicitly. Snapshot drift invalidates that validation result without
-fabricating deployment failure or holding a custom lock.
+The UI shows current versions, recent and waiting workflows, exact SHA and PR,
+elapsed time, concise failure, validation result, and GitHub/communication
+links. Rolling ETA analytics are later work.
 
-## PR feedback
+## Validation and coordinated changes
 
-Use the smallest GitHub surface that meets the requirement:
+Every requested staging and production outcome retains the baseline read-only
+E2E requirement after health and exact-version proof. The frontend repository
+owns the Playwright workflows.
 
-1. retain the canonical workflow check and make its name/result useful;
-2. add a commit status with a Deploy Hub/workflow link if another compact state
-   is needed; and
-3. introduce a narrow GitHub App Check Run only if the first two are proven
-   insufficient.
+For coordinated frontend/backend work, the Codex task deploys the intended
+components and triggers one E2E workflow against the final snapshot. The same
+run link is reported for each participating change. No validation database or
+state machine exists.
 
-PR feedback shows target environment, exact SHA, current phase, workflow link,
-validation result, and terminal conclusion. It does not duplicate workflow
-logs or every internal step.
+## PR feedback and communications
 
-## Deployment communications and release notes
+Use the existing workflow check first, then at most one commit status if the
+existing check is insufficient. A GitHub App Check Run requires separate
+evidence and approval.
 
-Canonical repository workflows keep collecting exact contributor evidence and
-posting to the existing backend CI-alert/release-note pipeline. Deploy Hub
-passes the operation ID, GitHub authority, Deploy Hub origin, requester/task,
-exact SHA/PR/environment, and selected services required by that pipeline.
-
-Deploy Hub does not mirror the release-note queue or state machine. The UI and
-agent status show a canonical link and a small available outcome such as
-`pending`, `published`, `skipped`, or `failed`. Communication remains non-gating
-for a healthy, exact, E2E-validated deployment.
-
-## Shadow and rollout
-
-Offline tests and deterministic fakes run first. If frontend Git integration
-needs a real branch proof, `1a-deploy-hub` has one credentialless, opt-in shadow
-workflow and cannot update shared refs, dispatch real deployments, access AWS,
-or publish real deployment communications. It never becomes another staging
-lane.
-
-After shadow behavior is clear, use controlled low-risk shared-staging canaries
-during a known clear window. Canonical manual deployment stays available and
-Deploy Hub does not hold colleagues behind an experimental lock. Build separate
-isolated cloud infrastructure only if a specific unsafe behavior cannot be
-tested through fakes, dry runs, shadowing, or controlled staging.
+Canonical workflows keep using the existing CI-drop and release-note pipeline.
+Deploy Hub displays available links/outcomes and does not mirror that pipeline
+or make communications a deployment gate.
 
 ## Recovery
 
-The API and UI reconstruct status by reading GitHub workflow runs and runtime
-truth. Cancel and retry call the existing GitHub Actions operations after
-rechecking authorization and exact identity. A retry never silently substitutes
-a newer SHA.
+Reloading the page or rerunning an agent lookup reads GitHub again. Cancel and
+retry target the exact workflow run after fresh authorization and identity
+checks. Retry never substitutes a newer SHA.
 
-Known-good rollback remains an explicit canonical redeployment. Automatic
-cross-repository rollback is not part of the MVP.
+Known-good rollback remains an explicit canonical redeployment. Direct
+canonical workflow use remains the break-glass fallback.
 
 ## Explicit MVP exclusions
 
-- Release trains, candidate discovery, autonomous claiming, or batching.
-- A Deploy Hub database, Git state branch, queue, scheduler, or reconciler.
-- A second Deploy Hub backend runtime.
-- A separate validation state machine.
-- Mandatory callbacks, webhooks, task-event delivery, SSE, or WebSockets.
-- GitHub Deployments or a GitHub App unless a concrete requirement proves them
-  necessary.
+- A Deploy Hub backend, proxy API, Lambda, container, database, Git state
+  branch, queue, scheduler, lock service, callback receiver, or reconciler.
+- Release trains, autonomous candidate discovery, claiming, or batching.
+- OAuth, wallet auth, PKCE, refresh grants, GitHub App token brokering, shared
+  service tokens, callbacks, SSE, or WebSockets.
+- A separate validation state machine, release-note mirror, or analytics
+  subsystem.
 - Deploy Hub-owned build, AWS deployment, E2E, notification, or release-note
   implementation.
-- Automatic rollback or transactional multi-repository releases.
+- Automatic rollback or transactional cross-repository releases.

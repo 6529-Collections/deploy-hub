@@ -1,18 +1,13 @@
 flowchart LR
-    U["Human operator"] -->|"GitHub Bearer token"| API["Deploy Hub HTTP API"]
-    C["Codex task with existing GitHub auth"] -->|"GitHub Bearer token"| API
-    B["Static browser UI"] -->|"GitHub Bearer token"| API
+    U["Human operator"] -->|"Token entered locally"| UI["Deploy Hub static page"]
+    C["Codex task"] -->|"Existing GitHub auth"| GH["GitHub API"]
+    UI -->|"Bearer token directly"| GH
 
-    subgraph S["Existing backend boundary"]
-        API --> V["Resolve GitHub /user"]
-        V --> P["Repository and operator policy"]
-        P --> A["Allowlisted deployment adapter"]
-    end
+    GH --> V["Resolve /user"]
+    V --> P["Organization/operator membership"]
+    P --> A["Fixed repository/workflow/ref/action"]
+    A --> W["Canonical GitHub workflow"]
+    W --> AWS["Existing workflow-owned AWS authentication"]
 
-    A -->|"Caller GitHub authority"| GH["GitHub API and canonical workflows"]
-    GH --> R["Repository workflow"]
-    R --> AWS["Existing workflow-owned AWS authentication"]
-    GH -->|"Workflow/run state"| API
-    API -->|"Authenticated snapshot polling"| B
-
-    X["Task ID, requester text, PR labels, branches, contributors"] -. "Correlation/evidence only" .-> P
+    X["Task ID, requester text, PR labels, contributors"] -. "Correlation/evidence only" .-> P
+    H["Static host"] -->|"Files only; no token or authority"| UI

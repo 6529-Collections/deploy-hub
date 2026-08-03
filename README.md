@@ -13,9 +13,8 @@ The intended operating model is:
   and deployment workflows.
 - GitHub workflow checks, commit statuses, or—only if required—a narrow Check
   Run provide current pull-request feedback.
-- The secret-free browser UI shell is served from the exact current
-  `deploy-hub/main` commit through the backend private-repository proxy;
-  operational calls require GitHub Bearer authentication.
+- The browser UI is a portable static app; it authenticates and operates
+  directly through GitHub using the user's existing token.
 - New deployments, queue changes, progress, and results appear in an open UI
   automatically without manual browser refresh.
 - Every staging and production outcome passes the full baseline read-only E2E
@@ -28,22 +27,21 @@ The intended operating model is:
 
 ## Current status
 
-**Documentation and static UI foundation; Task 7 has not started.**
+**Portable static app; Task 7 browser authentication is implemented locally.**
 
 The rejected loopback server, callback/event model, strict ledger contracts,
 and Git-ledger prototype have been removed from the active tree. Git history
 and retired ADRs preserve why they were rejected. This repository contains the
-plain static UI and project documentation; Task 7's authenticated HTTP API is
-explicitly owned by the existing `6529seize-backend` repository.
+entire Deploy Hub implementation: a plain static UI that talks directly to
+GitHub and can be hosted anywhere.
 
 This repository contains no live GitHub-token handling, GitHub App, OAuth
 client, AWS credential, repository environment, staging access, production
 access, live state branch, or deployment implementation.
 
-ADR 0009 replaces the earlier wallet OAuth/GitHub App broker design with the
-existing deployment UI's GitHub Bearer-token/operator model. The architecture
-and tracker directly apply the KISS decisions; there is no separate review
-process or document to interpret before Task 7.
+ADR 0011 makes Deploy Hub a portable static app. The browser stores the user's
+GitHub token locally, calls GitHub directly, and has no Deploy Hub server,
+backend dependency, OAuth system, or GitHub App broker.
 
 Release Bus is currently OFF for both staging and production and is not
 expected to be re-enabled. Existing manual and canonical repository workflows
@@ -75,9 +73,9 @@ npm install --ignore-scripts
 npm run check
 ```
 
-The project uses Node.js 22.17.1 for its small formatting and lint toolchain.
-`npm run check` validates the static UI and repository configuration. There is
-no server or production runtime in this repository.
+The project uses Node.js 22.17.1 for formatting, lint, and browser-module unit
+tests. `npm run check` validates the static app and repository configuration.
+There is no server or production runtime.
 
 Project boundaries:
 
@@ -87,16 +85,16 @@ docs/           requirements, architecture, decisions, migration, and testing
 .github/        credentialless read-only CI
 ```
 
-During the current credentialless bootstrap, changes are pushed directly to
+During the current private static-app bootstrap, changes are pushed directly to
 `main` after fetching and checking `origin/main`. Protected-main/PR workflow
-must be reconsidered before any credential, live permission, deployment
-authority, or additional write actor is introduced.
+must be reconsidered before GitHub mutation capability, deployment authority,
+repository secrets, or another write actor is introduced.
 
 ## Safety boundary
 
-This repository is physically incapable of changing `1a-staging`, `main`,
-shared staging, production, or AWS infrastructure. It contains no API server,
-deployment adapter, GitHub client, credential, or external mutation path.
+Task 7 authentication is read-only: it can resolve GitHub identity and operator
+membership but cannot dispatch workflows, update refs, or reach AWS. Later
+mutation capabilities remain gated by their own tasks and exact allowlists.
 
 `1a-deploy-hub` is only an optional credentialless shadow trigger if real
 branch-trigger behavior must be tested. It is not a second staging lane and

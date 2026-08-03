@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="deploy-hub-commit" content="development" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src https://api.github.com; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; script-src 'self'; style-src 'self'"
+    />
     <title>Deploy Hub</title>
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./app.js"></script>
@@ -15,22 +20,38 @@
           <p class="eyebrow">6529 engineering</p>
           <h1>Deploy Hub</h1>
         </div>
-        <span class="badge">Not connected</span>
+        <span class="badge" id="auth-state">Not connected</span>
       </header>
 
       <section class="notice" aria-labelledby="notice-title">
-        <p class="eyebrow">Static UI foundation</p>
-        <h2 id="notice-title">No deployment capability is connected.</h2>
+        <p class="eyebrow">GitHub authentication</p>
+        <h2 id="notice-title">Connect with your existing GitHub token.</h2>
         <p>
-          Operational data and commands will come from the authenticated Deploy
-          Hub API in the existing 6529 backend.
+          This static page sends the token directly to GitHub. Deploy Hub has no
+          authentication server and does not receive or log it.
         </p>
+        <form class="auth-form" id="auth-form">
+          <label for="github-token">GitHub token</label>
+          <div class="auth-controls">
+            <input
+              id="github-token"
+              name="github-token"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <button id="connect-github" type="submit">Connect GitHub</button>
+            <button id="forget-github" type="button" hidden>Forget</button>
+          </div>
+        </form>
+        <p class="auth-message" id="auth-message" role="status"></p>
       </section>
 
       <section class="grid" aria-label="Deploy Hub areas">
         <article>
           <h2>Environments</h2>
-          <p>Runtime versions will appear here when read adapters exist.</p>
+          <p>Runtime versions will appear here when GitHub adapters exist.</p>
         </article>
         <article>
           <h2>Operations</h2>

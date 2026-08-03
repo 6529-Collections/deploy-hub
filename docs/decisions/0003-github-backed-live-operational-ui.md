@@ -1,8 +1,12 @@
 # ADR 0003: GitHub-Backed Live Operational UI
 
-Status: Accepted
+Status: Superseded by ADR 0011
 
 Date: 2026-08-03
+
+The exact-SHA static UI and polling outcomes remain useful. ADR 0011 removes
+the backend proxy/API requirement and makes the app independently hostable with
+direct GitHub API access.
 
 ## Context
 

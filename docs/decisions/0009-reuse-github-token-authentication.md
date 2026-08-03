@@ -1,8 +1,12 @@
 # ADR 0009: Reuse GitHub token authentication
 
-Status: Accepted
+Status: Superseded by ADR 0011; GitHub-token choice retained
 
 Date: 2026-08-03
+
+Hosting amendment: ADR 0011 keeps this GitHub-token model but moves identity
+resolution and operator verification into the static browser app. There is no
+Deploy Hub backend.
 
 Supersedes the current-authentication and live-transport decisions in ADR 0007
 and the GitHub-App authentication choice in ADR 0002.

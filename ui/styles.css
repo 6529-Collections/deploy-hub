@@ -100,6 +100,63 @@ article {
   margin-bottom: 0;
 }
 
+.auth-form {
+  margin-top: 28px;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #dbe1ea;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.auth-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-controls input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #343a46;
+  border-radius: 10px;
+  background: #0d1016;
+  color: #f5f7fa;
+  font: inherit;
+}
+
+.auth-controls button {
+  padding: 12px 16px;
+  border: 1px solid #4c3f9b;
+  border-radius: 10px;
+  background: #6f5cff;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.auth-controls button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.auth-controls button:last-child {
+  border-color: #343a46;
+  background: transparent;
+  color: #cbd2dc;
+}
+
+.auth-message {
+  min-height: 1.5em;
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -137,5 +194,10 @@ code {
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .auth-controls {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

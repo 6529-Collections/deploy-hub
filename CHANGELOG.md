@@ -2,6 +2,14 @@
 
 ## 2026-08-03
 
+- Corrected the owner-reconfirmed repository boundary: Deploy Hub is entirely a
+  portable static app in this repository, not an API in
+  `6529seize-backend`. Closed mistaken backend PR #1900 unmerged and deleted
+  its remote branch. ADR 0011 now supersedes the backend proxy/API assumption.
+  Task 7 implements direct browser-to-GitHub `/user` and operator-membership
+  authentication with local token storage, a forget action, CSP, fixed safe
+  errors, and token-canary tests; Codex continues using its existing GitHub
+  authentication directly.
 - Applied the owner-requested KISS cleanup instead of retaining rejected
   prototypes: marked Tasks 2, 5, and 6 `RETIRED`; removed the loopback server,
   TypeScript runtime/domain/adapters, callback/event fakes, 1,146-line Git

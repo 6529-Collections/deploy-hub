@@ -1,54 +1,25 @@
 flowchart LR
-    U["Developer"] --> C["Codex task"]
-    U --> UI["Deploy Hub UI"]
+    U["Developer"] --> UI["Deploy Hub static page"]
+    U --> C["Codex task"]
+    H["Any static-file host"] -->|"HTML, CSS, JavaScript"| UI
 
-    subgraph B["Existing 6529 backend"]
-        API["Small Deploy Hub HTTP API<br/>GitHub Bearer auth"]
-        S["Polled status snapshot"]
-        P["Private-repository UI proxy"]
-    end
+    UI -->|"User GitHub token"| GH["GitHub API"]
+    C -->|"Existing GitHub auth"| GH
 
-    subgraph G["GitHub and repositories"]
-        UIS["deploy-hub/main UI files"]
-        PR["Workflow check or commit status"]
-        FE["Frontend canonical workflows"]
-        BE["Backend canonical workflow"]
-        E2E["Frontend-owned E2E workflows"]
-    end
+    GH --> FE["Frontend canonical workflows"]
+    GH --> BE["Backend canonical workflow"]
+    GH --> E2E["Frontend-owned E2E workflows"]
+    GH --> PR["Workflow check or commit status"]
 
-    subgraph E["Runtime environments"]
-        STG["Staging"]
-        PROD["Production"]
-    end
-
-    subgraph N["Existing communications"]
-        CI["CI deployment drop"]
-        RN["Production release note"]
-    end
-
-    C -->|"Exact SHA deployment request"| API
-    UI -->|"Authenticated commands and polling"| API
-    API --> S
-    UIS -->|"Files from one resolved SHA"| P
-    P --> UI
-
-    API --> FE
-    API --> BE
-    API --> E2E
-    FE --> STG
-    FE --> PROD
+    FE --> STG["Staging"]
+    FE --> PROD["Production"]
     BE --> STG
     BE --> PROD
     E2E -. "Read-only validation" .-> STG
     E2E -. "Read-only validation" .-> PROD
 
-    FE --> PR
-    BE --> PR
-    E2E --> PR
-    FE --> CI
-    BE --> CI
-    CI --> RN
+    FE --> COMM["Existing CI-drop and release-note pipeline"]
+    BE --> COMM
 
-    G -->|"Workflow/run state"| S
-    E -->|"Runtime version"| S
-    N -->|"Available links/outcomes"| S
+    GH -->|"Run/check/artifact state"| UI
+    GH -->|"Run/check/artifact state"| C

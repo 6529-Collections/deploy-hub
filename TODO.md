@@ -32,10 +32,9 @@ receive an evidence-based answer.
 - On 2026-08-03 the owner also explicitly requested cleanup of the rejected
   prototype work: Tasks 2, 5, and 6 became `RETIRED`, while Task 4 was narrowed
   to the repository/static-UI foundation. ADR 0010 records that amendment.
-- Direct pushes to `main` are permitted only during the owner-approved private,
-  credentialless bootstrap recorded in `STATUS.md`. Reconsider protection
-  before Task 7 handles a live GitHub token or any live permission, deployment
-  authority, secret, or additional write actor.
+- Direct pushes to `main` remain owner-approved for the private static-app
+  bootstrap. Reconsider protection before adding GitHub mutation capability,
+  deployment authority, a repository secret, or another write actor.
 
 The tracker itself is the design gate. A task may add only the smallest
 mechanism required by its acceptance criteria. A live ledger, database, queue,
@@ -54,10 +53,10 @@ existing GitHub/backend primitives cannot meet a requirement.
 | 4 | Repository tooling and static UI foundation | DONE | 3 |
 | 5 | Callback/event fake experiment | RETIRED | 4 |
 | 6 | Git-ledger experiment | RETIRED | 4 |
-| 7 | Authenticated API in `6529seize-backend` | NOT STARTED | 1, 3 |
+| 7 | Static GitHub authentication | IN PROGRESS | 3, 4 |
 | 8 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 7 |
 | 9 | PR feedback and GitHub run lookup | NOT STARTED | 7 |
-| 10 | GitHub-backed static UI delivery | NOT STARTED | 3, 4, 7 |
+| 10 | Portable static UI publishing | NOT STARTED | 4, 7 |
 | 11 | Live operational UI and history | NOT STARTED | 8, 9, 10 |
 | 12 | Canonical frontend staging adapter | NOT STARTED | 1, 7–9 |
 | 13 | Canonical backend staging adapter | NOT STARTED | 1, 7–9 |
@@ -107,7 +106,7 @@ Evidence:
 - `docs/testing-strategy.md`
 - `docs/e2e-validation-analysis.md`
 - `docs/deployment-communications-analysis.md`
-- ADRs 0001 through 0005 and superseding auth ADR 0009 under
+- ADRs 0001 through 0005 and portable-static-app ADR 0011 under
   `docs/decisions/`
 
 ### [x] Task 1 — Dormant-state and canonical-workflow inventory
@@ -132,8 +131,8 @@ Scope:
   endpoints, GitHub Deployments, manual fallback, and the complete canonical
   workflow → notifier → CI-alert receiver → release-note queue/generator
   path.
-- Inventory the existing backend hosting/auth/realtime capabilities relevant to
-  the UI proxy, API, and live updates.
+- Inventory the backend hosting/auth/realtime capabilities that were considered
+  during planning; ADR 0011 later rejected them as Deploy Hub dependencies.
 - Produce an exact change map per repository and workflow; do not implement it.
 
 Acceptance criteria:
@@ -207,23 +206,22 @@ Acceptance criteria:
 Evidence:
 
 - `docs/security-model.md`
-- ADR 0009 (`docs/decisions/0009-reuse-github-token-authentication.md`), which
-  supersedes ADR 0007 before implementation
+- ADR 0011 (`docs/decisions/0011-portable-static-app.md`), which retains the
+  simple GitHub-token choice without a backend
 - `docs/diagrams/security-trust-boundaries.mmd`
-- ADR 0009 and the v1.1 security-model correction on 2026-08-03 supersede the
-  original wallet OAuth/App broker/WebSocket design. Current GitHub identity,
-  repository access, operator membership, explicit production intent, and a
-  pre-mutation exact-SHA recheck are required; token canary tests exclude the
-  credential from every visible/durable surface. No credential or live
-  permission was created.
+- ADR 0011 and security-model v1.2 supersede both the original wallet/App
+  design and the mistaken backend-owned API. Direct GitHub identity, operator
+  membership, explicit production intent, and a pre-mutation exact-SHA recheck
+  are required; token canary tests exclude the credential from visible or
+  durable surfaces.
 
 ### [x] Task 4 — Repository tooling and static UI foundation
 
 Status: `DONE`
 
 Outcome: This repository has the small development toolchain, read-only CI,
-documentation, and plain static UI shell it needs. It has no API server or
-deployment runtime; Task 7 belongs in `6529seize-backend`.
+documentation, and plain static UI shell it needs. It owns the whole portable
+Deploy Hub app and has no API server or deployment runtime.
 
 Acceptance criteria:
 
@@ -239,10 +237,9 @@ Acceptance criteria:
 - [x] README and agent instructions explain how to develop and verify it.
 
 2026-08-03 workflow amendment: the repository owner explicitly retained direct
-pushes to `main` for the current private, credentialless bootstrap. Enforced
-protection is deferred rather than required by Task 4; it must be reconsidered
-before any credential, live permission, deployment authority, or additional
-write actor is introduced.
+pushes to `main` for the current private static-app bootstrap. Enforced
+protection must be reconsidered before GitHub mutation capability, deployment
+authority, a repository secret, or another write actor is introduced.
 
 Evidence:
 
@@ -291,40 +288,45 @@ sources of truth. Historical evidence remains in retired ADR 0006, commit
 `ec725aacf0edf25dc7bc819f9803e536bdcf377a`, and Git history. Task 6 is not a
 dependency of any active implementation task.
 
-### [ ] Task 7 — Authenticated API in `6529seize-backend`
+### [ ] Task 7 — Static GitHub authentication
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
-Repository boundary: this task changes the existing
-`6529-Collections/6529seize-backend` repository. It does not add a server to
-`deploy-hub`.
+Repository boundary: all implementation is in `deploy-hub`. The page works
+from any ordinary static host and calls GitHub directly. No backend repository,
+proxy API, or Deploy Hub server is involved.
 
-Outcome: Codex tasks and authorized humans use a small HTTP boundary in that
-existing backend to dispatch and inspect exact canonical workflow runs.
+Outcome: A human can connect the static page with an existing GitHub token, and
+Codex continues to use its existing GitHub authentication directly.
 
 Acceptance criteria:
 
-- [ ] The existing backend implements staging, production, operation lookup,
-  cancel, retry, validation dispatch, and one UI-snapshot endpoint.
-- [ ] Existing GitHub Bearer tokens authenticate humans and Codex callers;
-  identity is derived through GitHub and current repository/operator policy is
-  checked per request.
-- [ ] No OAuth server, PKCE, refresh-token store, wallet role mapping, GitHub App
-  broker, callback identity system, or WebSocket authentication is introduced.
-- [ ] No second server, Lambda, container, database, live Git ledger, queue,
-  scheduler, or reconciler is introduced.
-- [ ] Authentication, authorization, input validation, and attribution fail
-  closed.
-- [ ] Mutation responses return the exact GitHub workflow run ID and URL;
-  lookup derives current state from GitHub and runtime evidence.
-- [ ] Duplicate requests first look for the same exact operation/run and rely
-  on canonical workflow concurrency; stronger idempotency storage is added only
-  after a reproduced duplicate-mutation failure proves it necessary.
-- [ ] Production intent cannot be inferred from staging intent.
-- [ ] The small request/response contract is documented and covered by focused
-  backend tests.
+- [ ] The browser sends the supplied token directly to GitHub `/user` and
+  derives the login from GitHub.
+- [ ] Active organization-admin or existing deployment-operator team
+  membership is required.
+- [ ] The token is stored only in the page origin's `localStorage`; a visible
+  forget action removes it.
+- [ ] Missing, invalid, insufficiently scoped, and non-operator tokens fail
+  closed with fixed messages that never echo GitHub response content.
+- [ ] The static app uses no third-party scripts and restricts connections to
+  GitHub with CSP.
+- [ ] Token-canary tests prove the token is absent from returned identity and
+  errors.
+- [ ] Codex needs no Deploy Hub credential or auth flow.
+- [ ] No backend/proxy API, Lambda, OAuth service, GitHub App, database, ledger,
+  queue, scheduler, callback system, SSE, or WebSocket is introduced.
+- [ ] The mistaken backend PR #1900 is closed unmerged and its remote feature
+  branch is deleted.
+- [ ] Focused tests, lint, formatting, and exact-head CI pass.
 
-Evidence: Not yet available.
+Evidence in progress:
+
+- `ui/github-auth.js`
+- `ui/app.js`
+- `test/github-auth.test.js`
+- ADR 0011 (`docs/decisions/0011-portable-static-app.md`)
+- Closed backend PR #1900
 
 ### [ ] Task 8 — Canonical workflow concurrency and waiting visibility
 
@@ -372,25 +374,22 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 10 — GitHub-backed static UI delivery
+### [ ] Task 10 — Portable static UI publishing
 
 Status: `NOT STARTED`
 
-Outcome: The existing backend securely serves the UI owned by
-`deploy-hub/main` without copying UI source or artifacts into the backend repo.
+Outcome: One internally consistent static release can be published and rolled
+back on any ordinary static host without a backend deployment.
 
 Acceptance criteria:
 
-- [ ] `/deploy/ui/hub` serves a secret-free shell; all operational data and
-  commands require GitHub Bearer authentication.
-- [ ] The proxy resolves `deploy-hub/main` to one exact SHA per release and
-  never mixes assets from different commits.
-- [ ] Commit-addressed assets are cached safely and a new main SHA switches
-  atomically.
-- [ ] Private-repository fetch credentials remain server-side; the browser uses
-  only the same GitHub Bearer token already used by current deploy UIs.
-- [ ] UI source SHA is visible and a missing UI cannot break deployment APIs.
-- [ ] UI release and rollback do not require backend deployment.
+- [ ] The chosen host serves one exact HTML/CSS/JavaScript release without
+  mixing assets.
+- [ ] The app works without a Deploy Hub backend or GitHub proxy.
+- [ ] Hosting receives no GitHub token from application code.
+- [ ] UI source version is visible.
+- [ ] Release and rollback require only selecting a known static release.
+- [ ] Hosting failure cannot break canonical manual workflows.
 
 Evidence: Not yet available.
 
@@ -404,12 +403,12 @@ and cancellation without manual refresh.
 
 Acceptance criteria:
 
-- [ ] State comes from one authoritative authenticated snapshot endpoint.
+- [ ] State comes directly from relevant GitHub workflow/check/artifact reads.
 - [ ] Polling updates visible state at least every five seconds without manual
   refresh.
-- [ ] The next successful full snapshot repairs any missed/failed poll without
-  event replay, cursors, or resynchronization machinery.
-- [ ] Conditional requests keep unchanged polling cheap.
+- [ ] The next successful complete GitHub read repairs any missed/failed poll
+  without event replay, cursors, or resynchronization machinery.
+- [ ] Conditional GitHub requests keep unchanged polling cheap.
 - [ ] WebSocket/SSE transport is absent unless measured polling behavior proves
   it necessary.
 - [ ] UI shows exact versions, request/PR/task identity, elapsed time, workflow
@@ -774,5 +773,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 7 — Authenticated API in `6529seize-backend`, pending explicit owner
-confirmation of that repository boundary.
+Complete the Task 7 audit and exact-head CI, then start Task 8.

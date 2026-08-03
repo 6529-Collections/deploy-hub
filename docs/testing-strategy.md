@@ -1,6 +1,6 @@
 # Deploy Hub Testing Strategy
 
-Status: Agreed simplified MVP
+Status: Agreed portable static MVP
 
 Last updated: 2026-08-03
 
@@ -55,20 +55,18 @@ or new AWS-IAM test suites unless an approved implementation adds that boundary.
 
 ## 3. UI delivery and polling tests
 
-- Resolve `deploy-hub/main` once and serve HTML/CSS/JavaScript from that exact
-  SHA without mixing assets.
-- Keep the private-repository fetch credential server-side.
-- Require GitHub Bearer authentication for every operational snapshot/command.
+- Serve one internally consistent static release from any ordinary host.
+- Prove the static host receives no GitHub token from application code.
+- Require successful direct GitHub authentication before operational controls.
 - Display the UI source SHA.
-- Publish and roll back UI by changing `deploy-hub/main`, without a backend
-  deployment.
+- Publish and roll back UI independently of backend deployments.
 - Show a newly discovered workflow run by the next normal poll, no later than
   five seconds.
 - Update phase, GitHub waiting reason, blocker, runtime identity, validation,
   communication link, and terminal result without browser refresh.
 - Interrupt polling and prove the next complete snapshot repairs the view with
   no cursor or event replay.
-- Use ETags/conditional requests for unchanged snapshots.
+- Respect GitHub conditional responses and rate-limit guidance.
 - Keep a healthy deployment successful when a communication outcome is absent
   or failed.
 
@@ -118,15 +116,15 @@ canonical deployment path.
 The initial staging E2E guidance is approximately seven minutes. Show elapsed
 time; do not build rolling ETA analytics before real use proves a need.
 
-## 6. Restart and recovery checks
+## 6. Reload and recovery checks
 
-- Restart the backend before a dispatch and prove no mutation was reported.
-- Restart after dispatch and recover the run from GitHub correlation.
-- Look up a run that finished while the backend was unavailable.
+- Reload the page before dispatch and prove no mutation was reported.
+- Reload after dispatch and recover the run from GitHub correlation.
+- Look up a run that finished while the page was closed.
 - Attempt an identical duplicate request and a conflicting operation reuse.
 - Cancel the GitHub run outside Deploy Hub and report that truth.
 - Move `main` between preparation and production dispatch and fail closed.
-- Advance `deploy-hub/main` while browsers are open without mixing UI assets.
+- Publish a new static release without mixing assets.
 - Interrupt snapshot polling while operation state changes.
 - Redeploy a known-good exact version through the canonical manual path.
 

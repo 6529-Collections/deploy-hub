@@ -106,39 +106,38 @@ Exit criteria:
 
 ## Phase 3 — Build Deploy Hub MVP
 
-- Create the dedicated Deploy Hub implementation repository.
-- During the owner-approved credentialless bootstrap, use audited direct pushes
+- Build the dedicated Deploy Hub repository as a portable static app.
+- During the owner-approved private static-app bootstrap, use audited direct pushes
   to `deploy-hub/main` after fresh remote-head checks. Reconsider protected-main
   and reviewed task branches before credentials, live permissions, deployment
   authority, or another write actor; create no live credential as part of
   skeleton work.
-- Reuse the current deployment UI's GitHub Bearer-token authentication. Resolve
-  the caller through GitHub `/user`, check current repository/operator policy,
-  and expose separate explicit staging and production actions.
-- Let Codex use its existing GitHub authentication through the same small HTTP
-  API or a thin CLI helper. Add no OAuth server, PKCE flow, refresh-token store,
-  wallet role mapping, or shared Codex service token.
+- Reuse the current deployment UI's GitHub Bearer-token model. The browser
+  calls GitHub `/user` and current operator membership directly.
+- Let Codex use its existing GitHub authentication directly. Add no Deploy Hub
+  server, OAuth flow, refresh-token store, wallet role mapping, or shared Codex
+  service token.
 - Keep the first browser flow equivalent to the existing internal deploy UIs:
   paste or reuse a GitHub token, store it locally, send it only as a Bearer
   header, and provide a visible forget action.
-- Implement the small agent-facing endpoint set in the existing backend.
+- Implement fixed GitHub API adapters in this repository only as their current
+  UI/agent action requires them.
 - Treat environment-snapshot validation as a linked workflow phase.
 - Implement exact-SHA, stale-head, authorization, and idempotency validation.
 - Implement the four canonical workflow adapters.
 - Implement staging and production E2E adapters without copying Playwright into
   this repository.
-- Return exact GitHub workflow run IDs/URLs and derive progress from GitHub and
-  runtime evidence. Let canonical GitHub Actions concurrency own waiting.
+- Return or discover exact GitHub workflow run IDs/URLs and derive progress
+  directly from GitHub and repository-owned runtime evidence. Let canonical
+  GitHub Actions concurrency own waiting.
 - Add the smallest PR feedback and GitHub operation links that meet the UX;
   assess workflow checks and commit statuses before richer projections.
-- Add the backend private-repository proxy that resolves `deploy-hub/main` to
-  one exact SHA and serves its secret-free static UI shell under
-  `/deploy/ui/hub`; require GitHub Bearer auth for operational calls.
-- Build the operational UI and deployment history in this repository.
-- Deliver state, queue, blocker, and deployed-version changes by polling one
-  authenticated snapshot endpoint at least every five seconds. Add no
-  WebSocket, SSE, cursor, replay, or special transport credential until
-  measurements show polling is insufficient.
+- Publish one internally consistent static release through any ordinary static
+  host. `api.6529.io` may host files but is not a runtime dependency.
+- Build the operational UI and deployment history entirely in this repository.
+- Deliver run, waiting, blocker, and deployed-version changes by polling GitHub
+  directly at least every five seconds. Add no WebSocket, SSE, cursor, replay,
+  or special transport credential.
 - Observe authoritative GitHub workflow/run state; do not add callbacks or
   webhooks in the MVP.
 - Preserve the canonical workflows' existing AWS authentication. Deploy Hub
@@ -149,8 +148,8 @@ Exit criteria:
   and release-note pipeline without reimplementing it.
 - Surface only the available communication link/outcome in PR feedback,
   request lookup, and UI, outside deployment success gates.
-- Do not add a database, S3/Git ledger, custom queue, scheduler, lock service,
-  callback receiver, reconciler, or second backend runtime.
+- Do not add a backend/proxy API, database, S3/Git ledger, custom queue,
+  scheduler, lock service, callback receiver, or reconciler.
 
 Explicit exclusions:
 

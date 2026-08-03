@@ -8,10 +8,11 @@
     "node": ">=22.17.1"
   },
   "scripts": {
-    "check": "npm run format:check && npm run lint",
-    "format": "prettier --write \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"ui/**/*.{html,js,css}\"",
-    "format:check": "prettier --check \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"ui/**/*.{html,js,css}\"",
-    "lint": "eslint . --max-warnings=0"
+    "check": "npm run format:check && npm run lint && npm test",
+    "format": "prettier --write \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"test/**/*.js\" \"ui/**/*.{html,js,css}\"",
+    "format:check": "prettier --check \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"test/**/*.js\" \"ui/**/*.{html,js,css}\"",
+    "lint": "eslint . --max-warnings=0",
+    "test": "node --test test/*.test.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

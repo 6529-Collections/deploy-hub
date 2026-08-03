@@ -41,8 +41,8 @@ material.
 
 ## Current safety boundary
 
-- Credentialless implementation is permitted only while `STATUS.md` records
-  the approved bootstrap phase.
+- Static read-only GitHub authentication is owner-approved. No repository or
+  workflow mutation capability is approved merely by that authentication.
 - Do not add executable GitHub Actions, dependencies, live GitHub-token
   handling, GitHub App permissions, repository secrets, environments, AWS
   roles, or deployment credentials without explicit current-task
@@ -59,12 +59,12 @@ material.
 
 - Rule 1 is KISS: Keep It Simple, Silly. Add only the smallest abstraction,
   dependency, service, state, or workflow proven necessary by the current task.
-- During the current owner-approved credentialless bootstrap, changes are
+- During the current owner-approved private static-app bootstrap, changes are
   committed and pushed directly to `main`. Fetch `origin/main` immediately
   before each push and stop on divergence or unexpected worktree changes.
-- Before handling a live GitHub token or adding any GitHub App, OAuth client,
-  secret, AWS role, repository or environment permission, deployment authority,
-  or additional write actor, revisit protected `main` and the task-branch/
+- Before adding GitHub mutation capability, a GitHub App, OAuth client, secret,
+  AWS role, repository/environment permission, deployment authority, or
+  additional write actor, revisit protected `main` and the task-branch/
   ready-PR workflow as an explicit security gate.
 - When that later switch happens, new task-owned branches use the
   `agent-prxt/` prefix followed by concise kebab-case.
@@ -80,6 +80,7 @@ material.
 
 - Install: `npm install --ignore-scripts`
 - Full check: `npm run check`
-- Individual checks: `npm run format:check` and `npm run lint`
-- There is no Deploy Hub server in this repository. The existing 6529 backend
-  owns authenticated API and static-file proxy behavior.
+- Individual checks: `npm run format:check`, `npm run lint`, and `npm test`
+- Deploy Hub is a portable static app. Authentication and operations call the
+  GitHub API directly from the browser or the agent's existing GitHub tooling.
+- Do not add or modify a backend, proxy, Lambda, or other Deploy Hub runtime.

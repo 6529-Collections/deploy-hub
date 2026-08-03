@@ -26,8 +26,8 @@ or own global release trains.
 
 ## Consequences
 
-- The agent-facing HTTP API and run lookup are primary product interfaces;
-  callbacks are not required for the MVP.
+- Direct GitHub operations and exact run lookup are the primary agent
+  interfaces; callbacks and a Deploy Hub HTTP API are not required for MVP.
 - The UI is a shared operational view, not the release decision-maker.
 - Coordinated frontend/backend changes are plans composed by the agent from
   independent operations.
