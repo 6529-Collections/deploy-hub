@@ -4,7 +4,9 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Deterministic fake-adapter and contract-suite preparation.
+Task 6 implementation: Git-backed ledger semantics over an in-memory
+compare-and-swap repository. Task 5's deterministic capability-free adapters
+and contract suite are complete.
 
 ## Accepted direction
 
@@ -93,9 +95,9 @@ Deterministic fake-adapter and contract-suite preparation.
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Tasks 0–4 are
-  complete, Task 5 is next, and Task 25 owns the cross-cutting communications
-  integration.
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0–5 are
+  complete, Task 6 is in progress, and Task 25 owns the cross-cutting
+  communications integration.
 - Task 2 completed the versioned deployment, validation, cancel, retry, ledger,
   task-event, communication-outcome, and safe-error schemas with normative
   fixtures under `docs/contracts/`.
@@ -114,6 +116,11 @@ Deterministic fake-adapter and contract-suite preparation.
   deployment boundaries, a plain static UI shell, four unit tests, and a
   read-only CI workflow. Local checks and exact-head GitHub Actions run
   `30818122104` passed.
+- Task 5 completed deterministic in-memory frontend, backend, E2E, callback,
+  CI-drop, and release-note behavior for success, delay, product and
+  infrastructure failure, cancellation, stale, duplicate, and conflict cases.
+  The completion audit passed local format, lint, type, build, and all 12 tests
+  with zero production dependencies or live capability.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -150,8 +157,9 @@ Deterministic fake-adapter and contract-suite preparation.
 
 ## Remaining security and implementation work
 
-- Task 5 must add deterministic fake deployment, validation, and communication
-  adapters without adding live permissions or external side effects.
+- Task 6 must prove the accepted Git ledger semantics and reconciliation over
+  an in-memory compare-and-swap repository without creating the live state
+  branch or GitHub transport.
 - Later rollout tasks must provide the phase-specific permission snapshots,
   denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
   evidence, secret-canary scans, and owner approvals required by
@@ -165,7 +173,7 @@ Deterministic fake-adapter and contract-suite preparation.
 
 ## Next recommended work
 
-Complete Task 5 directly on `main`: add deterministic fake adapters and the
-contract suite for success, delay, failure, cancellation, stale, duplicate, and
-conflicting-callback behavior. Do not create a GitHub App, OAuth client, state
+Complete Task 6 directly on `main`: implement the accepted ledger semantics
+behind a Git repository port and prove them with an in-memory
+compare-and-swap repository. Do not create a GitHub App, OAuth client, state
 branch, deployment authority, AWS role, live permission, or credential.

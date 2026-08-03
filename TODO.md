@@ -35,8 +35,8 @@ receive an evidence-based answer.
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
 | 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | DONE | 2, 3 |
-| 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
-| 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
+| 5 | Fake adapters and deterministic contract suite | DONE | 4 |
+| 6 | GitHub-native request ledger and idempotency | IN PROGRESS | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
 | 8 | Scoped concurrency, waiting, and validation locks | NOT STARTED | 6, 7 |
 | 9 | GitHub Deployments, Check Runs, and task events | NOT STARTED | 6, 7 |
@@ -266,30 +266,41 @@ Evidence:
   source/config/workflow scans found no GitHub/AWS SDK, external API endpoint,
   write permission, workflow dispatch, credential, database, or cache path.
 
-### [ ] Task 5 — Fake adapters and deterministic contract suite
+### [x] Task 5 — Fake adapters and deterministic contract suite
 
-Status: `NOT STARTED`
+Status: `DONE`
 
 Outcome: Deploy Hub behavior can be developed and proven end-to-end without
 GitHub writes, AWS access, or shared-environment mutation.
 
 Acceptance criteria:
 
-- [ ] Fake frontend/backend deploy and E2E adapters support success, delay,
+- [x] Fake frontend/backend deploy and E2E adapters support success, delay,
   product failure, infrastructure failure, cancellation, and stale outcomes.
-- [ ] Fake communication sinks support CI-drop acceptance/failure and
+- [x] Fake communication sinks support CI-drop acceptance/failure and
   production release-note enqueue/publish/skip/failure without real posts.
-- [ ] A deterministic clock and event fixtures make retries reproducible.
-- [ ] Contract tests cover every operation state and transition.
-- [ ] Duplicate dispatch and duplicate/conflicting callback scenarios are
+- [x] A deterministic clock and event fixtures make retries reproducible.
+- [x] Contract tests cover every operation state and transition.
+- [x] Duplicate dispatch and duplicate/conflicting callback scenarios are
   proven safe.
-- [ ] Test configuration is physically incapable of live mutation.
+- [x] Test configuration is physically incapable of live mutation.
 
-Evidence: Not yet available.
+Evidence:
+
+- `src/domain/operation-state.ts`
+- `src/testing/`
+- `test/fake-adapters.test.ts`
+- Completion audit on 2026-08-03: all six scenarios passed for each frontend,
+  backend, and E2E fake; all eight states and 18 allowed transitions were
+  asserted; before/after-dispatch cancellation, deterministic delayed replay,
+  duplicate/conflicting dispatch and callback, and all requested CI-drop and
+  release-note outcomes passed. Local format, lint, type, build, and 12 tests
+  passed; the production dependency tree was empty and the fake source had no
+  network, GitHub SDK, AWS SDK, workflow-dispatch, or external-posting path.
 
 ### [ ] Task 6 — GitHub-native request ledger and idempotency
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Accepted requests, validation records, waiting order, and terminal
 evidence are durable and reconstructable without a database or S3 ledger.

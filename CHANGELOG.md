@@ -2,6 +2,16 @@
 
 ## 2026-08-03
 
+- Started Tasks 5 and 6 together under the credentialless direct-to-`main`
+  workflow. The implementation is limited to deterministic fakes and a Git
+  ledger repository port backed only by an in-memory compare-and-swap test
+  repository; no live state branch, GitHub write, credential, workflow, or AWS
+  capability is being introduced.
+- Completed Task 5 after its acceptance audit: deterministic frontend,
+  backend, E2E, callback, CI-drop, and release-note fakes cover every required
+  success, delay, failure, cancellation, stale, duplicate, and conflict case.
+  Local format, lint, type, build, and all 12 tests passed with zero production
+  dependencies and no live network or mutation path.
 - Started Task 4 under the owner-approved direct-to-`main` workflow for the
   private credentialless bootstrap. Recorded KISS as Rule 1 and deferred
   protected-main workflow to the pre-credential/live-authority gate.
