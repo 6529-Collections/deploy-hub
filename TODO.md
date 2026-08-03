@@ -32,7 +32,7 @@ receive an evidence-based answer.
 | ---: | --- | --- | --- |
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
-| 2 | Exact deployment, validation, and GitHub-state contracts | NOT STARTED | 1 |
+| 2 | Exact deployment, validation, and GitHub-state contracts | IN PROGRESS | 1 |
 | 3 | Authentication, permissions, and threat model | NOT STARTED | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | NOT STARTED | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
@@ -141,7 +141,7 @@ Evidence:
 
 ### [ ] Task 2 — Exact deployment, validation, and GitHub-state contracts
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Implementation-ready contracts define the smallest durable control
 plane without a release train or database state machine.

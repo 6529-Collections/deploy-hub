@@ -130,4 +130,5 @@ Exact control-plane contract definition.
 
 Execute Task 2 in `TODO.md`: define the exact deployment, validation,
 GitHub-state, task-event, and communication-outcome contracts and accept the
-GitHub-native representation ADR. Make no live deployment or migration change.
+GitHub-native representation ADR. Task 2 is in progress; make no live
+deployment or migration change.

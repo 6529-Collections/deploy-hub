@@ -2,6 +2,7 @@
 
 ## 2026-08-03
 
+- Started Task 2 contract definition after Task 1 passed its acceptance audit.
 - Completed Task 1 with an exact current-system inventory covering live
   Release Bus OFF state, all four canonical deploy paths, both E2E workflows,
   deployment communications, backend hosting/auth/realtime capabilities, and
