@@ -2,11 +2,13 @@
 
 ## 2026-08-03
 
-- Started Task 4's prerequisite audit and found it blocked before executable
-  code: the private repository has no `main` protection, and GitHub returned
-  HTTP 403 for both branch-protection and repository-ruleset APIs under the
-  current plan. Kept the repository private and specification-only and added
-  no code, Actions, credentials, or deployment authority.
+- Started Task 4 under the owner-approved direct-to-`main` workflow for the
+  private credentialless bootstrap. Recorded KISS as Rule 1 and deferred
+  protected-main workflow to the pre-credential/live-authority gate.
+- Added the single-package Node/TypeScript skeleton with zero runtime
+  dependencies, read-only status API, offline-only configuration, disabled
+  GitHub/deployment boundaries, plain static UI shell, four unit tests, and a
+  credentialless read-only CI workflow.
 - Completed Task 3 after its acceptance audit: every requested GitHub
   capability maps to a feature and rollout phase, read-only shadow is enforced
   by absent credential capabilities, production authority is exact and

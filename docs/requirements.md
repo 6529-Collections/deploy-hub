@@ -15,6 +15,11 @@ Deploy Hub is not an autonomous release manager. The initiating Codex task owns
 implementation, pull requests, CI and review handling, staging validation,
 merging, production progression, and response to failures.
 
+Rule 1 is KISS: Keep It Simple, Silly. The implementation adds no abstraction,
+service, datastore, framework, dependency, workflow, or state unless the
+current accepted requirement needs it and a simpler existing primitive cannot
+satisfy it.
+
 ## 2. Required developer outcomes
 
 The following instructions must be supported without manual workflow

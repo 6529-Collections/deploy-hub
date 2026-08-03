@@ -34,7 +34,7 @@ receive an evidence-based answer.
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
 | 2 | Exact deployment, validation, and GitHub-state contracts | DONE | 1 |
 | 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
-| 4 | Executable Deploy Hub skeleton | BLOCKED | 2, 3 |
+| 4 | Executable Deploy Hub skeleton | IN PROGRESS | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | NOT STARTED | 4 |
 | 6 | GitHub-native request ledger and idempotency | NOT STARTED | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
@@ -225,7 +225,7 @@ Evidence:
 
 ### [ ] Task 4 — Executable Deploy Hub skeleton
 
-Status: `BLOCKED`
+Status: `IN PROGRESS`
 
 Outcome: The repository contains the minimal production-quality application
 structure needed for API, static UI, adapters, and tests, with no deployment
@@ -239,19 +239,27 @@ Acceptance criteria:
 - [ ] Local build, lint, type, unit-test, and formatting commands are defined.
 - [ ] Safe sample configuration contains no secrets.
 - [ ] CI validates the repository without deployment credentials or mutation.
-- [ ] `main` protection and the task-branch/ready-PR workflow are enabled before
-  this task introduces executable application code or GitHub Actions.
+- [ ] The approved direct-to-`main` credentialless workflow and remote-head
+  safety checks are documented; protected-main/PR workflow remains a mandatory
+  reconsideration before any credential or deployment authority.
 - [ ] README and agent instructions explain how to develop and verify it.
 
-Blocking evidence:
+2026-08-03 workflow amendment: the repository owner explicitly retained direct
+pushes to `main` for the current private, credentialless bootstrap. Enforced
+protection is deferred rather than required by Task 4; it must be reconsidered
+before any credential, live permission, deployment authority, or additional
+write actor is introduced.
 
-- On 2026-08-03, authenticated GitHub REST reads confirmed the private
-  repository has no `main` protection or ruleset. Both the branch-protection
-  and repository-rulesets endpoints returned HTTP 403 with GitHub's requirement
-  to upgrade the plan or make the repository public.
-- Executable code and GitHub Actions remain intentionally uncreated. Task 4 can
-  resume when private-repository branch protection is available, or only after
-  an explicit reviewed change to the accepted safety requirement.
+Progress evidence:
+
+- `docs/decisions/0008-keep-the-executable-skeleton-small.md`
+- `package.json`, `tsconfig*.json`, `eslint.config.mjs`, and
+  `.prettierrc.json`
+- `src/`, `ui/`, and `test/skeleton.test.ts`
+- `.env.example` and `.github/workflows/ci.yml`
+- Local `npm run check` on 2026-08-03: formatting, lint, type checking, build,
+  and four unit tests passed. Completion remains pending the first exact-head
+  GitHub CI result and final acceptance audit.
 
 ### [ ] Task 5 — Fake adapters and deterministic contract suite
 
@@ -733,5 +741,4 @@ Completion evidence: Not yet available.
 
 ## Current next task
 
-Task 4 — Executable Deploy Hub skeleton (`BLOCKED` on private-repository
-`main` protection availability).
+Task 4 — Executable Deploy Hub skeleton.

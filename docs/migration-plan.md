@@ -106,8 +106,11 @@ Exit criteria:
 ## Phase 3 — Build Deploy Hub MVP
 
 - Create the dedicated Deploy Hub implementation repository.
-- Before executable code or Actions, protect `deploy-hub/main` and switch to
-  reviewed task branches; create no live credential as part of skeleton work.
+- During the owner-approved credentialless bootstrap, use audited direct pushes
+  to `deploy-hub/main` after fresh remote-head checks. Reconsider protected-main
+  and reviewed task branches before credentials, live permissions, deployment
+  authority, or another write actor; create no live credential as part of
+  skeleton work.
 - Implement wallet-backed OAuth 2.1/PKCE for the Streamable HTTP MCP surface,
   with separate read, staging, production, validation, cancellation, and retry
   scopes and current server-side role checks.

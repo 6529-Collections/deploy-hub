@@ -41,8 +41,8 @@ material.
 
 ## Current safety boundary
 
-- The repository is specification-only until `STATUS.md` explicitly records an
-  approved implementation phase.
+- Credentialless implementation is permitted only while `STATUS.md` records
+  the approved bootstrap phase.
 - Do not add executable GitHub Actions, dependencies, GitHub App permissions,
   repository secrets, environments, AWS roles, or deployment credentials
   without explicit current-task authorization.
@@ -56,13 +56,17 @@ material.
 
 ## Development conventions
 
-- While `STATUS.md` records the repository as private and specification-only,
-  documentation changes may be committed and pushed directly to `main`.
-- Before adding executable application code, GitHub Actions, permissions,
-  credentials, or deployment authority, switch to protected `main` with
-  task-owned `agent-prxt/` branches and ready-for-review pull requests.
-- After that switch, new task-owned branches use the `agent-prxt/` prefix
-  followed by concise kebab-case.
+- Rule 1 is KISS: Keep It Simple, Silly. Add only the smallest abstraction,
+  dependency, service, state, or workflow proven necessary by the current task.
+- During the current owner-approved credentialless bootstrap, changes are
+  committed and pushed directly to `main`. Fetch `origin/main` immediately
+  before each push and stop on divergence or unexpected worktree changes.
+- Before adding any GitHub App, OAuth client, secret, AWS role, repository or
+  environment permission, deployment authority, or additional write actor,
+  revisit protected `main` and the task-branch/ready-PR workflow as an explicit
+  security gate.
+- When that later switch happens, new task-owned branches use the
+  `agent-prxt/` prefix followed by concise kebab-case.
 - Open normal ready-for-review pull requests unless the user explicitly asks
   for a draft.
 - State requirements as testable outcomes.
@@ -70,3 +74,11 @@ material.
 - Optimize for agent-owned feature lifecycles and exact deployment operations;
   do not recreate Release Bus trains or autonomous candidate claiming under new
   terminology.
+
+## Credentialless bootstrap commands
+
+- Install: `npm install --ignore-scripts`
+- Full check: `npm run check`
+- Individual checks: `npm run format:check`, `npm run lint`,
+  `npm run typecheck`, `npm run build`, and `npm test`
+- Do not start the local status server unless the user explicitly asks.

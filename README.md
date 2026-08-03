@@ -26,11 +26,12 @@ The intended operating model is:
 
 ## Current status
 
-**Specification only.**
+**Credentialless executable skeleton.**
 
-This repository currently contains no Deploy Hub implementation, executable
-GitHub Actions, AWS credentials, GitHub App, repository environments, staging
-access, or production access.
+Task 4 establishes a minimal Node/TypeScript package, read-only status API,
+disabled adapter boundaries, static UI shell, tests, and credentialless CI. It
+contains no GitHub App, OAuth client, AWS credential, repository environment,
+staging access, production access, state branch, or deployment implementation.
 
 Release Bus is currently OFF for both staging and production and is not
 expected to be re-enabled. Existing manual and canonical repository workflows
@@ -54,11 +55,42 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Original handoff references](docs/references/)
 - [Planning changelog](CHANGELOG.md)
 
+## Development
+
+Rule 1 is KISS: Keep It Simple, Silly.
+
+```bash
+npm install --ignore-scripts
+npm run check
+```
+
+The project uses Node.js 22.17.1. `npm run check` runs formatting verification,
+lint, type checking, build, and unit tests. `npm start` runs the optional
+loopback-only status server after `npm run build`; it has no deployment
+operations.
+
+Project boundaries:
+
+```text
+src/api/       read-only HTTP boundary
+src/domain/    dependency-free domain values
+src/adapters/  deployment adapter boundary, disabled in Task 4
+src/github/    GitHub boundary, disabled in Task 4
+src/config/    offline-only configuration
+ui/            plain static UI files
+test/          Node built-in unit tests
+```
+
+During the current credentialless bootstrap, changes are pushed directly to
+`main` after fetching and checking `origin/main`. Protected-main/PR workflow
+must be reconsidered before any credential, live permission, deployment
+authority, or additional write actor is introduced.
+
 ## Safety boundary
 
-The first executable milestone will use fake adapters and credentialless shadow
-behavior. It must remain physically incapable of changing `1a-staging`, `main`,
-shared staging, production, or AWS infrastructure.
+The executable skeleton is physically incapable of changing `1a-staging`,
+`main`, shared staging, production, or AWS infrastructure. Task 5 will add only
+deterministic fake adapters.
 
 The proposed frontend shadow integration branch is `1a-deploy-hub`. It does not
 exist yet and will not be created until its credentialless workflow contract is

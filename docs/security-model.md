@@ -259,8 +259,11 @@ installation scope.
 
 ### 5.3 Required repository rules
 
-- `deploy-hub/main`: protected before executable code; PR required, current
-  checks required, force push/delete blocked, App has no bypass.
+- `deploy-hub/main`: audited direct pushes are allowed only during the
+  owner-approved credentialless bootstrap. Before any GitHub App, OAuth client,
+  secret, live permission, deployment authority, or additional write actor,
+  protection/PR requirements must be enabled or this security review repeated;
+  the App never receives a bypass.
 - `deploy-hub/state/v1`: creation restricted; updates restricted to the App,
   fast-forward only, deletion and force push blocked. Human emergency access
   requires an audited ruleset change, not ordinary bypass.

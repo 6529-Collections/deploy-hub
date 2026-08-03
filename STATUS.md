@@ -4,11 +4,12 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Executable skeleton blocked before code by unavailable private-repository
-`main` protection.
+Credentialless executable skeleton implementation.
 
 ## Accepted direction
 
+- Rule 1 is KISS: Keep It Simple, Silly. Complexity requires current evidence,
+  not hypothetical future need.
 - Build Deploy Hub as a new system rather than iterating Release Bus.
 - A Codex task owns the end-to-end feature lifecycle.
 - Deploy Hub owns one exact deployment operation from acceptance to terminal
@@ -63,15 +64,12 @@ Executable skeleton blocked before code by unavailable private-repository
 
 ## Current repository workflow
 
-- The repository is private and specification-only. Documentation changes may
-  be committed and pushed directly to `main` during this phase.
-- Before executable application code, GitHub Actions, permissions,
-  credentials, or deployment authority are added, protect `main` and use
-  task-owned branches with ready-for-review pull requests.
-- An authenticated check on 2026-08-03 found no existing protection and GitHub
-  returned HTTP 403 for both branch protection and repository rulesets, asking
-  for a plan upgrade or a public repository. The repository remains private,
-  and no executable code or Actions were added.
+- The repository is private and the owner explicitly approved direct pushes to
+  `main` during the current credentialless bootstrap. Every push must follow a
+  fresh remote-head/divergence check and an intentional file audit.
+- Protected-main/task-branch workflow is deferred. It must be reconsidered
+  before any GitHub App, OAuth client, secret, AWS role, repository/environment
+  permission, deployment authority, or additional write actor is introduced.
 
 ## Current documents
 
@@ -111,6 +109,11 @@ Executable skeleton blocked before code by unavailable private-repository
   GitHub OIDC workflow/AWS trust, secured WebSocket transport, secret
   boundaries, and 26-case threat review. No identity, permission, credential,
   workflow, or environment authority was created.
+- Task 4 credentialless skeleton is implemented with one Node/TypeScript
+  package, zero runtime dependencies, a read-only status API, disabled GitHub
+  and deployment boundaries, a plain static UI shell, four unit tests, and a
+  read-only CI workflow. Local checks pass; exact-head GitHub CI and the final
+  acceptance audit remain.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -147,11 +150,8 @@ Executable skeleton blocked before code by unavailable private-repository
 
 ## Remaining security and implementation work
 
-- Task 4 is blocked at its first gate: the current GitHub plan does not expose
-  branch protection or rulesets for this private repository. A plan that
-  supports private-repository protection is the recommended resolution; making
-  the repository public or weakening the safety gate requires an explicit
-  separate decision.
+- Task 4 is in progress pending exact-head GitHub CI and its final acceptance
+  audit.
 - Later rollout tasks must provide the phase-specific permission snapshots,
   denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
   evidence, secret-canary scans, and owner approvals required by
@@ -165,8 +165,7 @@ Executable skeleton blocked before code by unavailable private-repository
 
 ## Next recommended work
 
-Enable branch protection/rulesets for the private repository, then resume Task
-4: protect `main`, create `agent-prxt/executable-skeleton`, choose the minimal
-runtime/package structure, and build the credentialless application/test
-skeleton through a ready-for-review pull request. Do not create a GitHub App,
-OAuth client, state branch, deployment authority, AWS role, or live credential.
+Complete and audit Task 4 directly on `main`: add the minimal runtime/package
+structure and credentialless application/test/CI skeleton. Do not create a
+GitHub App, OAuth client, state branch, deployment authority, AWS role, live
+permission, or credential.
