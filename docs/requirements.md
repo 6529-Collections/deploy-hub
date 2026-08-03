@@ -56,13 +56,13 @@ a genuine blocker requires user input.
 - Target-scoped waiting and concurrency protection.
 - Dispatching the canonical repository workflow.
 - Observing workflow and runtime results.
-- GitHub Deployment and Check Run updates.
+- PR feedback and links to authoritative GitHub operations.
 - Supplying immutable request and authority context to repository-owned
   deployment communications.
 - Observing and linking CI-drop and production release-note side-effect
   outcomes without making them environment-mutation gates.
 - Operational UI state.
-- Terminal events and callbacks to the initiating task.
+- Terminal status remains queryable by request ID for the initiating task.
 
 ### Repositories own
 
@@ -77,9 +77,15 @@ a genuine blocker requires user input.
 
 ## 4. Agent-facing operation contract
 
-Deploy Hub must provide these machine-facing operations through an
-OAuth-authenticated Streamable HTTP MCP surface backed by the same versioned
-HTTP/domain contracts:
+KISS gate: the exact-SHA deployment operations are required, but the separate
+validation API, custom queue/lock state, Git ledger, and callback/projection
+machinery described in later sections are implementation proposals under
+K1–K4 of `kiss-architecture-review.md`. They must not be implemented merely
+because Task 2 prototyped their contracts.
+
+Deploy Hub must provide these machine-facing operations through a small
+versioned HTTP API. Humans and Codex callers use their existing GitHub Bearer
+token; a thin CLI helper may wrap the same endpoints for agents:
 
 ```text
 requestDeployment({
@@ -116,14 +122,15 @@ retryValidation(validationId)
 
 Requirements:
 
-- The authenticated wallet/profile and current server-side role grant
-  authority; `taskReference` is lifecycle/callback correlation only.
-- Staging, production, validation, cancellation, retry, and read operations
-  have separate OAuth scopes, with production exposed as an explicit
-  destructive action.
-- Every call revalidates token issuer, audience, expiry, revocation, scope, and
-  current role. No static Codex service token or caller-supplied callback URL is
-  accepted.
+- The GitHub login resolved server-side from the Bearer token grants authority
+  only when current repository access and deployment-operator policy allow the
+  exact action; `taskReference` is lifecycle correlation only.
+- Staging and production are separate explicit actions. Validation,
+  cancellation, retry, and read routes enforce their own current operator and
+  request ownership policy.
+- Every call revalidates the GitHub token and current access required by the
+  route. No static shared Codex service token, caller-asserted login, or
+  caller-supplied callback URL is accepted.
 - `sourceSha` is an immutable 40-character commit SHA.
 - Repeating the same `requestId` and identical payload returns the same logical
   operation.
@@ -191,7 +198,7 @@ stale
 Workflow-level detail may be displayed from GitHub Actions without duplicating
 every workflow step as Deploy Hub state.
 Deployment and validation remain distinguishable within `running`: the UI and
-Check Runs must show phases such as `deploying`, `deployed; validating`, and
+PR feedback must show phases such as `deploying`, `deployed; validating`, and
 `deployed; validation failed` without expanding the durable state machine.
 
 ## 7. Concurrency and waiting
@@ -254,13 +261,13 @@ Check Runs must show phases such as `deploying`, `deployed; validating`, and
   `deploy-staging.yml`.
 - The shadow workflow may resolve exact SHAs, integrate commits, build, project
   statuses, exercise idempotency, and simulate success, failure, cancellation,
-  retry, and callback delivery.
+  retry, and agent status recovery.
 - The shadow workflow must have no staging or production AWS credentials, no
   permission to update `1a-staging` or `main`, and no ability to dispatch a real
   deployment workflow.
-- Initial shadowing must not publish Check Runs to colleagues' PRs. Check Run
-  writes are limited to explicitly opted-in test PRs after projected payloads
-  have been verified.
+- Initial shadowing must not publish PR feedback to colleagues' PRs. Writes are
+  limited to explicitly opted-in test PRs after projected payloads have been
+  verified.
 - Backend shadow validation may use the exact PR SHA directly because the
   canonical backend deploy workflow is dispatch-based; a backend integration
   branch is not required unless later evidence shows one is useful.
@@ -270,11 +277,12 @@ Check Runs must show phases such as `deploying`, `deployed; validating`, and
 
 ## 9. Pull request feedback and live updates
 
-Every request attempt creates one Check Run for its exact SHA and target. A
-retry creates a new attempt Check Run and the logical request links all
-attempts.
+Every request attempt creates or updates one small PR-feedback record for its
+exact SHA and target. Existing workflow checks and commit statuses are assessed
+before adding a GitHub App for a rich Check Run. A retry links the new attempt
+without hiding the earlier result.
 
-The Check Run must expose:
+The PR feedback must expose:
 
 - Target environment.
 - Repository, PR, and exact source SHA.
@@ -296,27 +304,25 @@ The operational UI must update without a browser refresh when:
 - Shared integration-validation ownership changes.
 - A CI-drop or production release-note milestone changes.
 
-The browser first loads an authoritative snapshot, then consumes a live event
-channel through the existing backend WebSocket runtime. It obtains a
-single-use, short-lived WebSocket ticket through authenticated HTTP, must
-reconnect automatically, and must resynchronize from a fresh snapshot after
-any interruption or event gap. Under normal operation, accepted or observed
-changes appear within two seconds. A fallback polling path must preserve
-automatic updates at least every five seconds if the live channel is
-temporarily unavailable. Commands remain authenticated HTTP operations and are
-never authorized by a WebSocket connection.
+The browser polls one authenticated authoritative snapshot endpoint at least
+every five seconds. New deployments, queue changes, progress, blockers,
+versions, and results must appear without manual refresh. ETags or an equivalent
+conditional-read mechanism should avoid returning unchanged payloads. A push
+transport, cursor, replay protocol, and special transport credential are not
+part of the MVP; they require measured evidence that polling is insufficient.
+Commands remain separate authenticated HTTP operations.
 
-PR Check Runs update from the same operation transitions. Developers must not
-need to monitor Actions logs to understand progress.
+PR feedback updates from the same observed operation state. Developers must not
+need to monitor raw Actions logs to understand progress.
 
 ### Deployment communications and release notes
 
 - Canonical repository workflows submit exact deployment evidence to the
   existing backend CI-alert receiver. Deploy Hub does not implement a parallel
   notifier.
-- The authenticated organization-owned Deploy Hub GitHub App is a distinct
-  deployment authority. It must never be rendered as `Release Train` or as the
-  requesting human.
+- The GitHub login resolved from the caller token is the authenticated
+  deployment authority and workflow executor. `Deploy Hub` is the operation
+  origin and must never be rendered as `Release Train` or as a different human.
 - CI-drop attribution is scoped to the exact deployment operation. Frontend
   evidence uses a bounded deployed range and PR evidence; backend evidence is
   narrowed to the exact PRs and deployed services.
@@ -341,9 +347,10 @@ need to monitor Actions logs to understand progress.
 ### Delivery
 
 - Static UI files are owned by this repository on `deploy-hub/main`.
-- The existing backend exposes the UI at `/deploy/ui/hub` through an
-  authenticated proxy; UI source and build output are not copied into the
-  backend repository.
+- The existing backend exposes the UI shell at `/deploy/ui/hub` through a
+  private-repository proxy; UI source and build output are not copied into the
+  backend repository. The shell contains no operational data or secret, while
+  every operational API call requires GitHub Bearer authentication.
 - The proxy resolves `deploy-hub/main` to an exact commit SHA and serves all
   files for one page load from that SHA so releases cannot mix assets.
 - UI releases become available after merging to `deploy-hub/main` without a
@@ -351,8 +358,8 @@ need to monitor Actions logs to understand progress.
 - The proxy caches immutable commit-addressed files and switches to a new
   resolved `main` release atomically.
 - The UI displays the exact `deploy-hub` commit SHA it is running.
-- The private-repository credential remains server-side and has read access
-  only to the UI content it needs.
+- The private-repository UI-read credential remains server-side and has read
+  access only to the UI content it needs. It is not deployment authority.
 
 ### Operational data
 
@@ -375,15 +382,15 @@ The UI must show:
 
 The UI must not expose release trains or a single opaque global lane.
 Static files from GitHub never serve as operational state; the authenticated
-Deploy Hub API supplies snapshots, live events, history, and commands.
+Deploy Hub API supplies snapshots, history, and commands.
 
 ## 11. Failure and recovery
 
 - Infrastructure failures may retry the same logical request within a bounded
   policy.
-- Duplicate dispatch or callback delivery must not create a second logical
-  deployment.
-- Missed callbacks are recovered by reading authoritative GitHub state.
+- Duplicate dispatch or observed workflow result must not create a second
+  logical deployment.
+- Missed observations are recovered by reading authoritative GitHub state.
 - A deployment that cannot prove its exact runtime version does not succeed.
 - Stale SHAs fail closed.
 - One failed operation does not pause unrelated environments or repositories.
@@ -405,39 +412,35 @@ Deploy Hub API supplies snapshots, live events, history, and commands.
 
 ## 12. Security and audit
 
-- Human authority comes from the existing wallet-authenticated 6529 profile
-  and current server-side Deploy Hub role.
-- Codex uses OAuth 2.1 authorization-code with PKCE and short-lived,
-  audience-bound, scoped tokens. A Codex task ID, prompt, PR author, branch,
-  label, webhook sender, or contributor list is never deployment authority.
-- The browser exchanges existing wallet authentication for a short-lived,
-  `Secure`, `HttpOnly`, `SameSite=Strict` Deploy Hub session. Mutations require
-  an allowed origin and session-bound CSRF token; browser code never receives a
-  GitHub or AWS credential.
-- An organization-owned GitHub App is the control-plane executor. Its private
-  key is available only to the token broker, and each operation receives one
-  repository- and permission-subset installation token.
-- Shadow begins with an App registration and installation that are physically
-  read-only. Repository writes, workflow dispatch, Check Run writes,
-  deployment records, and environment authority are granted separately and
-  only when the corresponding rollout phase requires them.
-- Production authority requires the explicit production role and scope and is
-  bound atomically to the exact initiating request, source, environment, and
-  action; staging success never implies production authority.
-- Repository and environment permissions use least privilege.
-- Canonical workflow callbacks and AWS access use short-lived GitHub OIDC
-  identity bound to the exact repository, workflow, run, ref/environment, and
-  accepted request. No Release Bus shared callback bearer or long-lived AWS key
-  is introduced.
-- GitHub webhooks are verified over raw bytes and deduplicated by delivery ID;
-  callbacks and webhooks can report only an existing exact request and never
-  create authority.
+- Human and Codex authority comes from the GitHub login resolved from the
+  caller's existing Bearer token plus current repository and deployment-
+  operator policy.
+- A Codex task ID, prompt, PR author, branch, label, webhook sender, requester
+  string, or contributor list is never deployment authority.
+- The UI uses the existing internal deployment-tool token model. It may retain
+  the GitHub token in `localStorage` for the MVP, so it uses only first-party
+  static files, a restrictive CSP, safe DOM rendering, no third-party scripts,
+  and a visible forget action.
+- The same authorized GitHub identity performs allowed GitHub actions. No new
+  OAuth service, refresh-token store, wallet role mapping, GitHub App broker,
+  workflow-callback identity service, or WebSocket authentication service is
+  part of the MVP.
+- Production authority requires an explicit production action and current
+  operator permission and is bound to the exact initiating request, source,
+  environment, and action; staging success never implies production authority.
+- Repository and environment permissions use least privilege and every
+  mutation uses fixed repository/workflow/ref/service allowlists.
+- Deploy Hub does not redesign canonical workflow AWS authentication. It polls
+  GitHub workflow and runtime truth where callbacks are unnecessary.
+- If later webhooks or callbacks are proven necessary, they receive a separate
+  authenticated, idempotent contract and can report only an existing exact
+  request; they can never create authority.
 - Every request records requester, task reference, PR, exact SHA, target,
   authenticated deployment authority, workflow run, deployed version,
   notification/release-note identities, timestamps, and terminal result.
 - Requester, deployment authority, CI-drop contributors, and per-PR
   release-note contributors remain separately attributable.
-- Secret values never enter request records, Check Runs, UI payloads, task
+- Secret values never enter request records, PR feedback, UI payloads, task
   events, logs, diagnostic URLs, or artifacts.
 - The normative model, permission phases, and reviewed abuse cases are in
   `security-model.md` and ADR 0007.
@@ -455,7 +458,8 @@ The MVP includes:
 - Minimal durable request tracking.
 - GitHub-native durable evidence without an MVP database or S3 request ledger.
 - Scoped concurrency.
-- GitHub Deployments and Check Runs.
+- The smallest sufficient PR feedback plus authoritative workflow/runtime
+  links.
 - Repository-owned CI deployment-drop and production release-note integration,
   with machine-visible non-gating outcomes.
 - Terminal events for Codex tasks.

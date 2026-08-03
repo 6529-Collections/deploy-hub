@@ -37,8 +37,7 @@ Required scenarios:
 - Environment snapshot changes while E2E is running.
 - Product E2E failure is not retried automatically.
 - Retryable E2E workflow/setup failure preserves the validation identity.
-- Authenticated Deploy Hub authority is distinct from requester and
-  contributors.
+- Authenticated GitHub authority is distinct from requester and contributors.
 - Train-shaped metadata cannot label a Deploy Hub or manual request as Release
   Train.
 - Frontend bounded-range and backend service-scoped contributor evidence.
@@ -49,44 +48,41 @@ Required scenarios:
   ineligibility.
 - Backend multi-service production uses one immutable release group and
   publishes only after its intended service set completes.
-- Missed terminal callback with successful GitHub run.
-- Callback duplicated with identical result.
-- Callback duplicated with conflicting result.
+- Missed observation with a successful GitHub run.
+- Duplicate identical workflow observation.
+- Conflicting workflow evidence.
 - Agent task reference is preserved through completion.
 
 ## 2. Authentication and security tests
 
 Caller and browser boundaries:
 
-- Exercise OAuth authorization code with PKCE, exact redirect URI, one-use
-  code, access-token audience/expiry/revocation, scope enforcement, refresh
-  rotation, and refresh-family reuse revocation.
-- Prove a valid task reference, prompt, branch, PR label, contributor, or
-  GitHub identity grants no authority without the wallet-backed role and
-  required scope.
-- Prove staging authority cannot invoke production, and that production
-  authority is bound to the exact request and rechecked before mutation.
-- Exercise browser session rotation, expiry, logout/role-change revocation,
-  exact-origin and CSRF enforcement, and WebSocket ticket expiry/single use.
-- Prove no GitHub, AWS, OAuth refresh, wallet JWT, session, CSRF, WebSocket, or
-  callback credential reaches UI code, URLs, Check Runs, ledger/events,
-  fixtures, logs, Sentry, or error payloads; use seeded canary values.
+- Accept a valid GitHub Bearer token and derive its login from GitHub `/user`.
+- Reject missing, malformed, invalid, revoked, inaccessible, and insufficiently
+  scoped tokens before any mutation.
+- Prove a task reference, prompt, branch, PR label, requester login, or
+  contributor list cannot grant authority or override the resolved GitHub
+  identity.
+- Prove staging authority cannot invoke production. Bind explicit production
+  intent to the exact request and recheck current operator permission and
+  `main` SHA immediately before mutation.
+- Prove the browser forget action removes the stored token and subsequent calls
+  fail closed.
+- Seed a fake token marker and prove it never reaches URLs, responses, records,
+  PR feedback, fixtures, logs, Sentry, or artifacts.
 
 External identity and permission boundaries:
 
-- Verify raw-body webhook HMAC, constant-time comparison, hook/App/install/repo
-  allowlists, delivery-ID idempotency, and same-ID/different-digest rejection.
-- Verify GitHub OIDC issuer/JWKS, audience, repository ID, workflow ref/SHA,
-  run/attempt, event, ref/environment, time, and exact-request binding.
-- Exercise wrong-repository, wrong-workflow, replayed, moved-ref, stale-SHA,
-  arbitrary-workflow, cross-repository, and conflicting-callback failures.
-- Snapshot the GitHub App registration, installations, rulesets, environment
-  policy, token permission subset, AWS trust, and IAM policy for each phase.
-- In read-only shadow, attempt workflow dispatch, ref update, Check Run write,
-  Deployment write, environment/AWS access, and CI/release-note publication;
-  every attempt must fail because the credential lacks the capability.
-- Run IAM Access Analyzer and a manual resource review before any staging or
-  production role is trusted.
+- Exercise wrong-repository, wrong-workflow, moved-ref, stale-SHA,
+  arbitrary-workflow, cross-repository, and conflicting-request failures.
+- Verify every route uses a fixed repository/workflow/ref/service allowlist and
+  only the GitHub permissions required for that route.
+- In read-only shadow, attempt workflow dispatch, protected-ref update,
+  environment/AWS access, and real CI/release-note publication; every attempt
+  must fail because the credential or workflow lacks the capability.
+- Do not add webhook, callback, GitHub App, OAuth, WebSocket-authentication, or
+  AWS-IAM test suites until an approved implementation actually adds that
+  boundary.
 
 ## 3. UI delivery and live-update tests
 
@@ -97,28 +93,25 @@ Static delivery:
 - Never mix assets when `main` advances during a page load.
 - Cache commit-addressed files without serving stale mutable `main` resolution
   indefinitely.
-- Reject unauthenticated UI access and never expose the private-repository
-  credential to the browser.
+- Allow the secret-free UI shell to load, reject every unauthenticated
+  operational-data or command request, and never expose the private-repository
+  UI-read credential to the browser.
 - Display the exact UI source SHA.
 - Publish a new UI release by advancing `deploy-hub/main` without deploying the
   backend.
 
-Live behavior in an already-open browser:
+Automatic behavior in an already-open browser:
 
 - Show a newly accepted deployment without manual refresh.
 - Update operation state, queue order, blocker, validation owner, and deployed
   version without manual refresh.
-- Show accepted or observed changes within two seconds during normal live
-  operation.
-- Reject unauthenticated subscriptions and consume each WebSocket ticket only
-  once.
-- Reconnect automatically after a dropped WebSocket connection.
-- Fetch a fresh authoritative snapshot before applying events after reconnect.
-- Exercise a missed event and prove that snapshot resynchronization repairs the
-  screen.
-- Fall back to automatic polling at intervals no longer than five seconds while
-  the live stream is unavailable.
-- Prevent duplicate or out-of-order events from regressing visible state.
+- Show accepted or observed changes by the next poll, no later than five
+  seconds during normal operation.
+- Reject unauthenticated polling requests.
+- Pause or fail polling, then prove the next successful full snapshot repairs
+  the screen without an event cursor or replay protocol.
+- Use conditional requests so unchanged polling is cheap and cannot regress
+  visible state.
 - Show CI-drop and release-note milestone changes without manual refresh.
 - Keep a healthy deployment visibly successful when a communication side
   effect fails, while presenting the warning and exact recovery evidence.
@@ -134,15 +127,15 @@ Prove:
 - Exact-head readiness.
 - Production authorization.
 - Correct adapter selection.
-- Projected Check Run creation and updates without writing to colleagues' PRs
+- Projected PR-feedback creation and updates without writing to colleagues' PRs
   during initial shadowing.
 - UI projection.
-- Event delivery to the originating task.
+- Status lookup by the originating task.
 - Projected CI-drop and release-note outcomes through non-publishing fake sinks.
 
-The shadow identity must have no workflow-dispatch, repository-write, or AWS
-deployment capability. It must also be unable to publish real CI or release-note
-drops. A software mode flag alone is not sufficient isolation.
+The shadow path must have no workflow-dispatch, protected-repository-write, or
+AWS deployment capability. It must also be unable to publish real CI or
+release-note drops. A software mode flag alone is not sufficient isolation.
 
 ### Frontend `1a-deploy-hub` branch
 
@@ -151,8 +144,8 @@ drops. A software mode flag alone is not sufficient isolation.
 - Trigger only a dedicated `deploy-hub-shadow` workflow.
 - Confirm the existing `1a-staging` deployment workflow is not triggered.
 - Exercise non-force integration, exact-head identity, superseded heads,
-  concurrent requests, duplicate requests, projected Check Runs, cancellation,
-  retry, and agent callback behavior.
+  concurrent requests, duplicate requests, projected PR feedback, cancellation,
+  retry, and agent status-recovery behavior.
 - Verify the workflow cannot update `1a-staging` or `main` and cannot access
   staging or production AWS credentials.
 
@@ -186,9 +179,9 @@ Required cases:
   other-environment mutation, CI, preparation, and agent work continue.
 - Exact runtime version matches the requested SHA.
 - Failed health check produces a failed operation and truthful PR feedback.
-- Frontend and backend staging CI drops use exact operation evidence, show
-  Deploy Hub authority separately from the requester, and credit only verified
-  contributors.
+- Frontend and backend staging CI drops use exact operation evidence, show the
+  GitHub authority and Deploy Hub origin separately from the requester, and
+  credit only verified contributors.
 - Staging reports release-note ineligible and never enqueues generation.
 - Product E2E failure produces `deployed but validation failed`, blocks that
   result from production, and does not auto-retry.
@@ -216,7 +209,7 @@ estimate as a deadline.
 - Move `main` between request preparation and dispatch.
 - Advance `deploy-hub/main` while browsers are open and while static assets are
   being requested.
-- Interrupt the live UI event stream while deployment state changes.
+- Interrupt UI polling while deployment state changes.
 
 After restart, Deploy Hub must reconcile from GitHub and runtime truth without
 creating another logical deployment.
@@ -259,14 +252,14 @@ Deploy Hub becomes the default only when:
 - Duplicate and stale requests have been exercised.
 - A failure, retry, cancellation, and missed-event recovery have been exercised.
 - UI and PR status match GitHub and runtime truth.
-- UI, Check Run, and task events match authoritative CI-drop and release-note
-  outcomes without treating them as environment-mutation gates.
+- UI, PR feedback, and task status lookup match authoritative CI-drop and
+  release-note outcomes without treating them as environment-mutation gates.
 - Canonical frontend/backend staging drops and production release notes have
   correct authority, requester, PR, contributor, and service attribution.
 - An already-open UI receives new operations, queue changes, progress, and
   terminal results without manual browser refresh.
-- UI stream interruption recovers automatically without missing authoritative
-  state.
+- UI polling interruption recovers automatically from the next authoritative
+  snapshot.
 - No unexplained environment drift occurred.
 - FE and unrelated BE work are not globally serialized.
 - Manual canonical deployment remains documented and usable.

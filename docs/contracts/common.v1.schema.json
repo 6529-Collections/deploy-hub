@@ -98,44 +98,22 @@
     "authority": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "subject", "authenticated_at"],
+      "required": ["kind", "subject", "authenticated_at", "github_login"],
       "properties": {
         "kind": {
-          "type": "string",
-          "enum": ["wallet_jwt", "codex_service"]
+          "const": "github_token"
         },
         "subject": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 200
+          "maxLength": 200,
+          "pattern": "^github:"
         },
         "authenticated_at": {
           "$ref": "#/$defs/timestamp"
         },
-        "profile_id": {
-          "$ref": "#/$defs/uuidV4"
-        },
         "github_login": {
           "$ref": "#/$defs/githubLogin"
-        }
-      }
-    },
-    "executor": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "slug"],
-      "properties": {
-        "kind": {
-          "const": "github_app"
-        },
-        "slug": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 100
-        },
-        "installation_id": {
-          "type": "integer",
-          "minimum": 1
         }
       }
     },

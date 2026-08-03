@@ -27,9 +27,8 @@ recreate Release Bus complexity or make shadow testing unsafe.
 - Always require deployment health, exact-version proof, and the full baseline
   read-only environment-snapshot E2E policy for staging and production. Deeper
   authenticated, mutating, or feature-specific validation remains risk-based.
-- Authenticate Deploy Hub with an organization-owned GitHub App. Begin with a
-  physically read-only shadow installation and add narrowly scoped write and
-  workflow permissions only as each rollout phase requires them.
+- Reuse the existing GitHub bearer-token and operator-policy authentication
+  path for humans and Codex tasks, as superseded and specified by ADR 0009.
 - For the MVP, rollback is agent-guided or manual redeployment of a known-good
   exact version through the repository-owned canonical workflow. Automatic
   component rollback remains later work until repo-owned primitives are proven
@@ -38,12 +37,14 @@ recreate Release Bus complexity or make shadow testing unsafe.
 ## Consequences
 
 - The MVP has no separate deployment-state database or S3 request ledger.
-- ADR 0006 and `docs/contracts/README.md` define durable waiting, idempotency,
-  cancellation, recovery, and GitHub projection behavior on a protected Git
-  ledger branch. Tasks 5 and 6 must prove it before live use.
+- ADR 0006 and `docs/contracts/README.md` define the Task 6 Git-ledger
+  prototype. K1–K4 in the later KISS review require workflow-run/status/runtime
+  evidence and canonical GitHub concurrency to be assessed before any live
+  ledger or duplicate projection is approved.
 - Baseline snapshot E2E is universal; deeper validation is proportional to risk
   without allowing any deployment to claim success without runtime identity
   proof and unchanged-environment validation.
-- Shadow permissions cannot mutate repositories, workflows, or AWS resources.
+- Shadow execution remains credentialless or read-only and cannot mutate
+  repositories, workflows, or AWS resources.
 - Rollback remains explicit, attributable, and exact-version based rather than
   pretending that a multi-repository deployment is transactional.

@@ -70,7 +70,6 @@
       "required": [
         "requester",
         "authority",
-        "executor",
         "workflow",
         "source",
         "ci_drop_contributors",
@@ -82,9 +81,6 @@
         },
         "authority": {
           "$ref": "common.v1.schema.json#/$defs/authority"
-        },
-        "executor": {
-          "$ref": "common.v1.schema.json#/$defs/executor"
         },
         "workflow": {
           "$ref": "common.v1.schema.json#/$defs/workflowEvidence"

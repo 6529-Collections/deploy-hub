@@ -25,8 +25,13 @@ receive an evidence-based answer.
   new task or explicitly amend this tracker with a recorded reason.
 - Direct pushes to `main` are permitted only during the owner-approved private,
   credentialless bootstrap recorded in `STATUS.md`. Reconsider protection
-  before any credential, live permission, deployment authority, or additional
-  write actor.
+  before Task 7 handles a live GitHub token or any live permission, deployment
+  authority, secret, or additional write actor.
+
+The architecture-wide KISS review is recorded in
+`docs/kiss-architecture-review.md`. Its open findings are decision gates, not
+new completed implementation work; no later task may silently implement a
+flagged complex design.
 
 ## Summary
 
@@ -41,7 +46,7 @@ receive an evidence-based answer.
 | 6 | GitHub-native request ledger and idempotency | DONE | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
 | 8 | Scoped concurrency, waiting, and validation locks | NOT STARTED | 6, 7 |
-| 9 | GitHub Deployments, Check Runs, and task events | NOT STARTED | 6, 7 |
+| 9 | PR feedback and GitHub operation links | NOT STARTED | 6, 7 |
 | 10 | GitHub-backed static UI delivery | NOT STARTED | 3, 4, 7 |
 | 11 | Live operational UI and history | NOT STARTED | 8, 9, 10 |
 | 12 | Canonical frontend staging adapter | NOT STARTED | 5–9 |
@@ -74,8 +79,8 @@ Acceptance criteria:
 - [x] Agent-owned lifecycle and atomic Deploy Hub operation boundary accepted.
 - [x] Start-over migration and dormant Release Bus posture recorded.
 - [x] Canonical frontend/backend deployment ownership recorded.
-- [x] GitHub-native-first state, GitHub App auth, rollback, and fallback choices
-  recorded.
+- [x] GitHub-native-first state, existing GitHub-token auth, rollback, and
+  fallback choices recorded.
 - [x] GitHub-backed static UI and automatic live-update requirements recorded.
 - [x] Mandatory staging and production environment-snapshot E2E accepted.
 - [x] Repository-owned CI posting, exact attribution, and asynchronous
@@ -91,7 +96,8 @@ Evidence:
 - `docs/testing-strategy.md`
 - `docs/e2e-validation-analysis.md`
 - `docs/deployment-communications-analysis.md`
-- ADRs 0001 through 0005 under `docs/decisions/`
+- ADRs 0001 through 0005 and superseding auth ADR 0009 under
+  `docs/decisions/`
 
 ### [x] Task 1 — Dormant-state and canonical-workflow inventory
 
@@ -193,20 +199,19 @@ least-privilege, and staged by rollout phase.
 
 Scope:
 
-- Organization-owned GitHub App identity and installation model.
-- Caller authentication and authorization for staging, production, retry, and
-  cancellation.
-- Permissions matrix for offline, read-only shadow, writable shadow, isolated,
-  staging, and production phases.
-- Private UI-file access, browser authentication, webhook verification, secret
-  handling, and audit attribution.
-- Abuse cases: forged callbacks, replay, moved refs, confused deputy,
+- Existing GitHub Bearer-token authentication for humans and Codex agents.
+- Caller authorization for staging, production, retry, and cancellation.
+- Minimum permissions for credentialless shadow and later live adapter phases.
+- Private UI-file access, browser token handling, secret handling, and audit
+  attribution.
+- Abuse cases: invalid/revoked tokens, moved refs, confused deputy,
   cross-repository escalation, unauthorized production intent, spoofed Release
-  Train/Deploy Hub identity, and caller-supplied contributor claims.
+  Train identity, and caller-supplied contributor claims.
 
 Acceptance criteria:
 
-- [x] Every permission is mapped to a feature and rollout phase.
+- [x] Every currently proposed permission is mapped to a feature and rollout
+  phase; speculative App/OAuth/WebSocket/callback permissions are excluded.
 - [x] Read-only shadow is physically unable to dispatch or mutate.
 - [x] Production authority is explicit, attributable, and request-bound.
 - [x] Secrets never enter UI payloads, Check Runs, records, or logs.
@@ -215,15 +220,15 @@ Acceptance criteria:
 Evidence:
 
 - `docs/security-model.md`
-- `docs/decisions/0007-authentication-permissions-and-live-transport.md`
+- ADR 0009 (`docs/decisions/0009-reuse-github-token-authentication.md`), which
+  supersedes ADR 0007 before implementation
 - `docs/diagrams/security-trust-boundaries.mmd`
-- Task 3 acceptance audit on 2026-08-03: the permission-to-feature table and
-  rollout matrix cover every requested App capability; read-only shadow has no
-  write/AWS credential and requires negative capability tests; production
-  requires current role, scope, explicit action, atomic exact-request
-  authorization, and a pre-mutation recheck; the secret inventory and canary
-  test policy exclude credentials from every visible/durable surface; 26 abuse
-  cases were reviewed before any credential or live permission existed.
+- ADR 0009 and the v1.1 security-model correction on 2026-08-03 supersede the
+  original wallet OAuth/App broker/WebSocket design. Current GitHub identity,
+  repository access, operator membership, explicit production intent, and a
+  pre-mutation exact-SHA recheck are required; token canary tests exclude the
+  credential from every visible/durable surface. No credential or live
+  permission was created.
 
 ### [x] Task 4 — Executable Deploy Hub skeleton
 
@@ -339,6 +344,12 @@ Evidence:
   and all 22 tests passed with zero production dependencies. No GitHub App,
   credential, live state branch, SDK, workflow, AWS, or external mutation path
   was created.
+- Post-completion KISS review: Task 6 proves the credentialless prototype it
+  built, but does not prove that a live Git event ledger is needed. K1 in
+  `docs/kiss-architecture-review.md` blocks creation of `state/v1` or a live Git
+  adapter until the simpler workflow-run/status/runtime-evidence model is
+  assessed. Task 6 remains historical prototype evidence, not approval to ship
+  the architecture.
 
 ### [ ] Task 7 — Authenticated agent-facing API
 
@@ -350,6 +361,13 @@ and validate exact deployments through a stable machine-facing API.
 Acceptance criteria:
 
 - [ ] Deployment and validation endpoints implement the accepted contracts.
+- [ ] Existing GitHub Bearer tokens authenticate humans and Codex callers;
+  identity is derived through GitHub and current repository/operator policy is
+  checked per request.
+- [ ] No OAuth server, PKCE, refresh-token store, wallet role mapping, GitHub App
+  broker, callback identity system, or WebSocket authentication is introduced.
+- [ ] K10 is resolved before hosting work; Task 7 does not create a second
+  backend runtime when the existing API can own the small HTTP boundary.
 - [ ] Authentication, authorization, input validation, and attribution fail
   closed.
 - [ ] Every response identifies the request, exact source, environment, state,
@@ -378,23 +396,29 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 9 — GitHub Deployments, Check Runs, and task events
+### [ ] Task 9 — PR feedback and GitHub operation links
 
 Status: `NOT STARTED`
 
-Outcome: Every exact operation reports useful real-time progress to its PR and
-can resume the correct initiating Codex task.
+Outcome: Every exact operation reports useful current progress to its PR and
+can be found again by the initiating Codex task.
 
 Acceptance criteria:
 
-- [ ] One Check Run per exact SHA/target exposes state, blocker, request ID,
-  workflow, UI link, validation, and terminal conclusion.
-- [ ] GitHub Deployment records preserve environment and exact version history.
+- [ ] Assess workflow checks and commit statuses before adding a GitHub App for
+  rich Check Runs; use the smallest surface that meets PR-feedback needs.
+- [ ] One PR feedback record per exact SHA/target exposes state, blocker,
+  request ID, workflow, UI link, validation, and terminal conclusion.
+- [ ] Existing workflow and runtime links preserve enough environment and exact
+  version history; add GitHub Deployment projections only if a concrete gap
+  remains.
 - [ ] Moved PR heads are visibly stale without rewriting accepted identity.
-- [ ] Terminal task events are attributable, idempotent, and resumable.
+- [ ] The initiating task can recover status by request ID; push callbacks are
+  not required unless polling proves insufficient.
 - [ ] Non-gating CI-drop and release-note milestone events are linked to the
   exact deployment without changing its terminal truth.
-- [ ] Missed or duplicate event delivery is recoverable from GitHub truth.
+- [ ] Missed polling or duplicate observations are recoverable from GitHub
+  truth through request lookup.
 
 Evidence: Not yet available.
 
@@ -407,7 +431,8 @@ Outcome: The existing backend securely serves the UI owned by
 
 Acceptance criteria:
 
-- [ ] `/deploy/ui/hub` requires authenticated access.
+- [ ] `/deploy/ui/hub` serves a secret-free shell; all operational data and
+  commands require GitHub Bearer authentication.
 - [ ] The proxy resolves `deploy-hub/main` to one exact SHA per release and
   never mixes assets from different commits.
 - [ ] Commit-addressed assets are cached safely and a new main SHA switches
@@ -428,12 +453,14 @@ without manual refresh.
 
 Acceptance criteria:
 
-- [ ] Initial state comes from an authoritative authenticated snapshot.
-- [ ] Live events normally update visible state within two seconds.
-- [ ] Reconnect resynchronizes before applying new events.
-- [ ] Automatic polling at no more than five-second intervals covers stream
-  failure.
-- [ ] Duplicate/out-of-order events cannot regress the UI.
+- [ ] State comes from one authoritative authenticated snapshot endpoint.
+- [ ] Polling updates visible state at least every five seconds without manual
+  refresh.
+- [ ] The next successful full snapshot repairs any missed/failed poll without
+  event replay, cursors, or resynchronization machinery.
+- [ ] Conditional requests keep unchanged polling cheap.
+- [ ] WebSocket/SSE transport is absent unless measured polling behavior proves
+  it necessary.
 - [ ] UI shows exact versions, request/PR/task identity, elapsed time, ETA,
   workflow links, and scoped waiting reason.
 - [ ] UI shows CI-drop and production release-note milestones, warnings, links,
@@ -575,9 +602,8 @@ Acceptance criteria:
 - [ ] Structured failure classes distinguish source, policy, deployment,
   product E2E, infrastructure, and control-plane failures.
 - [ ] Diagnostic links reach the exact GitHub run and evidence artifact.
-- [ ] Diagnostics distinguish CI-drop acceptance, attribution omission,
-  release-note ineligibility, enqueue, skip, deduplication, publication, queue
-  failure, and generation failure.
+- [ ] Diagnostics show the smallest communication summary the existing pipeline
+  exposes without building a second release-note state machine; see K8.
 
 Evidence: Not yet available.
 
@@ -592,7 +618,8 @@ Acceptance criteria:
 
 - [ ] Waiting and running cancellation semantics are explicit and tested.
 - [ ] Retry preserves logical identity and never substitutes a newer SHA.
-- [ ] Restart and missed-webhook recovery reconcile GitHub and runtime truth.
+- [ ] Restart and missed-observation recovery reconcile GitHub and runtime
+  truth without requiring a callback path.
 - [ ] Direct workflow cancellation and partial deployment are represented
   truthfully.
 - [ ] Known-good exact redeployment is documented for staging and production.
@@ -612,15 +639,15 @@ without any ability to change shared refs, environments, or AWS resources.
 
 Acceptance criteria:
 
-- [ ] Long-lived frontend `1a-deploy-hub` accepts only allowlisted test PRs and
-  triggers only a credentialless shadow workflow.
+- [ ] K6 is resolved first. If retained, frontend `1a-deploy-hub` accepts only
+  allowlisted test PRs and triggers only one credentialless shadow workflow.
 - [ ] Backend shadow uses exact PR SHAs and simulated selected services.
 - [ ] Shadow identity cannot update `1a-staging`/`main`, dispatch real deploys,
   assume staging/production roles, or publish real CI/release-note drops.
-- [ ] Initial Check Runs are projected; later writes target only opted-in test
-  PRs.
-- [ ] Success, failure, waiting, duplicate, stale, cancel, retry, callbacks, UI,
-  and restart reconstruction are exercised.
+- [ ] Initial PR feedback is projected locally; later writes target only
+  opted-in test PRs.
+- [ ] Success, failure, waiting, duplicate, stale, cancel, retry, UI, and status
+  recovery are exercised without adding callbacks by default.
 - [ ] Shadow results are never presented as real deployment evidence.
 
 Evidence: Not yet available.
@@ -631,6 +658,10 @@ Status: `NOT STARTED`
 
 Outcome: Real cloud mutation, health, exact-version proof, E2E, failure, and
 recovery are proven without risking colleagues' shared staging work.
+
+KISS gate: K9 must show that a new isolated cloud environment is necessary
+after fakes, dry runs, read-only shadowing, and controlled low-risk staging
+options are exhausted. This task is not automatic infrastructure scope.
 
 Acceptance criteria:
 
@@ -656,10 +687,10 @@ Acceptance criteria:
 - [ ] Frontend-only, backend-only, and coordinated canaries succeed.
 - [ ] Baseline E2E binds exact environment snapshots.
 - [ ] Frontend and unrelated backend work are not globally serialized.
-- [ ] Waiting, UI, Check Runs, task events, retry, cancel, and failure behavior
-  match authoritative GitHub/runtime truth.
-- [ ] Staging CI drops show exact Deploy Hub authority/requester/contributor
-  attribution and remain release-note-ineligible.
+- [ ] Waiting, UI, PR feedback, request lookup, retry, cancel, and failure
+  behavior match authoritative GitHub/runtime truth.
+- [ ] Staging CI drops show exact GitHub authority, Deploy Hub origin,
+  requester, and contributor attribution and remain release-note-ineligible.
 - [ ] A burn-in window and success/failure acceptance record are complete.
 - [ ] Manual canonical staging remains immediately usable.
 
@@ -724,12 +755,12 @@ outcomes.
 
 Scope:
 
-- Finalize the Deploy Hub authority and immutable notification evidence
-  contract using the source task and PRs as implementation input.
+- Finalize the GitHub authority, Deploy Hub origin, and immutable notification
+  evidence contract using the source task and PRs as implementation input.
 - Preserve repository-owned contributor derivation, backend CI-alert rendering,
   production eligibility, queue/generator, deduplication, and publication.
-- Integrate communication outcomes into adapters, Check Runs, task events,
-  audit history, recovery, and the live UI.
+- Integrate the smallest available communication summary into adapters, PR
+  feedback, request lookup, audit history, recovery, and the polling UI.
 - Preserve explicit no-PR/internal/recovery behavior and backend multi-service
   release grouping.
 - Remove Release Bus-specific identity assumptions without discarding the
@@ -740,9 +771,9 @@ Acceptance criteria:
 - [ ] Backend PR #1869 and frontend PR #3504 final disposition is recorded, and
   the implementation uses only behavior verified on the exact deployed/main
   heads rather than assuming open-PR code exists.
-- [ ] `Deploy Hub` is authenticated as its own authority and cannot be spoofed
-  by workflow inputs, train-like strings, requester fields, or contributor
-  metadata.
+- [ ] The GitHub login resolved from the caller token is the authority;
+  `Deploy Hub` is an unspoofable operation origin rather than a synthetic
+  person or Release Train identity.
 - [ ] Requester, authority, operation-scoped CI contributors, and per-PR
   release-note contributors remain separate and correctly attributed.
 - [ ] Frontend contributor evidence is bounded to exact workflow/run/ref/SHA
@@ -761,9 +792,9 @@ Acceptance criteria:
 - [ ] Duplicate, rollback, recovery, unsafe-range, explicit no-PR, queue
   failure, generation failure, already-published, and successful publication
   outcomes are covered and truthful.
-- [ ] Communication milestones update the UI, Check Run, audit history, and
-  originating task without holding environment locks or changing deployment
-  and E2E terminal truth.
+- [ ] The available communication summary updates the UI, PR feedback, audit
+  lookup, and originating task status without holding environment locks or
+  changing deployment and E2E terminal truth.
 - [ ] Shadow and fake modes are physically unable to publish real CI or
   release-note drops.
 - [ ] Focused cross-repository contract tests and isolated/canary evidence prove

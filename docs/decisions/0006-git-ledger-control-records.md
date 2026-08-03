@@ -1,8 +1,13 @@
 # ADR 0006: Use one Git-backed control ledger with GitHub projections
 
-Status: Accepted
+Status: Accepted for the credentialless Task 6 prototype; live use under KISS review
 
 Date: 2026-08-03
+
+The prototype proved these semantics can be implemented, not that Deploy Hub
+needs them. K1 in `../kiss-architecture-review.md` blocks a live `state/v1`
+branch or Git adapter until workflow-run/status/runtime evidence is tested as
+the smaller MVP source of truth.
 
 ## Context
 
@@ -164,8 +169,9 @@ by silently changing the accepted SHA.
 - The one ledger branch serializes short metadata commits. It does not
   serialize builds or deployments; an unexpected sustained write bottleneck is
   evidence to revisit the storage decision.
-- `state/v1` needs branch protection against human force-push/delete and write
-  permission restricted to the Deploy Hub GitHub App.
+- If retained after the KISS gate, `state/v1` needs branch protection against
+  force-push/delete and write permission restricted to the approved Deploy Hub
+  execution path.
 - Snapshots may be regenerated, but event and request files may not be edited or
   deleted during normal operation.
 

@@ -12,9 +12,9 @@ attribution, and asynchronous production release notes. Building equivalent
 logic inside Deploy Hub would duplicate security-sensitive evidence
 validation, publication deduplication, and release-note behavior.
 
-Deploy Hub still needs these outcomes in its Check Runs, UI, audit history, and
-agent callbacks. It also introduces a new authenticated deployment authority
-that must not be mislabeled as a manual user or Release Train.
+Deploy Hub still needs these outcomes in its PR feedback, UI, audit history,
+and agent-facing status. It must preserve the authenticated GitHub operator and
+must not mislabel that person as Release Train.
 
 ## Decision
 
@@ -28,9 +28,11 @@ drop rendering, production-only release-note eligibility, asynchronous queueing
 and generation, deduplication, and publication.
 
 Deployment authority, requester, and contributors remain separate identities.
-The organization-owned Deploy Hub GitHub App receives its own authenticated
-authority classification. Caller-supplied train identifiers or contributor
-names cannot relabel an operation or substitute for immutable evidence.
+The GitHub login resolved from the caller's Bearer token is the authenticated
+authority and workflow executor. `Deploy Hub` is operation origin, not a fake
+person or separate authentication identity. Caller-supplied train identifiers
+or contributor names cannot relabel an operation or substitute for immutable
+evidence.
 
 Deploy Hub observes and links communication milestones and failures. CI-drop or
 release-note failure is visible and recoverable but does not hold an environment
@@ -45,8 +47,9 @@ the deployment success gates.
 - Staging generates deployment notifications but remains release-note
   ineligible.
 - Production release-note processing remains asynchronous and non-gating.
-- Check Runs, task events, audit history, and the UI expose communication
-  milestones separately from deployment and validation state.
+- PR feedback, request lookup, audit history, and the UI expose the smallest
+  available communication summary separately from deployment and validation
+  state.
 - Shadow workflows must use fake or suppressed communication sinks and cannot
   publish real drops or release notes.
 - Release Bus-specific authority and workflow identities can be removed only

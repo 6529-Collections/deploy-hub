@@ -4,6 +4,12 @@ Status: Accepted Task 2 contract
 
 Date: 2026-08-03
 
+Live-use note: these contracts remain evidence of the Task 2/6 prototype. K1–K4
+in `../kiss-architecture-review.md` require the custom Git ledger, separate
+validation lifecycle, custom queues/locks, and duplicate projections to justify
+themselves against a smaller workflow-run/status/runtime-evidence MVP before
+live implementation.
+
 ## Purpose and boundary
 
 These contracts define the smallest durable Deploy Hub control plane. They
@@ -48,7 +54,7 @@ versioned. Implementations must not silently relax v1.
    followed by SHA-256.
 5. `request_digest` is the idempotency digest of stable authenticated intent,
    not a digest of server clock readings. For a deployment it covers schema
-   version, request ID, stable requester/authority/executor identity fields,
+   version, request ID, stable requester/authority identity fields,
    source repository/ref/SHA/PR identities, environment, intent, production
    action and authority subject, target, resource keys, plan reference, and
    communication policy. It excludes acceptance/authentication/resolution
@@ -74,14 +80,13 @@ The following identities never substitute for one another:
 | Identity | Meaning | Source |
 | --- | --- | --- |
 | `requester` | Human or Codex task asking for the deployment | Authenticated request context plus task metadata |
-| `authority` | Principal whose authenticated policy decision permits the exact action/environment | Wallet JWT or trusted Codex service authentication |
-| `executor` | Organization GitHub App that writes records and starts workflows | Server configuration; never caller-supplied |
+| `authority` | GitHub user whose authenticated token and current operator policy permit the exact action/environment; also the GitHub executor | Server resolution through GitHub `/user`; never caller-supplied |
 | workflow actor | GitHub identity recorded on the exact canonical run | GitHub run evidence |
 | `ci_drop_contributors` | Humans proven in the deployed operation for the CI post | Repository-owned immutable GitHub evidence |
 | `release_note_contributors_by_pr` | Humans proven separately for each release-note PR | Repository-owned PR/commit evidence |
 
-The accepted API request is server-enriched with requester, authority, and
-executor. A client cannot claim any of these by sending JSON fields.
+The accepted API request is server-enriched with requester and authority. A
+client cannot claim either identity by sending JSON fields.
 
 ## Deployment request
 
@@ -103,7 +108,6 @@ are several deployment requests. `plan_reference` is correlation only.
 | `accepted_at` | Trusted server audit time; not the concurrency primitive |
 | `requester` | Server-enriched requester; a Codex requester must include the originating task ID |
 | `authority` | Server-enriched authenticated authority and authentication time |
-| `executor` | Server-enriched Deploy Hub GitHub App identity |
 | `source.repository` | Exact frontend or backend GitHub repository |
 | `source.ref` | Human-readable source ref resolved at acceptance; never used instead of the SHA after acceptance |
 | `source.sha` | Immutable accepted source |
@@ -289,7 +293,7 @@ environment at one moment, not one repository deployment.
 | Field | Rule |
 | --- | --- |
 | `validation_id` | UUIDv4 and idempotency key |
-| `requester`, `authority`, `executor` | Same separation as deployment |
+| `requester`, `authority` | Same separation as deployment |
 | `environment` | `staging` or `production` |
 | `resource_key` | Exactly `<environment>:validation` |
 | `linked_deployment_request_ids` | One or more exact deployment requests; a coordinated set shares this one result |
@@ -484,8 +488,8 @@ their observed outcome.
 
 ### Immutable provenance
 
-The first outcome event fixes requester, authority, executor, exact workflow,
-exact source, optional GitHub Deployment ID, CI-drop contributors, and
+The first outcome event fixes requester, authority, exact workflow, exact
+source, optional GitHub Deployment ID, CI-drop contributors, and
 per-PR release-note contributor sets. `provenance_digest` is repeated on later
 events; a mismatch is a conflicting callback.
 
@@ -525,7 +529,7 @@ or publication state machine.
 | `cancelled-deployment.json` | Waiting request records cancel intent and terminal cancellation without environment mutation |
 | `failed-deployment.json` | Runtime mutation completed but E2E product failure remains a truthful failed deployment with non-gating communication warning |
 | `valid-validation.json` | Before/after environment snapshots match and all baseline packs succeed |
-| `communication-outcome.json` | Requester, authority, executor and evidence-derived contributors remain distinct while CI posting stays non-gating |
+| `communication-outcome.json` | Requester, GitHub authority and evidence-derived contributors remain distinct while CI posting stays non-gating |
 | `task-event-delivery.json` | One committed authoritative event is delivered verbatim with its exact ledger commit to the initiating Codex task |
 | `error-response.json` | A safe, versioned idempotency conflict reports no ledger or external mutation |
 
@@ -534,6 +538,10 @@ identity propagation visually. They are not live repository evidence.
 
 ## Versioning
 
+- No live producer or consumer exists yet. Owner-approved pre-implementation
+  corrections may amend v1 when recorded in the changelog; ADR 0009's removal
+  of the speculative App executor is such a correction. Freeze compatibility
+  rules when Task 7 ships its first consumer.
 - Additive optional fields require a documented compatible minor consumer
   policy but keep the v1 discriminator only if old consumers safely ignore
   them. Current schemas reject unknown fields, so producers must coordinate
@@ -545,7 +553,7 @@ identity propagation visually. They are not live repository evidence.
 
 ## Work intentionally deferred
 
-Task 2 specifies behavior; it does not create the state branch, GitHub App,
-Check Runs, Deployments, workflows, credentials, UI, or environment access.
+Task 2 specifies behavior; it does not create the state branch, PR feedback,
+Deployments, workflows, credentials, UI, or environment access.
 Task 3 owns permissions/threat modeling. Tasks 5 and 6 must prove these
 contracts with fake and isolated GitHub adapters before any live mutation.

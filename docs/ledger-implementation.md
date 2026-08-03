@@ -4,6 +4,11 @@ Status: Task 6 implementation boundary
 
 Date: 2026-08-03
 
+Live-use gate: K1–K4 in `kiss-architecture-review.md` classify this as a
+credentialless prototype that may be substantially more complex than the MVP
+needs. Do not add a GitHub adapter or create `state/v1` until the smaller
+workflow-run/status/runtime-evidence design is tried and found insufficient.
+
 ## What exists now
 
 `RequestLedger` implements the accepted `state/v1` semantics behind a tiny
@@ -22,7 +27,8 @@ The current adapter is intentionally in memory. It simulates Git commits,
 parent heads, non-force conflicts, complete trees, and retained history. It has
 no URL, token, network client, GitHub write, workflow dispatch, state branch,
 or environment capability. A live GitHub Git-database adapter and creation of
-the protected `refs/heads/state/v1` branch remain later permission-gated work.
+the protected `refs/heads/state/v1` branch are blocked by the KISS gate, not
+merely deferred permission work.
 
 ## Retention and audit history
 

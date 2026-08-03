@@ -1,8 +1,14 @@
 # ADR 0007: Use wallet-backed OAuth, scoped GitHub App tokens, OIDC workflows, and WebSockets
 
-Status: Accepted
+Status: Superseded by ADR 0009
 
 Date: 2026-08-03
+
+This record is retained as historical context. Before implementation, the
+repository owner rejected this design as unnecessary for the MVP. ADR 0009
+replaces its wallet OAuth, OAuth server, refresh-token, GitHub App broker,
+workflow-callback OIDC, and authenticated WebSocket decisions with the proven
+GitHub bearer-token/operator model and polling-first UI updates.
 
 ## Context
 

@@ -56,9 +56,10 @@ deduplication, and publishes the release note.
 - A train-shaped string or caller-supplied contributor list is not authority
   evidence.
 
-Deploy Hub will require its own authenticated authority classification. It
-must never masquerade as `Release Train` or collapse the requesting human into
-the workflow actor.
+Deploy Hub records the GitHub login resolved from the caller token as the
+authenticated authority and workflow executor. `Deploy Hub` remains the
+operation origin, not a synthetic person. It must never masquerade as `Release
+Train` or collapse the requester or contributors into the workflow actor.
 
 ### Contributor scope follows immutable deployed evidence
 
@@ -111,7 +112,7 @@ contributor resolver, release-note generator, queue, or publication store.
 For each repository adapter, Deploy Hub supplies enough immutable context for
 the canonical workflow to prove:
 
-- Deploy Hub request ID and authenticated Deploy Hub authority;
+- Deploy Hub request ID, origin, and authenticated GitHub authority;
 - requester and originating Codex task;
 - repository, PR, exact source SHA, environment, and selected services;
 - exact workflow run, workflow identity, ref, and deployed runtime identity;
@@ -143,8 +144,8 @@ machine terminals. Their exact machine schema belongs to Task 2.
   authentication rules at repository `main`.
 - Determine how the existing backend exposes asynchronous queue/generator
   outcomes to Deploy Hub without adding a second durable state store.
-- Define the exact authenticated `Deploy Hub` initiator label and evidence
-  contract without retaining Release Bus train semantics.
+- Define the exact GitHub-authority plus `Deploy Hub` origin evidence contract
+  without retaining Release Bus train semantics.
 - Verify canonical frontend production baseline selection after Release Bus
   workflows are retired and historical runs remain in GitHub.
 - Prove the backend-first compatibility and rollout order before any adapter

@@ -13,9 +13,10 @@ Before changing the project, read:
 3. `TODO.md`
 4. `docs/requirements.md`
 5. `docs/architecture.md`
-6. `docs/migration-plan.md`
-7. `docs/testing-strategy.md`
-8. All accepted records in `docs/decisions/`
+6. `docs/kiss-architecture-review.md`
+7. `docs/migration-plan.md`
+8. `docs/testing-strategy.md`
+9. All accepted records in `docs/decisions/`
 
 Read files under `docs/references/` when validating claims about Release Bus or
 the original Deploy Hub proposal. Treat those files as immutable source
@@ -43,9 +44,10 @@ material.
 
 - Credentialless implementation is permitted only while `STATUS.md` records
   the approved bootstrap phase.
-- Do not add executable GitHub Actions, dependencies, GitHub App permissions,
-  repository secrets, environments, AWS roles, or deployment credentials
-  without explicit current-task authorization.
+- Do not add executable GitHub Actions, dependencies, live GitHub-token
+  handling, GitHub App permissions, repository secrets, environments, AWS
+  roles, or deployment credentials without explicit current-task
+  authorization.
 - Do not change frontend, backend, Release Bus, GitHub workflows, AWS resources,
   live deployment state, or Release Bus controls from this repository without a
   separately authorized operation.
@@ -61,10 +63,10 @@ material.
 - During the current owner-approved credentialless bootstrap, changes are
   committed and pushed directly to `main`. Fetch `origin/main` immediately
   before each push and stop on divergence or unexpected worktree changes.
-- Before adding any GitHub App, OAuth client, secret, AWS role, repository or
-  environment permission, deployment authority, or additional write actor,
-  revisit protected `main` and the task-branch/ready-PR workflow as an explicit
-  security gate.
+- Before handling a live GitHub token or adding any GitHub App, OAuth client,
+  secret, AWS role, repository or environment permission, deployment authority,
+  or additional write actor, revisit protected `main` and the task-branch/
+  ready-PR workflow as an explicit security gate.
 - When that later switch happens, new task-owned branches use the
   `agent-prxt/` prefix followed by concise kebab-case.
 - Open normal ready-for-review pull requests unless the user explicitly asks

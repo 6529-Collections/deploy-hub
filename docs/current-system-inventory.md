@@ -254,12 +254,12 @@ eventual integration and compatibility audit.
 | --- | --- | --- |
 | HTTP hosting | Express API mounts `deploy.routes.ts` at `/deploy`; current HTML and JavaScript are rendered by backend TypeScript | Backend can host a Deploy Hub proxy/API without a new public application service, subject to Task 3 security design |
 | Static UI behavior | `/deploy/ui`, `/deploy/ui/app.js`, `/deploy/ui/bus`, and `/deploy/ui/bus/app.js` are public shells with `no-store`; code is compiled into backend renderers, not fetched from `deploy-hub/main` | Replace the source with a private GitHub-content proxy resolved to one exact Deploy Hub commit |
-| Current UI auth | Browser pastes a GitHub token, stores it in `localStorage`, and sends it as Bearer auth; backend checks viewer/repository write/operator status | Do not reuse this browser-token model; Deploy Hub requires normal 6529 wallet/JWT auth and server-held GitHub App credentials |
+| Current UI auth | Browser pastes a GitHub token, stores it in `localStorage`, and sends it as Bearer auth; backend checks viewer/repository write/operator status | Reuse this proven internal-tool model for Deploy Hub MVP; tighten CSP, DOM safety, token redaction, and the visible forget action rather than adding a second identity system |
 | HTTP user auth | `auth/auth.ts` provides Passport JWT required/optional middleware and profile resolution | Reusable primitive, but current deploy routes do not apply it |
 | Live transport | Production WebSocket support exists through API Gateway and authenticates the same JWT; current protocol handles auth, notification identity sync, wave subscription, and typing | Transport infrastructure is reusable in principle, but no Deploy Hub topic, authorization, replay cursor, or events exist |
 | Server-sent events | No `text/event-stream` or `EventSource` implementation exists at the inspected backend SHA | SSE support is unproven; the accepted no-refresh requirement must retain bounded polling fallback, and Task 3/10 selects the secured transport |
-| Current UI refresh | Manual deploy UI polls run history every 15 seconds; Release Bus UI polls every 30 seconds when the user is not interacting | Polling is proven, but current intervals and interaction suppression do not meet immediate, always-current Deploy Hub UX by themselves |
-| GitHub access | `deploy.github.service.ts` already reads refs/runs, resolves exact heads, checks repo write access, and dispatches canonical workflows using a user token | Useful behavior can be extracted behind an organization GitHub App; user token storage and Release Bus guard calls are not retained |
+| Current UI refresh | Manual deploy UI polls run history every 15 seconds; Release Bus UI polls every 30 seconds when the user is not interacting | Polling is proven; shorten Deploy Hub's single snapshot poll to at most five seconds and add conditional responses before considering a push transport |
+| GitHub access | `deploy.github.service.ts` already reads refs/runs, resolves exact heads, checks repo write access, and dispatches canonical workflows using a user token | Reuse the generic behavior and caller credential; remove Release Bus guard coupling and keep route targets allowlisted |
 
 ## Release Bus dependency and change map
 
@@ -279,7 +279,7 @@ are not runtime dependencies; their cleanup is editorial and deferred.
 | `ops/deployment-bus/manifest.v1.schema.json` | Existing deployment evidence schema | Retain compatible evidence; do not confuse it with a Deploy Hub request ledger |
 | `scripts/e2e-packs.cjs` | Pack selection/execution/evidence | Retain as frontend-owned adapter implementation |
 | `scripts/release-bus-baseline-adoption-decision.cjs` | Decides whether automatic staging E2E should call Release Bus baseline adoption | Remove after the generic snapshot dispatch replaces adoption |
-| `scripts/notify-ci-wave.mjs` | CI drop and release-note request sender; current Release Bus contributor semantics | Retain repository ownership; generalize immutable Deploy Hub authority/provenance |
+| `scripts/notify-ci-wave.mjs` | CI drop and release-note request sender; current Release Bus contributor semantics | Retain repository ownership; generalize immutable GitHub authority, Deploy Hub origin, and provenance |
 
 Related contract tests that must be updated with those changes are
 `__tests__/scripts/deployment-bus.test.ts`, `e2e-packs.test.ts`,
@@ -313,7 +313,7 @@ they protect.
 | --- | --- | --- |
 | `.github/workflows/deploy.yml` | Canonical one-service deploy, Release Bus artifact path, manual readiness, global manual mutex, exact proof and communications | Retain canonical owner; remove global manual mutex in favor of scoped service/environment ownership; make exact proof generic; replace Release Bus guard/operation fields |
 | `scripts/generate-deploy-config.mjs` and `src/config/deploy-services.json` | Generate deploy workflow/service allowlist and include the `releaseBus` service | Retain generator; later remove Release Bus service/functions and obsolete inputs |
-| `src/api-serverless/src/deploy/deploy.github.service.ts` | Ref/run lookup, permissions, workflow dispatch | Retain/extract generic GitHub adapter; replace user-token authority |
+| `src/api-serverless/src/deploy/deploy.github.service.ts` | Ref/run lookup, permissions, workflow dispatch | Retain/extract generic GitHub adapter and reuse user-token authority with fixed allowlists |
 | `src/api-serverless/src/deploy/deploy.routes.ts` | Mixed manual UI and Release Bus API surface | Split: retain generic deploy endpoints only after new auth/contracts; retire all Release Bus routes |
 | `src/api-serverless/src/deploy/deploy.validation.ts` | Mixed manual dispatch and Release Bus request validation | Split/generate from accepted Deploy Hub contracts |
 | `src/api-serverless/src/ci-pipeline-alerts/ci-pipeline-alert.routes.ts` | HMAC validation, Release Bus contributor fields, Redis dedupe | Retain notification receiver; generalize authority/provenance and expose typed outcomes |
@@ -359,7 +359,7 @@ staging state. Deploy Hub must not recreate these train-level concepts.
 | Coordinated production | No exact agent-owned sequencing record or one shared snapshot result outside Release Bus |
 | PR feedback | Canonical workflows create GitHub Deployments but do not create/update a stable Deploy Hub Check Run on every owning PR in real time |
 | Waiting/ownership | GitHub concurrency queues runs, but there is no cross-repository visible scoped waiting record, deterministic owner, cancel intent, or restart reconstruction contract |
-| UI | Existing UIs are embedded, token-based and polling-only; no GitHub-backed Deploy Hub UI, wallet authorization or operation event contract |
+| UI | Existing UIs are embedded, token-based and polling-only; no GitHub-backed Deploy Hub UI or unified operation snapshot exists |
 | Communications | Current `main` lacks exact manual contributor derivation and typed downstream outcomes; stronger PR implementation is still unmerged |
 | Recovery | Manual exact redeploy exists, but generic cancellation, partial-mutation reconciliation, snapshot drift and side-effect retry are not one contract |
 
@@ -393,18 +393,19 @@ The following accepted direction still requires Task 2 and Task 3 contracts or
 prototypes before it becomes implementation truth:
 
 - GitHub-native Deploy Hub records instead of a new application database;
-- GitHub Check Runs as the primary PR progress surface;
-- an organization GitHub App rather than pasted browser tokens;
+- existing workflow checks or commit statuses as the first PR progress surface,
+  with a narrow Check Run only if needed;
+- the existing GitHub Bearer-token/operator model rather than a new identity
+  system;
 - the static UI fetched from one exact `deploy-hub/main` SHA through the
   backend;
-- a secured live event channel with automatic polling fallback;
+- a single authenticated snapshot polled at least every five seconds;
 - agent-owned coordinated plans composed from atomic repository operations;
 - explicit known-good redeployment rather than automatic rollback in MVP.
 
-Task 2 must choose the exact durable GitHub representation and prove that it
-supports atomic idempotency, deterministic waiting, cancellation intent and
-restart reconstruction. Task 3 must decide whether the existing WebSocket
-stack, a new SSE path, or polling-first delivery is the safe live transport.
+Task 2 selected a durable Git representation, but the later KISS review flags
+that custom event ledger for explicit reconsideration before live use. ADR 0009
+selects polling-first delivery and existing GitHub-token authentication.
 
 ## Task 1 conclusion
 

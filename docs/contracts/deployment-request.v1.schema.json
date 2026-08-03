@@ -11,7 +11,6 @@
     "accepted_at",
     "requester",
     "authority",
-    "executor",
     "source",
     "environment",
     "intent",
@@ -38,9 +37,6 @@
     },
     "authority": {
       "$ref": "common.v1.schema.json#/$defs/authority"
-    },
-    "executor": {
-      "$ref": "common.v1.schema.json#/$defs/executor"
     },
     "source": {
       "$ref": "common.v1.schema.json#/$defs/source"

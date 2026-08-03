@@ -2,6 +2,31 @@
 
 ## 2026-08-03
 
+- Corrected the MVP authentication design after owner review. ADR 0009 now
+  reuses the existing deploy UI's GitHub Bearer-token, GitHub `/user`, and
+  operator-policy path for both humans and Codex; ADR 0007 is superseded.
+- Removed wallet OAuth, PKCE, the new authorization server, refresh-token
+  storage, wallet role mapping, GitHub App token brokering, workflow-callback
+  OIDC, and WebSocket-ticket authentication from current MVP requirements,
+  architecture, migration, testing, contracts, diagrams, and status.
+- Simplified the no-refresh UI default to one authenticated snapshot poll at
+  least every five seconds with conditional responses. WebSocket/SSE transport
+  now requires measured evidence.
+- Simplified authority contracts so the GitHub login resolved from the caller
+  token is authority and executor; `Deploy Hub` is operation origin, not a
+  synthetic person. Removed the speculative GitHub App executor object from v1
+  schemas and fixtures.
+- Added `docs/kiss-architecture-review.md`, retaining concrete requirements but
+  flagging the custom Git event ledger, separate validation state machine,
+  custom locks/queues, duplicate projections/callbacks, early GitHub App,
+  shadow branch, static proxy growth, release-note mirroring, and isolated cloud
+  infrastructure, a possible duplicate backend runtime, and premature metrics/
+  ETA machinery for explicit simplification decisions.
+- Placed a live-use KISS gate on the completed credentialless Task 6 prototype:
+  no `state/v1` branch or Git adapter is approved until workflow-run/status/
+  runtime evidence and canonical GitHub concurrency are assessed first.
+- Left Task 7 `NOT STARTED`; this session changed documentation and pre-live
+  decisions only and introduced no credential or deployment capability.
 - Started Tasks 5 and 6 together under the credentialless direct-to-`main`
   workflow. The implementation is limited to deterministic fakes and a Git
   ledger repository port backed only by an in-memory compare-and-swap test

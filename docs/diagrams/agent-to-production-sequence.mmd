@@ -12,7 +12,7 @@ sequenceDiagram
     A->>G: Implement and open or update PR
     G-->>A: Exact-head CI and review result
     A->>H: Deploy exact PR SHA to staging
-    H->>G: Create or update staging Check Run
+    H->>G: Create or update staging PR feedback
     H->>W: Start canonical staging path
     W->>E: Deploy and health-check
     W->>C: Post exact staging deployment evidence
@@ -23,7 +23,7 @@ sequenceDiagram
     V->>E: Execute read-only packs
     V-->>H: Terminal snapshot-bound result
     H->>E: Verify staging snapshot is unchanged
-    H->>G: Conclude staging Check Run
+    H->>G: Conclude staging PR feedback
     H-->>A: Staging deployed and validated
     A->>E: Run additional feature validation when required
     A->>G: Merge exact approved result
@@ -39,7 +39,7 @@ sequenceDiagram
     V->>E: Execute read-only packs
     V-->>H: Terminal snapshot-bound result
     H->>E: Verify production snapshot is unchanged
-    H->>G: Conclude production Check Run
+    H->>G: Conclude production PR feedback
     H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production
     opt Later asynchronous communication outcome

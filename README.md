@@ -11,9 +11,11 @@ The intended operating model is:
   operation from acceptance through terminal reporting.
 - Frontend and backend repositories retain ownership of their canonical build
   and deployment workflows.
-- GitHub Check Runs provide real-time pull-request feedback.
-- The browser UI is served from the exact current `deploy-hub/main` commit
-  through the authenticated backend proxy.
+- GitHub workflow checks, commit statuses, or—only if required—a narrow Check
+  Run provide current pull-request feedback.
+- The secret-free browser UI shell is served from the exact current
+  `deploy-hub/main` commit through the backend private-repository proxy;
+  operational calls require GitHub Bearer authentication.
 - New deployments, queue changes, progress, and results appear in an open UI
   automatically without manual browser refresh.
 - Every staging and production outcome passes the full baseline read-only E2E
@@ -26,12 +28,21 @@ The intended operating model is:
 
 ## Current status
 
-**Credentialless executable skeleton.**
+**Credentialless executable skeleton with deterministic fakes and an in-memory
+Git-ledger prototype.**
 
-Task 4 establishes a minimal Node/TypeScript package, read-only status API,
-disabled adapter boundaries, static UI shell, tests, and credentialless CI. It
-contains no GitHub App, OAuth client, AWS credential, repository environment,
-staging access, production access, state branch, or deployment implementation.
+Tasks 4–6 establish a minimal Node/TypeScript package, read-only status API,
+disabled live adapter boundaries, static UI shell, deterministic fake adapters,
+and a credentialless Git-ledger prototype backed only by an in-memory
+repository. It contains no live GitHub token handling, GitHub App, OAuth
+client, AWS credential, repository environment, staging access, production
+access, live state branch, or deployment implementation.
+
+ADR 0009 replaces the earlier wallet OAuth/GitHub App broker design with the
+existing deployment UI's GitHub Bearer-token/operator model. The architecture-
+wide KISS review is in
+[docs/kiss-architecture-review.md](docs/kiss-architecture-review.md); its open
+findings must be resolved before Task 7 expands the control plane.
 
 Release Bus is currently OFF for both staging and production and is not
 expected to be re-enabled. Existing manual and canonical repository workflows
@@ -44,6 +55,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
 - [Authentication, permissions, and threat model](docs/security-model.md)
+- [KISS architecture review](docs/kiss-architecture-review.md)
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [Current deployment-system inventory](docs/current-system-inventory.md)
@@ -72,10 +84,11 @@ operations.
 Project boundaries:
 
 ```text
-src/api/       read-only HTTP boundary
+src/api/       currently read-only HTTP boundary
 src/domain/    dependency-free domain values
-src/adapters/  deployment adapter boundary, disabled in Task 4
-src/github/    GitHub boundary, disabled in Task 4
+src/adapters/  fake/disabled deployment adapter boundary
+src/github/    disabled live GitHub boundary
+src/ledger/    in-memory-tested Git ledger prototype pending KISS decision
 src/config/    offline-only configuration
 ui/            plain static UI files
 test/          Node built-in unit tests
@@ -89,8 +102,8 @@ authority, or additional write actor is introduced.
 ## Safety boundary
 
 The executable skeleton is physically incapable of changing `1a-staging`,
-`main`, shared staging, production, or AWS infrastructure. Task 5 will add only
-deterministic fake adapters.
+`main`, shared staging, production, or AWS infrastructure. Its adapters and
+ledger tests have no live credentials or external mutation path.
 
 The proposed frontend shadow integration branch is `1a-deploy-hub`. It does not
 exist yet and will not be created until its credentialless workflow contract is

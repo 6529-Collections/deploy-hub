@@ -21,16 +21,10 @@
         }
       },
       "authority": {
-        "kind": "wallet_jwt",
-        "subject": "profile:prxt0",
+        "kind": "github_token",
+        "subject": "github:prxt6529",
         "authenticated_at": "2026-08-03T09:59:58.000Z",
-        "profile_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
         "github_login": "prxt6529"
-      },
-      "executor": {
-        "kind": "github_app",
-        "slug": "6529-deploy-hub",
-        "installation_id": 12345678
       },
       "workflow": {
         "repository": "6529-Collections/6529seize-frontend",
@@ -77,8 +71,7 @@
   "expected": {
     "deployment_terminal_unchanged": true,
     "requester_subject": "codex-task:019faa0e-example",
-    "authority_subject": "profile:prxt0",
-    "executor_slug": "6529-deploy-hub",
+    "authority_subject": "github:prxt6529",
     "ci_drop_contributors": [
       "feature-author"
     ],

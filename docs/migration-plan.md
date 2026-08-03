@@ -111,15 +111,15 @@ Exit criteria:
   and reviewed task branches before credentials, live permissions, deployment
   authority, or another write actor; create no live credential as part of
   skeleton work.
-- Implement wallet-backed OAuth 2.1/PKCE for the Streamable HTTP MCP surface,
-  with separate read, staging, production, validation, cancellation, and retry
-  scopes and current server-side role checks.
-- Implement short-lived `HttpOnly` browser sessions, exact-origin/CSRF checks,
-  and one-time WebSocket tickets. Do not retain the current pasted-GitHub-token
-  browser model.
-- Implement a server-side GitHub App token broker that holds the private key
-  and mints one-repository, permission-subset installation tokens per typed
-  operation.
+- Reuse the current deployment UI's GitHub Bearer-token authentication. Resolve
+  the caller through GitHub `/user`, check current repository/operator policy,
+  and expose separate explicit staging and production actions.
+- Let Codex use its existing GitHub authentication through the same small HTTP
+  API or a thin CLI helper. Add no OAuth server, PKCE flow, refresh-token store,
+  wallet role mapping, or shared Codex service token.
+- Keep the first browser flow equivalent to the existing internal deploy UIs:
+  paste or reuse a GitHub token, store it locally, send it only as a Bearer
+  header, and provide a visible forget action.
 - Implement the agent-facing operation contract.
 - Implement the environment-snapshot validation contract and lifecycle.
 - Implement exact-SHA, stale-head, authorization, and idempotency validation.
@@ -129,29 +129,33 @@ Exit criteria:
 - Add minimal durable request tracking and scoped waiting.
 - Add independent staging and production validation locks that block only
   mutation to the environment being tested.
-- Create GitHub Deployments and Check Runs.
+- Add the smallest PR feedback and GitHub operation links that meet the UX;
+  assess workflow checks and commit statuses before richer projections.
 - Emit terminal events carrying the originating Codex task reference.
-- Add the authenticated backend proxy that resolves `deploy-hub/main` to one
-  exact SHA and serves its cached static UI files under `/deploy/ui/hub`.
+- Add the backend private-repository proxy that resolves `deploy-hub/main` to
+  one exact SHA and serves its secret-free static UI shell under
+  `/deploy/ui/hub`; require GitHub Bearer auth for operational calls.
 - Build the operational UI and deployment history in this repository.
-- Deliver state, queue, blocker, and deployed-version changes through the
-  authenticated existing backend WebSocket runtime with a ledger cursor,
-  automatic reconnect, snapshot resynchronization, and bounded
-  automatic-polling fallback.
-- Verify signed GitHub webhooks over raw bytes and deduplicate deliveries.
-  Authenticate canonical workflow callbacks with request-bound GitHub OIDC
-  claims rather than a shared Release Bus bearer secret.
-- Use GitHub Actions OIDC with environment-/ref-bound AWS roles; add no
-  long-lived AWS deployment key.
+- Deliver state, queue, blocker, and deployed-version changes by polling one
+  authenticated snapshot endpoint at least every five seconds. Add no
+  WebSocket, SSE, cursor, replay, or special transport credential until
+  measurements show polling is insufficient.
+- Prefer observing authoritative GitHub workflow/run state over introducing
+  callbacks or webhooks. Add a verified callback contract only if polling
+  cannot provide required evidence.
+- Preserve the canonical workflows' existing AWS authentication. Deploy Hub
+  neither receives AWS credentials nor redesigns that boundary in the MVP.
 - Reconcile displayed state against GitHub and runtime version truth.
-- Attach immutable Deploy Hub authority/request context to canonical workflow
-  notification evidence and observe the existing CI-drop and release-note
-  pipeline without reimplementing it.
-- Surface communication milestones in Check Runs, task events, history, and the
-  UI while keeping them outside environment locks and deployment success gates.
-- Implement the accepted protected `state/v1` Git ledger for immutable
-  requests, append-only events, deterministic waiting, commands, and replayable
-  snapshots; project state to GitHub Deployments and Check Runs.
+- Attach immutable GitHub authority, Deploy Hub origin, and requester context to
+  canonical workflow notification evidence and observe the existing CI-drop
+  and release-note pipeline without reimplementing it.
+- Surface the smallest available communication summary in PR feedback, request
+  lookup, history, and the UI while keeping it outside environment locks and
+  deployment success gates.
+- Resolve K1–K4 in `kiss-architecture-review.md`. Use canonical workflow runs,
+  PR status/check evidence, GitHub concurrency, and runtime proof unless the
+  review demonstrates that the proposed `state/v1` ledger or additional
+  projections are necessary.
 - Do not add a database or S3 request ledger without demonstrated need.
 
 Explicit exclusions:
@@ -166,25 +170,20 @@ Explicit exclusions:
 ## Phase 4 — Shadow and staging pilot
 
 - Run contract and failure tests against fake adapters.
-- Register and install the organization-owned GitHub App with read-only
-  permissions first. Retain a machine-readable permission/installation
-  snapshot as evidence.
+- Use credentialless fakes and existing caller GitHub credentials for the
+  smallest read-only shadow proof. Do not register a GitHub App merely to prove
+  that a credentialless workflow cannot deploy.
 - Create shadow requests for real PRs without dispatching deployment.
 - Create a long-lived frontend `1a-deploy-hub` branch that mirrors
   `1a-staging` integration behavior but triggers only a dedicated credentialless
   shadow workflow.
 - Allow only explicitly opted-in test PRs onto `1a-deploy-hub`; do not enroll
   colleagues' work automatically.
-- Keep the shadow identity physically incapable of updating `1a-staging`,
+- Keep the shadow path physically incapable of updating `1a-staging`,
   updating `main`, dispatching canonical deploy workflows, or assuming staging
   and production AWS roles.
-- Prove that boundary with denied workflow-dispatch, ref-update, Check Run,
-  Deployment, AWS, and real-notification attempts; a software shadow flag does
-  not count.
-- Elevate App permissions only in the documented sequence, with explicit
-  organization-owner approval and a fresh phase snapshot. Even after the App
-  registration gains writes, shadow workers receive narrowed tokens and never
-  receive the App private key.
+- Prove that boundary from the actual credential/workflow permission set; a
+  software shadow flag does not count.
 - Shadow backend operations directly from exact PR SHAs using a credentialless
   simulation workflow unless a backend integration branch is later justified.
 - Route every shadow notification and release-note event to fake or suppressed
@@ -192,8 +191,9 @@ Explicit exclusions:
 - Prove the shadow path before isolated execution. Treat shadow success as
   control-plane evidence only, not deployment evidence.
 - Run controlled frontend and backend staging canaries.
-- Verify staging CI drops show the Deploy Hub authority, requesting identity,
-  and exact scoped contributors, and remain release-note-ineligible.
+- Verify staging CI drops show the GitHub authority, Deploy Hub origin,
+  requesting identity, and exact scoped contributors, and remain release-note-
+  ineligible.
 - Run the complete mandatory staging E2E baseline for frontend-only,
   backend-only, and coordinated exact snapshots.
 - Prove that a coordinated deployment produces one linked validation rather
@@ -205,12 +205,12 @@ Explicit exclusions:
 - Verify Check Run and UI state against the exact GitHub workflow and runtime.
 - Verify that new operations and every queue or state transition appear in an
   already-open browser without manual refresh.
-- Interrupt and restore the live event channel; prove automatic reconnect and
-  snapshot resynchronization prevent missed or stale state.
-- Exercise OAuth scope/role denial, CSRF/session/WebSocket-ticket expiry,
-  webhook forgery/replay, OIDC wrong-workflow/wrong-request claims, moved refs,
-  token leakage canaries, and cross-repository escalation before a live canary.
-- Test restart reconstruction and missed-callback recovery.
+- Pause and resume snapshot polling; prove the next successful response repairs
+  the view without event replay or stale state.
+- Exercise invalid/revoked/non-operator GitHub tokens, explicit-production
+  denial, moved refs, token leakage canaries, arbitrary workflow/ref attempts,
+  and cross-repository escalation before a live canary.
+- Test restart reconstruction and missed-observation recovery.
 - Test duplicate, stale, cancellation, and bounded-retry behavior.
 
 Exit criteria:
@@ -261,8 +261,8 @@ Deploy Hub acceptance gate.
 - Remove the reconciler Lambda and scheduled triggers.
 - Remove Release Bus-specific frontend workflows.
 - Remove Release Train authority and train/operation notification contracts
-  only after the canonical manual and authenticated Deploy Hub authority paths
-  preserve CI posting and release-note automation.
+  only after the canonical manual and authenticated GitHub-authority/Deploy-Hub
+  origin paths preserve CI posting and release-note automation.
 - Remove Release Bus-only E2E train/manifest inputs, authorization, and
   callbacks after the generic environment-snapshot paths are established.
 - Remove Release Bus-only inputs, authorization, and callbacks from canonical
@@ -270,7 +270,8 @@ Deploy Hub acceptance gate.
 - Remove Release Bus readiness dependencies from canonical manual workflows.
 - Add cleanup migrations for obsolete tables; preserve historical migration
   files.
-- Remove unused AWS resources, alarms, credentials, and GitHub App permissions.
+- Remove unused AWS resources, alarms, credentials, and any later-added GitHub
+  App permissions.
 - Remove obsolete operator skills, documentation, and terminology.
 - Verify no production or staging path imports or calls Release Bus code.
 - Verify canonical Deploy Hub/manual deployment drops and production release

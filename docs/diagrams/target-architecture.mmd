@@ -5,12 +5,12 @@ flowchart LR
     subgraph H["Deploy Hub — control and visibility"]
         API["Agent-facing deployment API"]
         L["GitHub-native request evidence<br/>and scoped locks"]
-        P["Authenticated static-file proxy"]
+        P["Private-repository static-file proxy"]
     end
 
     subgraph G["GitHub and repositories"]
         UIS["deploy-hub/main<br/>static UI files"]
-        PR["PR Check Runs<br/>and Deployments"]
+        PR["PR workflow checks<br/>or commit status"]
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
         V["Frontend-owned<br/>E2E workflows"]
@@ -29,7 +29,7 @@ flowchart LR
 
     A -->|"Exact deployment or validation operation"| API
     UI -->|"Snapshots and commands"| API
-    API -->|"Live state events<br/>plus reconnect and resync"| UI
+    API -->|"Authenticated snapshot polling<br/>at least every five seconds"| UI
     UIS -->|"Files from one resolved SHA"| P
     P -->|"Serve /deploy/ui/hub"| UI
     API --> L

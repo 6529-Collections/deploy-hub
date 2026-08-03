@@ -17,10 +17,9 @@
       }
     },
     "authority": {
-      "kind": "wallet_jwt",
-      "subject": "profile:prxt0",
+      "kind": "github_token",
+      "subject": "github:prxt6529",
       "authenticated_at": "2026-08-03T12:01:00.000Z",
-      "profile_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "github_login": "prxt6529"
     },
     "accepted_at": "2026-08-03T12:01:01.000Z"

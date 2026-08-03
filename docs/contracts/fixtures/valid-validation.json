@@ -15,16 +15,10 @@
       }
     },
     "authority": {
-      "kind": "wallet_jwt",
-      "subject": "profile:prxt0",
+      "kind": "github_token",
+      "subject": "github:prxt6529",
       "authenticated_at": "2026-08-03T10:02:18.000Z",
-      "profile_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "github_login": "prxt6529"
-    },
-    "executor": {
-      "kind": "github_app",
-      "slug": "6529-deploy-hub",
-      "installation_id": 12345678
     },
     "environment": "staging",
     "resource_key": "staging:validation",
