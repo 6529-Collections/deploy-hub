@@ -12,6 +12,18 @@
   success, delay, failure, cancellation, stale, duplicate, and conflict case.
   Local format, lint, type, build, and all 12 tests passed with zero production
   dependencies and no live network or mutation path.
+- Implemented and completed Task 6 behind one Git repository port and an
+  in-memory non-force compare-and-swap adapter. Immutable deployment and
+  validation acceptance, stable digest replay, deterministic waiting,
+  append-only event history, exact snapshot replay, moved-identity rejection,
+  interruption reconciliation, retention, tree growth, and tamper failure are
+  covered without a live GitHub write path.
+- Audited Task 6 at commit `ec725aacf0edf25dc7bc819f9803e536bdcf377a`:
+  local and exact-head GitHub Actions run `30819637476` passed formatting,
+  lint, type checking, build, and all 22 tests with no production dependencies,
+  state branch, App, credential, workflow, AWS access, or external mutation.
+- Updated the tracker rule to match the already accepted direct-to-`main`
+  credentialless bootstrap rather than the obsolete specification-only phrase.
 - Started Task 4 under the owner-approved direct-to-`main` workflow for the
   private credentialless bootstrap. Recorded KISS as Rule 1 and deferred
   protected-main workflow to the pre-credential/live-authority gate.

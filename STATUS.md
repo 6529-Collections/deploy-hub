@@ -4,9 +4,8 @@ Last updated: 2026-08-03
 
 ## Phase
 
-Task 6 implementation: Git-backed ledger semantics over an in-memory
-compare-and-swap repository. Task 5's deterministic capability-free adapters
-and contract suite are complete.
+Tasks 5 and 6 complete. The next dependency-ready deliverable is Task 7, the
+authenticated agent-facing API; it has not started.
 
 ## Accepted direction
 
@@ -95,9 +94,9 @@ and contract suite are complete.
   communications.
 - Deployment communications boundary accepted in ADR 0005 and documented in
   `docs/deployment-communications-analysis.md`.
-- Root implementation tracker contains stable Tasks 0–25; Tasks 0–5 are
-  complete, Task 6 is in progress, and Task 25 owns the cross-cutting
-  communications integration.
+- Root implementation tracker contains stable Tasks 0–25; Tasks 0–6 are
+  complete, Task 7 is next, and Task 25 owns the cross-cutting communications
+  integration.
 - Task 2 completed the versioned deployment, validation, cancel, retry, ledger,
   task-event, communication-outcome, and safe-error schemas with normative
   fixtures under `docs/contracts/`.
@@ -121,6 +120,13 @@ and contract suite are complete.
   infrastructure failure, cancellation, stale, duplicate, and conflict cases.
   The completion audit passed local format, lint, type, build, and all 12 tests
   with zero production dependencies or live capability.
+- Task 6 completed the Git ledger semantics behind a minimal repository port:
+  stable digests, atomic acceptance, deterministic waiting, non-force
+  compare-and-swap retry, append-only events, replayable snapshots, exact-SHA
+  and snapshot enforcement, and GitHub-evidence reconciliation. The in-memory
+  Git adapter and 10 ledger tests prove the behavior without creating a live
+  state branch or transport. Local and exact-head CI passed all 22 repository
+  tests on commit `ec725aacf0edf25dc7bc819f9803e536bdcf377a`.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -157,9 +163,8 @@ and contract suite are complete.
 
 ## Remaining security and implementation work
 
-- Task 6 must prove the accepted Git ledger semantics and reconciliation over
-  an in-memory compare-and-swap repository without creating the live state
-  branch or GitHub transport.
+- Task 7 must add the authenticated agent-facing contract while retaining the
+  current credentialless boundary until its specific security gates are ready.
 - Later rollout tasks must provide the phase-specific permission snapshots,
   denied-operation proofs, OAuth/session/webhook/OIDC tests, ruleset and IAM
   evidence, secret-canary scans, and owner approvals required by
@@ -173,7 +178,6 @@ and contract suite are complete.
 
 ## Next recommended work
 
-Complete Task 6 directly on `main`: implement the accepted ledger semantics
-behind a Git repository port and prove them with an in-memory
-compare-and-swap repository. Do not create a GitHub App, OAuth client, state
-branch, deployment authority, AWS role, live permission, or credential.
+Begin Task 7 only after its API/authentication slice and permission boundary are
+explicitly planned. Do not create a GitHub App, live state branch, deployment
+authority, AWS role, or production credential as an incidental API step.

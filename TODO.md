@@ -23,8 +23,10 @@ receive an evidence-based answer.
   starts, blocks, unblocks, or completes a task.
 - Never reinterpret an existing task number. If scope changes materially, add a
   new task or explicitly amend this tracker with a recorded reason.
-- Direct documentation pushes to `main` are permitted only while the repository
-  remains private and specification-only as recorded in `STATUS.md`.
+- Direct pushes to `main` are permitted only during the owner-approved private,
+  credentialless bootstrap recorded in `STATUS.md`. Reconsider protection
+  before any credential, live permission, deployment authority, or additional
+  write actor.
 
 ## Summary
 
@@ -36,7 +38,7 @@ receive an evidence-based answer.
 | 3 | Authentication, permissions, and threat model | DONE | 1, 2 |
 | 4 | Executable Deploy Hub skeleton | DONE | 2, 3 |
 | 5 | Fake adapters and deterministic contract suite | DONE | 4 |
-| 6 | GitHub-native request ledger and idempotency | IN PROGRESS | 2, 4 |
+| 6 | GitHub-native request ledger and idempotency | DONE | 2, 4 |
 | 7 | Authenticated agent-facing API | NOT STARTED | 3, 6 |
 | 8 | Scoped concurrency, waiting, and validation locks | NOT STARTED | 6, 7 |
 | 9 | GitHub Deployments, Check Runs, and task events | NOT STARTED | 6, 7 |
@@ -297,24 +299,46 @@ Evidence:
   release-note outcomes passed. Local format, lint, type, build, and 12 tests
   passed; the production dependency tree was empty and the fake source had no
   network, GitHub SDK, AWS SDK, workflow-dispatch, or external-posting path.
+- Commit `54077fb04d025b7a4d6879d49834a9fd52aaac80`; exact-head GitHub
+  Actions run `https://github.com/6529-Collections/deploy-hub/actions/runs/30818825768`
+  passed.
 
-### [ ] Task 6 — GitHub-native request ledger and idempotency
+### [x] Task 6 — GitHub-native request ledger and idempotency
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Outcome: Accepted requests, validation records, waiting order, and terminal
 evidence are durable and reconstructable without a database or S3 ledger.
 
 Acceptance criteria:
 
-- [ ] Identical request ID/payload returns one logical operation.
-- [ ] Conflicting payload reuse fails closed.
-- [ ] Waiting ownership survives restart and has deterministic order.
-- [ ] Accepted immutable SHA never silently follows a branch.
-- [ ] Reconciliation rebuilds state from GitHub evidence after interruption.
-- [ ] Retention and audit-history behavior are documented and tested.
+- [x] Identical request ID/payload returns one logical operation.
+- [x] Conflicting payload reuse fails closed.
+- [x] Waiting ownership survives restart and has deterministic order.
+- [x] Accepted immutable SHA never silently follows a branch.
+- [x] Reconciliation rebuilds state from GitHub evidence after interruption.
+- [x] Retention and audit-history behavior are documented and tested.
 
-Evidence: Not yet available.
+Evidence:
+
+- `src/ledger/`
+- `src/testing/in-memory-git-ledger-repository.ts`
+- `test/request-ledger.test.ts`
+- `docs/ledger-implementation.md`
+- Commit `ec725aacf0edf25dc7bc819f9803e536bdcf377a`; exact-head GitHub
+  Actions run `https://github.com/6529-Collections/deploy-hub/actions/runs/30819637476`
+  passed.
+- Completion audit on 2026-08-03: deployment and validation replay performed
+  no duplicate commit; conflicting ID and evidence reuse failed closed;
+  compare-and-swap conflicts reread safely; queue ownership survived a fresh
+  ledger instance; moved-SHA and changed-snapshot evidence was rejected;
+  exact GitHub evidence reconstructed terminal deployment and validation state
+  after interruption; request/event immutability, snapshot byte replay, global
+  sequences, tamper detection, 50-subject linear tree growth, and zero-write
+  replay behavior passed. Local and exact-head CI format, lint, type, build,
+  and all 22 tests passed with zero production dependencies. No GitHub App,
+  credential, live state branch, SDK, workflow, AWS, or external mutation path
+  was created.
 
 ### [ ] Task 7 — Authenticated agent-facing API
 
