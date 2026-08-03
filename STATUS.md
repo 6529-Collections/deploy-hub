@@ -48,9 +48,11 @@ Initial specification and architecture definition.
 
 ## Current documents
 
-- Requirements v0.1 drafted.
+- Requirements v1.0 agreed.
 - Target architecture and agent-to-production sequence drafted.
 - Migration and test strategies drafted.
+- Current staging and production E2E workflows, coverage, integration gaps, and
+  recent GitHub Actions durations analyzed in `docs/e2e-validation-analysis.md`.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -82,9 +84,13 @@ Initial specification and architecture definition.
   regardless.
 - Define the exact GitHub-native representation for waiting order and
   idempotency during implementation design.
+- Decide whether to accept the recommendation that every staging and production
+  outcome requires baseline read-only E2E bound to one exact environment
+  snapshot, while deeper feature-specific validation remains risk-based.
 
 ## Next recommended work
 
-Inventory the exact changes required in the frontend and backend canonical
-workflows, verify the backend's live-stream support, and define the
-GitHub-native request representation before any live migration action.
+Resolve the baseline E2E recommendation, inventory the exact changes required
+in the frontend and backend canonical workflows, verify the backend's
+live-stream support, and define the GitHub-native request representation before
+any live migration action.

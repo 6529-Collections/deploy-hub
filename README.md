@@ -38,6 +38,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Architecture](docs/architecture.md)
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
+- [E2E validation analysis](docs/e2e-validation-analysis.md)
 - [Architecture decisions](docs/decisions/)
 - [Saved diagrams](docs/diagrams/)
 - [Original handoff references](docs/references/)

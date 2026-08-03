@@ -2,6 +2,14 @@
 
 ## 2026-08-03
 
+- Analyzed the existing staging and production Playwright workflows, pack
+  coverage, triggers, Release Bus coupling, failure behavior, and recent GitHub
+  Actions timing history.
+- Proposed mandatory baseline read-only E2E for every staging and production
+  outcome, bound to an exact environment snapshot rather than a release train.
+- Recorded initial observed E2E estimates of roughly seven minutes for staging
+  and four minutes for production, with rolling history recommended for UI
+  ETAs.
 - Agreed the v1 requirements and resolved the six initial MVP decisions.
 - Selected GitHub-native durable evidence, canonical manual workflow fallback,
   risk-based staging validation, a least-privilege organization GitHub App, and
