@@ -4,11 +4,11 @@ Status: Accepted Task 2 contract
 
 Date: 2026-08-03
 
-Live-use note: these contracts remain evidence of the Task 2/6 prototype. K1–K4
-in `../kiss-architecture-review.md` require the custom Git ledger, separate
-validation lifecycle, custom queues/locks, and duplicate projections to justify
-themselves against a smaller workflow-run/status/runtime-evidence MVP before
-live implementation.
+Live-use note: these contracts are Task 2/6 prototype evidence. The custom Git
+ledger, separate validation lifecycle, custom queues/locks, callbacks, task
+events, and duplicate projections are retired from the live MVP. Current
+implementation guidance is `../requirements.md` and `../architecture.md`, which
+use workflow-run/status/runtime evidence and canonical GitHub concurrency.
 
 ## Purpose and boundary
 
@@ -352,8 +352,8 @@ snapshot is no longer current; create a new validation ID and snapshot.
 
 ## Git ledger representation
 
-ADR 0006 is authoritative. The state branch is `refs/heads/state/v1` and the
-layout is:
+For the retired prototype described by ADR 0006, the proposed state branch was
+`refs/heads/state/v1` and the layout was:
 
 ```text
 ledger/v1/meta.json

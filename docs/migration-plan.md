@@ -1,6 +1,6 @@
 # Release Bus to Deploy Hub Migration Plan
 
-Status: Draft v0.1
+Status: Agreed simplified MVP
 Last updated: 2026-08-03
 
 ## Migration principle
@@ -18,8 +18,9 @@ deployment entirely.
 
 The current authoritative controls and manual-workflow readiness still need to
 be verified before implementation. Re-enabling Release Bus is not the rollback
-plan. Deploy Hub must first be tested offline, then as a read-only shadow, then
-against isolated execution infrastructure before any shared-staging canary.
+plan. Deploy Hub must first be tested offline and as a credentialless shadow,
+then in controlled low-risk shared-staging canaries. Build isolated execution
+infrastructure only if a specific unsafe behavior cannot be tested otherwise.
 
 ## Phase 0 — Verify the current dormant baseline
 
@@ -120,18 +121,16 @@ Exit criteria:
 - Keep the first browser flow equivalent to the existing internal deploy UIs:
   paste or reuse a GitHub token, store it locally, send it only as a Bearer
   header, and provide a visible forget action.
-- Implement the agent-facing operation contract.
-- Implement the environment-snapshot validation contract and lifecycle.
+- Implement the small agent-facing endpoint set in the existing backend.
+- Treat environment-snapshot validation as a linked workflow phase.
 - Implement exact-SHA, stale-head, authorization, and idempotency validation.
 - Implement the four canonical workflow adapters.
 - Implement staging and production E2E adapters without copying Playwright into
   this repository.
-- Add minimal durable request tracking and scoped waiting.
-- Add independent staging and production validation locks that block only
-  mutation to the environment being tested.
+- Return exact GitHub workflow run IDs/URLs and derive progress from GitHub and
+  runtime evidence. Let canonical GitHub Actions concurrency own waiting.
 - Add the smallest PR feedback and GitHub operation links that meet the UX;
   assess workflow checks and commit statuses before richer projections.
-- Emit terminal events carrying the originating Codex task reference.
 - Add the backend private-repository proxy that resolves `deploy-hub/main` to
   one exact SHA and serves its secret-free static UI shell under
   `/deploy/ui/hub`; require GitHub Bearer auth for operational calls.
@@ -140,23 +139,18 @@ Exit criteria:
   authenticated snapshot endpoint at least every five seconds. Add no
   WebSocket, SSE, cursor, replay, or special transport credential until
   measurements show polling is insufficient.
-- Prefer observing authoritative GitHub workflow/run state over introducing
-  callbacks or webhooks. Add a verified callback contract only if polling
-  cannot provide required evidence.
+- Observe authoritative GitHub workflow/run state; do not add callbacks or
+  webhooks in the MVP.
 - Preserve the canonical workflows' existing AWS authentication. Deploy Hub
   neither receives AWS credentials nor redesigns that boundary in the MVP.
-- Reconcile displayed state against GitHub and runtime version truth.
+- Derive displayed state from GitHub and runtime version truth.
 - Attach immutable GitHub authority, Deploy Hub origin, and requester context to
   canonical workflow notification evidence and observe the existing CI-drop
   and release-note pipeline without reimplementing it.
-- Surface the smallest available communication summary in PR feedback, request
-  lookup, history, and the UI while keeping it outside environment locks and
-  deployment success gates.
-- Resolve K1–K4 in `kiss-architecture-review.md`. Use canonical workflow runs,
-  PR status/check evidence, GitHub concurrency, and runtime proof unless the
-  review demonstrates that the proposed `state/v1` ledger or additional
-  projections are necessary.
-- Do not add a database or S3 request ledger without demonstrated need.
+- Surface only the available communication link/outcome in PR feedback,
+  request lookup, and UI, outside deployment success gates.
+- Do not add a database, S3/Git ledger, custom queue, scheduler, lock service,
+  callback receiver, reconciler, or second backend runtime.
 
 Explicit exclusions:
 
@@ -166,6 +160,7 @@ Explicit exclusions:
 - Automatic main progression.
 - Cross-repository rollback.
 - A continuously running reconciler.
+- A separate validation state machine or release-note mirror.
 
 ## Phase 4 — Shadow and staging pilot
 
@@ -174,10 +169,10 @@ Explicit exclusions:
   smallest read-only shadow proof. Do not register a GitHub App merely to prove
   that a credentialless workflow cannot deploy.
 - Create shadow requests for real PRs without dispatching deployment.
-- Create a long-lived frontend `1a-deploy-hub` branch that mirrors
-  `1a-staging` integration behavior but triggers only a dedicated credentialless
-  shadow workflow.
-- Allow only explicitly opted-in test PRs onto `1a-deploy-hub`; do not enroll
+- Use frontend `1a-deploy-hub` only if branch-trigger behavior needs real
+  integration testing; otherwise dispatch the credentialless shadow workflow
+  against exact opted-in test SHAs.
+- Allow only explicitly opted-in test PRs onto `1a-deploy-hub`, if used; do not enroll
   colleagues' work automatically.
 - Keep the shadow path physically incapable of updating `1a-staging`,
   updating `main`, dispatching canonical deploy workflows, or assuming staging
@@ -188,21 +183,20 @@ Explicit exclusions:
   simulation workflow unless a backend integration branch is later justified.
 - Route every shadow notification and release-note event to fake or suppressed
   sinks; shadow must be physically unable to publish real drops or notes.
-- Prove the shadow path before isolated execution. Treat shadow success as
-  control-plane evidence only, not deployment evidence.
+- Treat shadow success as control-plane evidence only, not deployment evidence.
 - Run controlled frontend and backend staging canaries.
 - Verify staging CI drops show the GitHub authority, Deploy Hub origin,
   requesting identity, and exact scoped contributors, and remain release-note-
   ineligible.
 - Run the complete mandatory staging E2E baseline for frontend-only,
   backend-only, and coordinated exact snapshots.
-- Prove that a coordinated deployment produces one linked validation rather
-  than duplicate E2E runs.
+- Prove that a coordinated deployment links one E2E run rather than duplicating
+  suites or creating a validation state store.
 - Exercise a product-test failure, a retryable workflow/setup failure, and a
   snapshot change during testing; verify each produces the specified truthful
   result.
 - Prove frontend activity does not globally block unrelated backend work.
-- Verify Check Run and UI state against the exact GitHub workflow and runtime.
+- Verify PR feedback and UI state against the exact GitHub workflow and runtime.
 - Verify that new operations and every queue or state transition appear in an
   already-open browser without manual refresh.
 - Pause and resume snapshot polling; prove the next successful response repairs
@@ -210,7 +204,8 @@ Explicit exclusions:
 - Exercise invalid/revoked/non-operator GitHub tokens, explicit-production
   denial, moved refs, token leakage canaries, arbitrary workflow/ref attempts,
   and cross-repository escalation before a live canary.
-- Test restart reconstruction and missed-observation recovery.
+- Restart the API and prove a fresh lookup reads authoritative state without a
+  reconstruction job.
 - Test duplicate, stale, cancellation, and bounded-retry behavior.
 
 Exit criteria:
@@ -219,8 +214,8 @@ Exit criteria:
 - No successful status without exact runtime proof.
 - No staging success without terminal snapshot-bound baseline E2E.
 - No unexplained environment drift.
-- No global FE/BE blocking; a validation window blocks mutation only to the
-  same environment.
+- No global FE/BE blocking; snapshot drift is detected and rerunnable without a
+  custom cross-repository validation lock.
 - No shadow identity possesses a shared-environment mutation capability.
 
 ## Phase 5 — Production pilot and establishment

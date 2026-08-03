@@ -43,6 +43,8 @@ sequenceDiagram
     H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production
     opt Later asynchronous communication outcome
-        C-->>H: Release note published, skipped, or failed
-        H-->>A: Non-gating communication event
+        H->>C: Poll available release-note outcome
+        C-->>H: Published, skipped, failed, or unavailable
+        A->>H: Poll operation status
+        H-->>A: Non-gating communication link or outcome
     end

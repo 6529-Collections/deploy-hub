@@ -23,26 +23,24 @@ The intended operating model is:
 - Canonical workflows retain repository-owned CI deployment posts and
   production release-note automation with exact, operation-scoped attribution;
   Deploy Hub observes those non-gating outcomes instead of duplicating them.
-- Frontend and backend deployment capacity is independent; baseline E2E blocks
-  mutation only to the environment being validated for its short test window.
+- Frontend and backend deployment capacity is independent; baseline E2E detects
+  snapshot drift and reruns without a custom cross-repository lock.
 
 ## Current status
 
-**Credentialless executable skeleton with deterministic fakes and an in-memory
-Git-ledger prototype.**
+**Credentialless executable skeleton; Task 7 has not started.**
 
-Tasks 4–6 establish a minimal Node/TypeScript package, read-only status API,
-disabled live adapter boundaries, static UI shell, deterministic fake adapters,
-and a credentialless Git-ledger prototype backed only by an in-memory
-repository. It contains no live GitHub token handling, GitHub App, OAuth
+Tasks 4–6 establish a minimal Node/TypeScript package, static UI shell, and
+credentialless prototypes. The loopback API server, callback/event fake model,
+and Git ledger are retired from the live plan; Task 7 belongs in the existing
+6529 backend. The repo contains no live GitHub token handling, GitHub App, OAuth
 client, AWS credential, repository environment, staging access, production
 access, live state branch, or deployment implementation.
 
 ADR 0009 replaces the earlier wallet OAuth/GitHub App broker design with the
-existing deployment UI's GitHub Bearer-token/operator model. The architecture-
-wide KISS review is in
-[docs/kiss-architecture-review.md](docs/kiss-architecture-review.md); its open
-findings must be resolved before Task 7 expands the control plane.
+existing deployment UI's GitHub Bearer-token/operator model. The architecture
+and tracker directly apply the KISS decisions; there is no separate review
+process or document to interpret before Task 7.
 
 Release Bus is currently OFF for both staging and production and is not
 expected to be re-enabled. Existing manual and canonical repository workflows
@@ -55,7 +53,6 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
 - [Authentication, permissions, and threat model](docs/security-model.md)
-- [KISS architecture review](docs/kiss-architecture-review.md)
 - [Migration plan](docs/migration-plan.md)
 - [Testing strategy](docs/testing-strategy.md)
 - [Current deployment-system inventory](docs/current-system-inventory.md)
@@ -77,18 +74,18 @@ npm run check
 ```
 
 The project uses Node.js 22.17.1. `npm run check` runs formatting verification,
-lint, type checking, build, and unit tests. `npm start` runs the optional
-loopback-only status server after `npm run build`; it has no deployment
-operations.
+lint, type checking, build, and unit tests. `npm start` runs the historical
+loopback-only status prototype after `npm run build`; it has no deployment
+operations and is not the production API plan.
 
 Project boundaries:
 
 ```text
-src/api/       currently read-only HTTP boundary
-src/domain/    dependency-free domain values
-src/adapters/  fake/disabled deployment adapter boundary
+src/api/       historical loopback status boundary; not production API
+src/domain/    prototype dependency-free domain values
+src/adapters/  prototype fake/disabled deployment boundary
 src/github/    disabled live GitHub boundary
-src/ledger/    in-memory-tested Git ledger prototype pending KISS decision
+src/ledger/    historical in-memory Git-ledger prototype; not live architecture
 src/config/    offline-only configuration
 ui/            plain static UI files
 test/          Node built-in unit tests
@@ -103,11 +100,11 @@ authority, or additional write actor is introduced.
 
 The executable skeleton is physically incapable of changing `1a-staging`,
 `main`, shared staging, production, or AWS infrastructure. Its adapters and
-ledger tests have no live credentials or external mutation path.
+historical ledger tests have no live credentials or external mutation path.
 
-The proposed frontend shadow integration branch is `1a-deploy-hub`. It does not
-exist yet and will not be created until its credentialless workflow contract is
-reviewed and accepted.
+`1a-deploy-hub` is only an optional credentialless shadow trigger if real
+branch-trigger behavior must be tested. It is not a second staging lane and
+does not exist yet.
 
 ## Resuming work
 

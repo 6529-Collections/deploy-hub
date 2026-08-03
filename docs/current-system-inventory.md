@@ -403,8 +403,8 @@ prototypes before it becomes implementation truth:
 - agent-owned coordinated plans composed from atomic repository operations;
 - explicit known-good redeployment rather than automatic rollback in MVP.
 
-Task 2 selected a durable Git representation, but the later KISS review flags
-that custom event ledger for explicit reconsideration before live use. ADR 0009
+Task 2 selected a durable Git representation, but the later owner KISS decision
+retired that custom event ledger before live use. ADR 0009
 selects polling-first delivery and existing GitHub-token authentication.
 
 ## Task 1 conclusion

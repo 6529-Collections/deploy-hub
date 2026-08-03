@@ -37,10 +37,10 @@ recreate Release Bus complexity or make shadow testing unsafe.
 ## Consequences
 
 - The MVP has no separate deployment-state database or S3 request ledger.
-- ADR 0006 and `docs/contracts/README.md` define the Task 6 Git-ledger
-  prototype. K1–K4 in the later KISS review require workflow-run/status/runtime
-  evidence and canonical GitHub concurrency to be assessed before any live
-  ledger or duplicate projection is approved.
+- ADR 0006 and `docs/contracts/README.md` define the retired Task 6 Git-ledger
+  prototype. Live MVP state comes from workflow-run/status/runtime evidence and
+  canonical GitHub concurrency; no live ledger or duplicate projection is
+  approved.
 - Baseline snapshot E2E is universal; deeper validation is proportional to risk
   without allowing any deployment to claim success without runtime identity
   proof and unchanged-environment validation.

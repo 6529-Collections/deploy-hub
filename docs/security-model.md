@@ -158,8 +158,8 @@ Shadow safety is achieved with the smallest concrete capability boundary:
 - offline tests use fakes and no credentials;
 - read-only shadow uses a token or workflow token that cannot dispatch, update
   protected refs, access AWS, or publish real deployment communications;
-- `1a-deploy-hub`, if retained after the KISS review, triggers only a
-  credentialless simulation workflow;
+- `1a-deploy-hub`, if concrete branch-trigger testing requires it, triggers
+  only a credentialless simulation workflow;
 - real staging and production authority is added only to the adapter and
   canonical workflow path that needs it;
 - no software `shadow=true` flag is treated as the only safety boundary.
@@ -192,8 +192,7 @@ responses, records, logs, PR feedback, and artifacts.
 | Arbitrary workflow/ref/repository | Typed allowlists and exact pre-mutation checks | `400/403`; alert on repeated attempts |
 | Moved PR/main/ref | Immutable accepted SHA and fresh recheck | Mark stale; never substitute source |
 | Cross-repository escalation | Fixed repository IDs and route-specific permissions | Deny before GitHub mutation |
-| Duplicate request or retry | Stable request ID and exact payload comparison | Return existing operation or `409` |
-| Forged callback | Prefer GitHub polling; if callbacks are later required, add a separate verified contract | Ignore unknown callback |
+| Duplicate request or retry | Search exact operation/run and rely on canonical workflow concurrency | Return the run or reject before a second mutation |
 | Stale UI | Five-second polling and full snapshot replacement | Next successful poll repairs view |
 | Excessive polling/rate exhaustion | One snapshot endpoint, ETag/conditional requests, page-visibility backoff, `429` handling | Visible degraded state; no mutation |
 | Untrusted PR gains deployment secrets | Canonical workflow protections remain authoritative | Workflow refuses mutation |

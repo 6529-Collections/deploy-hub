@@ -13,10 +13,9 @@ Before changing the project, read:
 3. `TODO.md`
 4. `docs/requirements.md`
 5. `docs/architecture.md`
-6. `docs/kiss-architecture-review.md`
-7. `docs/migration-plan.md`
-8. `docs/testing-strategy.md`
-9. All accepted records in `docs/decisions/`
+6. `docs/migration-plan.md`
+7. `docs/testing-strategy.md`
+8. All accepted records in `docs/decisions/`
 
 Read files under `docs/references/` when validating claims about Release Bus or
 the original Deploy Hub proposal. Treat those files as immutable source

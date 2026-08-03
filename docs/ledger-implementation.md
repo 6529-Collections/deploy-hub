@@ -1,13 +1,13 @@
 # Git Ledger Implementation Notes
 
-Status: Task 6 implementation boundary
+Status: Historical Task 6 prototype; retired from live architecture
 
 Date: 2026-08-03
 
-Live-use gate: K1–K4 in `kiss-architecture-review.md` classify this as a
-credentialless prototype that may be substantially more complex than the MVP
-needs. Do not add a GitHub adapter or create `state/v1` until the smaller
-workflow-run/status/runtime-evidence design is tried and found insufficient.
+Live-use decision: this credentialless prototype is substantially more complex
+than the MVP needs. Do not add a GitHub adapter or create `state/v1`. Tasks
+7–25 use workflow-run/status/runtime evidence instead. Retain this code only as
+historical prototype evidence until ordinary cleanup removes it.
 
 ## What exists now
 
@@ -27,8 +27,7 @@ The current adapter is intentionally in memory. It simulates Git commits,
 parent heads, non-force conflicts, complete trees, and retained history. It has
 no URL, token, network client, GitHub write, workflow dispatch, state branch,
 or environment capability. A live GitHub Git-database adapter and creation of
-the protected `refs/heads/state/v1` branch are blocked by the KISS gate, not
-merely deferred permission work.
+the protected `refs/heads/state/v1` branch are not part of the live plan.
 
 ## Retention and audit history
 
@@ -37,8 +36,7 @@ current `snapshot.json` and `meta.json` are replaceable caches in the head tree;
 their older bytes remain in Git commit history. Replay must reproduce every
 current snapshot exactly, and a mismatch fails closed.
 
-MVP has no compaction job. Compaction that removes request or event history
-would violate ADR 0006. The directory layout is the index: subject paths locate
+The prototype has no compaction job. The directory layout is the index: subject paths locate
 one operation, and acceptance sequence plus subject ID derives queue order.
 Any later archive or storage change requires a versioned migration preserving
 the v1 history and digests.

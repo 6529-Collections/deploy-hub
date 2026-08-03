@@ -2,6 +2,18 @@
 
 ## 2026-08-03
 
+- Corrected the KISS follow-up after owner clarification: removed the separate
+  `docs/kiss-architecture-review.md` layer and applied the decisions directly
+  to requirements, architecture, migration, testing, status, and Tasks 7–25.
+  The live MVP now uses the existing backend, GitHub workflow/run/runtime
+  truth, canonical Actions concurrency, snapshot polling, and communication
+  links. It explicitly excludes the Task 6 live Git ledger, a database, custom
+  queue/locks/scheduler/reconciler, callbacks, second runtime, separate
+  validation state machine, mandatory isolated cloud environment, and mirrored
+  release-note/metrics systems. Tasks 4–6 are retained as completed
+  credentialless prototypes/reusable test evidence, but their standalone
+  server, callback/event model, and ledger are removed from future-task
+  dependencies. Task 7 remains `NOT STARTED`.
 - Corrected the MVP authentication design after owner review. ADR 0009 now
   reuses the existing deploy UI's GitHub Bearer-token, GitHub `/user`, and
   operator-policy path for both humans and Codex; ADR 0007 is superseded.
@@ -16,7 +28,8 @@
   token is authority and executor; `Deploy Hub` is operation origin, not a
   synthetic person. Removed the speculative GitHub App executor object from v1
   schemas and fixtures.
-- Added `docs/kiss-architecture-review.md`, retaining concrete requirements but
+- Added (and subsequently removed in favor of direct specification changes)
+  `docs/kiss-architecture-review.md`, retaining concrete requirements but
   flagging the custom Git event ledger, separate validation state machine,
   custom locks/queues, duplicate projections/callbacks, early GitHub App,
   shadow branch, static proxy growth, release-note mirroring, and isolated cloud

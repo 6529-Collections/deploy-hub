@@ -1,25 +1,19 @@
 flowchart LR
-    U["Developer"] --> A["Codex task<br/>Feature lifecycle orchestrator"]
-    U --> UI["Deploy Hub browser UI"]
+    U["Developer"] --> C["Codex task"]
+    U --> UI["Deploy Hub UI"]
 
-    subgraph H["Deploy Hub — control and visibility"]
-        API["Agent-facing deployment API"]
-        L["GitHub-native request evidence<br/>and scoped locks"]
-        P["Private-repository static-file proxy"]
+    subgraph B["Existing 6529 backend"]
+        API["Small Deploy Hub HTTP API<br/>GitHub Bearer auth"]
+        S["Polled status snapshot"]
+        P["Private-repository UI proxy"]
     end
 
     subgraph G["GitHub and repositories"]
-        UIS["deploy-hub/main<br/>static UI files"]
-        PR["PR workflow checks<br/>or commit status"]
+        UIS["deploy-hub/main UI files"]
+        PR["Workflow check or commit status"]
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
-        V["Frontend-owned<br/>E2E workflows"]
-    end
-
-    subgraph C["Existing deployment communications"]
-        N["Backend CI-alert receiver"]
-        R["Release-note queue<br/>and generator"]
-        D["CI and release-note drops"]
+        E2E["Frontend-owned E2E workflows"]
     end
 
     subgraph E["Runtime environments"]
@@ -27,33 +21,34 @@ flowchart LR
         PROD["Production"]
     end
 
-    A -->|"Exact deployment or validation operation"| API
-    UI -->|"Snapshots and commands"| API
-    API -->|"Authenticated snapshot polling<br/>at least every five seconds"| UI
+    subgraph N["Existing communications"]
+        CI["CI deployment drop"]
+        RN["Production release note"]
+    end
+
+    C -->|"Exact SHA deployment request"| API
+    UI -->|"Authenticated commands and polling"| API
+    API --> S
     UIS -->|"Files from one resolved SHA"| P
-    P -->|"Serve /deploy/ui/hub"| UI
-    API --> L
+    P --> UI
+
     API --> FE
     API --> BE
-    API --> V
-
+    API --> E2E
     FE --> STG
     FE --> PROD
     BE --> STG
     BE --> PROD
-    V -. "Snapshot-bound read-only tests" .-> STG
-    V -. "Snapshot-bound read-only tests" .-> PROD
+    E2E -. "Read-only validation" .-> STG
+    E2E -. "Read-only validation" .-> PROD
 
-    FE -->|"Exact deployment evidence"| N
-    BE -->|"Exact deployment evidence"| N
-    N -->|"CI deployment drop"| D
-    N -->|"Production-only async request"| R
-    R -->|"Release-note drop"| D
-    N -->|"Notification outcomes"| API
-    R -->|"Publication outcomes"| API
+    FE --> PR
+    BE --> PR
+    E2E --> PR
+    FE --> CI
+    BE --> CI
+    CI --> RN
 
-    FE -->|"Workflow events"| PR
-    BE -->|"Workflow events"| PR
-    V -->|"Validation events"| PR
-    PR --> API
-    PR -->|"Resume or notify"| A
+    G -->|"Workflow/run state"| S
+    E -->|"Runtime version"| S
+    N -->|"Available links/outcomes"| S
