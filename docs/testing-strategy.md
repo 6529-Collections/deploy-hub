@@ -30,6 +30,13 @@ Required scenarios:
 - Cancellation after dispatch.
 - Retryable infrastructure failure.
 - Non-retryable deployment failure.
+- Valid exact environment-snapshot validation request.
+- Identical and conflicting duplicate validation IDs.
+- Coordinated deployments link to one validation result.
+- Environment snapshot changes before validation starts.
+- Environment snapshot changes while E2E is running.
+- Product E2E failure is not retried automatically.
+- Retryable E2E workflow/setup failure preserves the validation identity.
 - Missed terminal callback with successful GitHub run.
 - Callback duplicated with identical result.
 - Callback duplicated with conflicting result.
@@ -115,20 +122,36 @@ Run controlled real deployments through canonical workflows.
 
 Required cases:
 
-- Frontend-only staging deployment.
-- Backend-only staging deployment.
-- Coordinated backend-then-frontend deployment.
+- Frontend-only staging deployment followed by all 12 baseline packs.
+- Backend-only staging deployment followed by all 12 baseline packs.
+- Coordinated backend-then-frontend deployment followed by one shared baseline
+  validation.
 - Frontend deployment and unrelated backend deployment overlap.
-- Shared integration validation blocks mutation only for its protected window.
+- Baseline E2E verifies the exact frontend runtime SHA and backend runtime
+  versions by service before and after the run.
+- Same-environment mutation waits only for the protected validation window;
+  other-environment mutation, CI, preparation, and agent work continue.
 - Exact runtime version matches the requested SHA.
 - Failed health check produces a failed operation and truthful PR feedback.
+- Product E2E failure produces `deployed but validation failed`, blocks that
+  result from production, and does not auto-retry.
+- Retryable workflow/setup failure receives only the bounded retry allowed by
+  policy and retains the same validation identity.
+- A changed snapshot fails closed instead of attributing the E2E result to the
+  new environment state.
+
+Initial timing expectations are approximately seven minutes for a full staging
+baseline. The UI uses rolling observed durations rather than treating that
+estimate as a deadline.
 
 ## 5. Recovery drills
 
 - Stop Deploy Hub after accepting but before dispatching a request.
 - Stop it after dispatch while the workflow is running.
 - Drop or delay a terminal event.
+- Lose a validation event after E2E has reached a terminal GitHub state.
 - Create a duplicate dispatch signal.
+- Deliver duplicate and conflicting validation completion signals.
 - Leave a waiting lock owner stale.
 - Cancel the underlying GitHub workflow directly.
 - Move `main` between request preparation and dispatch.
@@ -143,9 +166,19 @@ creating another logical deployment.
 
 - Start with a low-risk exact backend service release.
 - Perform a low-risk exact frontend release.
-- Verify production runtime identity and Check Run outcome.
+- Run all 11 production-safe baseline packs against each resulting exact
+  production snapshot.
+- Verify production runtime identity, post-E2E snapshot identity, and Check Run
+  outcome.
+- Exercise a controlled validation failure and prove production is reported as
+  deployed but unvalidated until reconciliation, explicit acceptance, or
+  known-good exact redeployment.
 - Exercise the documented break-glass manual path separately.
 - Confirm unrelated staging activity remains independent.
+
+Initial timing expectations are approximately four minutes for a full
+production baseline. The UI uses rolling observed durations and retains
+outliers rather than promising a fixed completion time.
 
 ## 7. Acceptance gate
 
@@ -153,6 +186,12 @@ Deploy Hub becomes the default only when:
 
 - All four canonical deployment adapters have succeeded in real use.
 - Every success has exact runtime identity proof.
+- Every staging success has all 12 baseline packs bound to an unchanged exact
+  environment snapshot.
+- Every production success has all 11 production-safe packs bound to an
+  unchanged exact environment snapshot.
+- Frontend-only, backend-only, and coordinated outcomes have each passed the
+  mandatory validation path; coordinated outcomes create one validation.
 - Duplicate and stale requests have been exercised.
 - A failure, retry, cancellation, and missed-event recovery have been exercised.
 - UI and PR status match GitHub and runtime truth.

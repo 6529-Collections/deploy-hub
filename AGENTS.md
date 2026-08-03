@@ -10,11 +10,12 @@ Before changing the project, read:
 
 1. `README.md`
 2. `STATUS.md`
-3. `docs/requirements.md`
-4. `docs/architecture.md`
-5. `docs/migration-plan.md`
-6. `docs/testing-strategy.md`
-7. All accepted records in `docs/decisions/`
+3. `TODO.md`
+4. `docs/requirements.md`
+5. `docs/architecture.md`
+6. `docs/migration-plan.md`
+7. `docs/testing-strategy.md`
+8. All accepted records in `docs/decisions/`
 
 Read files under `docs/references/` when validating claims about Release Bus or
 the original Deploy Hub proposal. Treat those files as immutable source
@@ -26,6 +27,11 @@ material.
   only in a Codex conversation.
 - Save material conclusions in the appropriate file during the same task.
 - Update `STATUS.md` after every material planning or implementation session.
+- Treat `TODO.md` as the canonical execution tracker. Update task status and
+  durable evidence in the same change that materially advances a task.
+- Never mark a task complete from assertion or checkbox state alone. Reinspect
+  its acceptance criteria and exact linked implementation, PR, workflow, and
+  runtime evidence when answering whether a task is done.
 - Add a dated entry to `CHANGELOG.md` for every material document change.
 - Record architectural decisions in `docs/decisions/` instead of silently
   changing the architecture.
@@ -50,8 +56,13 @@ material.
 
 ## Development conventions
 
-- New task-owned branches use the `agent-prxt/` prefix followed by concise
-  kebab-case.
+- While `STATUS.md` records the repository as private and specification-only,
+  documentation changes may be committed and pushed directly to `main`.
+- Before adding executable application code, GitHub Actions, permissions,
+  credentials, or deployment authority, switch to protected `main` with
+  task-owned `agent-prxt/` branches and ready-for-review pull requests.
+- After that switch, new task-owned branches use the `agent-prxt/` prefix
+  followed by concise kebab-case.
 - Open normal ready-for-review pull requests unless the user explicitly asks
   for a draft.
 - State requirements as testable outcomes.

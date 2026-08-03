@@ -4,6 +4,11 @@ Status: Accepted
 
 Date: 2026-08-03
 
+Validation clarification: ADR 0004 requires the current full read-only baseline
+pack inventory for every staging and production outcome. In this record,
+`full cross-system E2E` means deeper authenticated, mutating, feature-specific,
+or otherwise risk-selected validation beyond that universal baseline.
+
 ## Context
 
 The first Deploy Hub specification left open the durable request store,
@@ -40,4 +45,3 @@ recreate Release Bus complexity or make shadow testing unsafe.
 - Shadow permissions cannot mutate repositories, workflows, or AWS resources.
 - Rollback remains explicit, attributable, and exact-version based rather than
   pretending that a multi-repository deployment is transactional.
-

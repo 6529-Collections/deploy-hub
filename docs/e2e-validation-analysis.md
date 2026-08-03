@@ -1,6 +1,6 @@
 # Deploy Hub E2E Validation Analysis
 
-Status: Proposed
+Status: Accepted as the basis for ADR 0004
 
 Last updated: 2026-08-03
 
@@ -236,10 +236,10 @@ Before Deploy Hub can use these suites:
 - Retain manual diagnostic pack selection without allowing partial diagnostics
   to satisfy mandatory baseline validation.
 
-## Decision to accept
+## Accepted decision
 
-Approve mandatory baseline read-only E2E for every staging and production
+Mandatory baseline read-only E2E is required for every staging and production
 outcome, using one exact environment-snapshot validation for a coordinated
 deployment set. Keep deeper feature-specific and cross-system validation
-risk-based.
+risk-based. ADR 0004 is the authoritative decision record.
 

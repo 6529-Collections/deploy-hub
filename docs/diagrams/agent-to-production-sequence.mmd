@@ -5,6 +5,7 @@ sequenceDiagram
     participant H as Deploy Hub
     participant W as Repository workflow
     participant E as Environment
+    participant V as Frontend E2E workflow
 
     D->>A: Work on this and see it through to prod
     A->>G: Implement and open or update PR
@@ -13,13 +14,25 @@ sequenceDiagram
     H->>G: Create or update staging Check Run
     H->>W: Start canonical staging path
     W->>E: Deploy and health-check
-    W-->>H: Terminal workflow event
-    H-->>A: Staging succeeded
-    A->>E: Run required feature validation
+    W-->>H: Deployed with exact runtime identity
+    H->>E: Capture exact staging snapshot
+    H->>V: Run mandatory staging baseline E2E
+    V->>E: Execute read-only packs
+    V-->>H: Terminal snapshot-bound result
+    H->>E: Verify staging snapshot is unchanged
+    H->>G: Conclude staging Check Run
+    H-->>A: Staging deployed and validated
+    A->>E: Run additional feature validation when required
     A->>G: Merge exact approved result
     A->>H: Deploy exact main SHA to production
     H->>W: Start canonical production path
     W->>E: Deploy and verify version
-    W-->>H: Production succeeded
-    H-->>A: Resume with final result
+    W-->>H: Deployed with exact runtime identity
+    H->>E: Capture exact production snapshot
+    H->>V: Run mandatory production-safe E2E
+    V->>E: Execute read-only packs
+    V-->>H: Terminal snapshot-bound result
+    H->>E: Verify production snapshot is unchanged
+    H->>G: Conclude production Check Run
+    H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production

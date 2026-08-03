@@ -2,6 +2,22 @@
 
 ## 2026-08-03
 
+- Finalized the v1 requirements and target architecture, including the exact
+  deployment-versus-validation boundary and terminal failure semantics.
+- Accepted mandatory full baseline E2E for every staging and production
+  outcome in ADR 0004: 12 current staging packs and 11 current
+  production-safe packs bound to an unchanged exact environment snapshot.
+- Updated the agent-to-production and target-architecture diagrams so neither
+  environment reports success before its snapshot-bound E2E result.
+- Expanded migration and testing plans for frontend-only, backend-only, and
+  coordinated validation, snapshot drift, product failure, infrastructure
+  retry, and environment-scoped locking.
+- Added the root `TODO.md` tracker with stable Tasks 0–24, acceptance criteria,
+  durable evidence rules, Task 0 completed, and Task 1 designated as next.
+- Allowed direct documentation pushes to `main` only during the current private,
+  specification-only phase; protected-main and ready-PR workflow becomes a
+  prerequisite before executable code, Actions, credentials, or deployment
+  authority.
 - Analyzed the existing staging and production Playwright workflows, pack
   coverage, triggers, Release Bus coupling, failure behavior, and recent GitHub
   Actions timing history.

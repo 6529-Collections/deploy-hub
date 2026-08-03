@@ -7,8 +7,8 @@ The intended operating model is:
 
 - A Codex task owns the feature lifecycle from implementation through the
   environment explicitly requested by the developer.
-- Deploy Hub owns one exact deployment operation from acceptance through
-  terminal reporting.
+- Deploy Hub owns one exact deployment or environment-snapshot validation
+  operation from acceptance through terminal reporting.
 - Frontend and backend repositories retain ownership of their canonical build
   and deployment workflows.
 - GitHub Check Runs provide real-time pull-request feedback.
@@ -16,8 +16,10 @@ The intended operating model is:
   through the authenticated backend proxy.
 - New deployments, queue changes, progress, and results appear in an open UI
   automatically without manual browser refresh.
-- Frontend and backend deployment capacity is independent except during an
-  explicitly protected shared-integration validation window.
+- Every staging and production outcome passes the full baseline read-only E2E
+  suite against an unchanged exact environment snapshot.
+- Frontend and backend deployment capacity is independent; baseline E2E blocks
+  mutation only to the environment being validated for its short test window.
 
 ## Current status
 
@@ -34,6 +36,7 @@ remain the operational deployment path while Deploy Hub is designed and tested.
 ## Documentation
 
 - [Current status](STATUS.md)
+- [Implementation tracker](TODO.md)
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
 - [Migration plan](docs/migration-plan.md)
@@ -56,6 +59,7 @@ reviewed and accepted.
 
 ## Resuming work
 
-Read [AGENTS.md](AGENTS.md) and [STATUS.md](STATUS.md) before making changes.
+Read [AGENTS.md](AGENTS.md), [STATUS.md](STATUS.md), and [TODO.md](TODO.md)
+before making changes.
 Material requirements, decisions, diagrams, and next steps must be saved in
 this repository rather than left only in a Codex conversation.

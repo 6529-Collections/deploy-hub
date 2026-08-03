@@ -13,6 +13,7 @@ flowchart LR
         PR["PR Check Runs<br/>and Deployments"]
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
+        V["Frontend-owned<br/>E2E workflows"]
     end
 
     subgraph E["Runtime environments"]
@@ -20,7 +21,7 @@ flowchart LR
         PROD["Production"]
     end
 
-    A -->|"Exact deployment operation"| API
+    A -->|"Exact deployment or validation operation"| API
     UI -->|"Snapshots and commands"| API
     API -->|"Live state events<br/>plus reconnect and resync"| UI
     UIS -->|"Files from one resolved SHA"| P
@@ -28,13 +29,17 @@ flowchart LR
     API --> L
     API --> FE
     API --> BE
+    API --> V
 
     FE --> STG
     FE --> PROD
     BE --> STG
     BE --> PROD
+    V -. "Snapshot-bound read-only tests" .-> STG
+    V -. "Snapshot-bound read-only tests" .-> PROD
 
     FE -->|"Workflow events"| PR
     BE -->|"Workflow events"| PR
+    V -->|"Validation events"| PR
     PR --> API
     PR -->|"Resume or notify"| A

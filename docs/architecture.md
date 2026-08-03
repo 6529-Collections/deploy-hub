@@ -1,14 +1,14 @@
 # Deploy Hub Architecture
 
-Status: Draft v0.1
+Status: Agreed v1.0
 Last updated: 2026-08-03
 
 ## Core boundary
 
 The Codex task is the feature-lifecycle orchestrator. Deploy Hub accepts and
-finishes one exact deployment operation. Repository workflows execute builds
-and deployments. GitHub and runtime version endpoints provide authoritative
-execution evidence.
+finishes one exact deployment or environment-snapshot validation operation.
+Repository workflows execute builds, deployments, and baseline E2E. GitHub and
+runtime version endpoints provide authoritative execution evidence.
 
 The canonical source for the following diagram is
 `diagrams/target-architecture.mmd`.
@@ -29,6 +29,7 @@ flowchart LR
         PR["PR Check Runs<br/>and Deployments"]
         FE["Frontend canonical workflows"]
         BE["Backend canonical workflow"]
+        V["Frontend-owned<br/>E2E workflows"]
     end
 
     subgraph E["Runtime environments"]
@@ -36,7 +37,7 @@ flowchart LR
         PROD["Production"]
     end
 
-    A -->|"Exact deployment operation"| API
+    A -->|"Exact deployment or validation operation"| API
     UI -->|"Snapshots and commands"| API
     API -->|"Live state events<br/>plus reconnect and resync"| UI
     UIS -->|"Files from one resolved SHA"| P
@@ -44,14 +45,18 @@ flowchart LR
     API --> L
     API --> FE
     API --> BE
+    API --> V
 
     FE --> STG
     FE --> PROD
     BE --> STG
     BE --> PROD
+    V -. "Snapshot-bound read-only tests" .-> STG
+    V -. "Snapshot-bound read-only tests" .-> PROD
 
     FE -->|"Workflow events"| PR
     BE -->|"Workflow events"| PR
+    V -->|"Validation events"| PR
     PR --> API
     PR -->|"Resume or notify"| A
 ```
@@ -69,6 +74,7 @@ sequenceDiagram
     participant H as Deploy Hub
     participant W as Repository workflow
     participant E as Environment
+    participant V as Frontend E2E workflow
 
     D->>A: Work on this and see it through to prod
     A->>G: Implement and open or update PR
@@ -77,15 +83,27 @@ sequenceDiagram
     H->>G: Create or update staging Check Run
     H->>W: Start canonical staging path
     W->>E: Deploy and health-check
-    W-->>H: Terminal workflow event
-    H-->>A: Staging succeeded
-    A->>E: Run required feature validation
+    W-->>H: Deployed with exact runtime identity
+    H->>E: Capture exact staging snapshot
+    H->>V: Run mandatory staging baseline E2E
+    V->>E: Execute read-only packs
+    V-->>H: Terminal snapshot-bound result
+    H->>E: Verify staging snapshot is unchanged
+    H->>G: Conclude staging Check Run
+    H-->>A: Staging deployed and validated
+    A->>E: Run additional feature validation when required
     A->>G: Merge exact approved result
     A->>H: Deploy exact main SHA to production
     H->>W: Start canonical production path
     W->>E: Deploy and verify version
-    W-->>H: Production succeeded
-    H-->>A: Resume with final result
+    W-->>H: Deployed with exact runtime identity
+    H->>E: Capture exact production snapshot
+    H->>V: Run mandatory production-safe E2E
+    V->>E: Execute read-only packs
+    V-->>H: Terminal snapshot-bound result
+    H->>E: Verify production snapshot is unchanged
+    H->>G: Conclude production Check Run
+    H-->>A: Production deployed and validated
     A-->>D: Feature is verified in production
 ```
 
@@ -96,6 +114,8 @@ sequenceDiagram
 - Pull-request identity and head SHA: GitHub Pull Requests.
 - CI and review readiness: GitHub checks and reviews.
 - Deployment execution: canonical GitHub Actions workflow run.
+- Baseline validation execution and evidence: frontend-owned GitHub Actions E2E
+  workflow run bound to an exact environment snapshot.
 - Deployment history: GitHub Deployment and Deployment Status records.
 - PR-visible progress: GitHub Check Run.
 - Actual deployed identity: environment-specific runtime version endpoint or
@@ -110,6 +130,8 @@ Deploy Hub may persist only what cannot be derived reliably:
 - Waiting order when a target is busy.
 - Idempotency evidence.
 - Cancellation intent not yet reflected in a workflow.
+- Validation ID, immutable environment snapshot, pack policy, and links to the
+  linked deployment and E2E runs.
 
 The MVP uses GitHub-native records for durable evidence and reconstructs state
 from GitHub and runtime truth. It does not add a database or S3 request ledger.
@@ -156,6 +178,29 @@ separate permissions introduced only when the rollout phase needs each one.
 | Backend | Staging | `deploy.yml` with exact SHA and selected services |
 | Backend | Production | `deploy.yml` with exact `main` SHA and selected services |
 
+## Environment-snapshot E2E
+
+Deploy Hub creates one validation record only after every component intended
+for the outcome is deployed. The record binds the environment, frontend
+runtime SHA, backend runtime version per service, linked deployment request
+IDs, E2E tooling SHA, and full baseline pack policy. A coordinated frontend and
+backend outcome shares one record rather than running duplicate suites.
+
+The frontend repository continues to own the Playwright implementation and E2E
+workflows. Deploy Hub dispatches and observes all 12 current staging
+post-deploy packs or all 11 current production-safe packs, verifies the exact
+environment snapshot immediately before and after the run, and exposes the
+result through the linked Check Runs, task event, and UI. Additional
+feature-specific, authenticated, mutating, or deeper cross-system validation is
+selected by the Codex task or policy and is not part of the universal baseline.
+
+A product-test failure is terminal until an explicit retry or corrective
+deployment. A retryable workflow or setup failure may receive a bounded retry
+under the same validation identity. Staging validation failure blocks that
+result from production. Production validation failure blocks later production
+mutation until reconciliation, explicit acceptance, or exact known-good
+redeployment.
+
 ## Shadow validation topology
 
 Frontend control-plane validation uses `1a-deploy-hub` as a non-production
@@ -189,8 +234,10 @@ tests.
 ## Concurrency model
 
 Concurrency is attached to actual mutation resources, not to a global release
-train. Shared integration testing receives a separate short-lived lock when the
-complete staging environment must remain unchanged.
+train. Staging and production each receive a separate short-lived validation
+lock while an exact snapshot is verified and baseline E2E runs. That lock
+blocks mutation only to the same environment; it does not block the other
+environment, PR CI, non-mutating preparation, or unrelated agent work.
 
 ## Multi-repository features
 
@@ -204,7 +251,9 @@ Example:
 backend staging operation
 → backend health check
 → frontend staging operation
-→ shared integration validation
+→ frontend health check
+→ one mandatory E2E validation of the resulting staging snapshot
+→ additional feature validation when required
 ```
 
 ## Recovery model

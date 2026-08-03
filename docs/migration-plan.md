@@ -66,9 +66,19 @@ Exercise the normal repository paths without Deploy Hub orchestration:
 - Frontend production through `build-upload-deploy-prod.yml`.
 - Backend staging through `deploy.yml`.
 - Backend production through `deploy.yml`.
+- Staging baseline E2E through the existing frontend-owned post-deploy workflow.
+- Production baseline E2E through the existing frontend-owned production-safe
+  workflow.
 - Exact runtime version verification for every path.
+- Exact environment-snapshot capture before and after every baseline E2E run.
 - Manual retry and previous-version redeployment.
 - Concurrent frontend and unrelated backend staging operations where safe.
+
+Generalize the two E2E workflows so a Deploy Hub validation identity and exact
+environment snapshot replace Release Bus train and manifest assumptions. The
+same generic validation path must support frontend-only, backend-only, and
+coordinated outcomes. Preserve all 12 current staging post-deploy packs and all
+11 current production-safe packs as the initial mandatory baselines.
 
 Modify canonical workflows only where necessary to provide a stable generic
 request ID, exact-SHA contract, terminal status output, and scoped concurrency.
@@ -77,15 +87,22 @@ Do not add Deploy Hub-specific build implementations.
 Exit criteria:
 
 - All four canonical adapters are proven independently.
+- Both baseline E2E workflows can validate a generic exact environment snapshot
+  without Release Bus ownership or callbacks.
 - Release Bus is not needed to execute a normal deployment.
 
 ## Phase 3 — Build Deploy Hub MVP
 
 - Create the dedicated Deploy Hub implementation repository.
 - Implement the agent-facing operation contract.
+- Implement the environment-snapshot validation contract and lifecycle.
 - Implement exact-SHA, stale-head, authorization, and idempotency validation.
 - Implement the four canonical workflow adapters.
+- Implement staging and production E2E adapters without copying Playwright into
+  this repository.
 - Add minimal durable request tracking and scoped waiting.
+- Add independent staging and production validation locks that block only
+  mutation to the environment being tested.
 - Create GitHub Deployments and Check Runs.
 - Emit terminal events carrying the originating Codex task reference.
 - Add the authenticated backend proxy that resolves `deploy-hub/main` to one
@@ -124,6 +141,13 @@ Explicit exclusions:
 - Prove the shadow path before isolated execution. Treat shadow success as
   control-plane evidence only, not deployment evidence.
 - Run controlled frontend and backend staging canaries.
+- Run the complete mandatory staging E2E baseline for frontend-only,
+  backend-only, and coordinated exact snapshots.
+- Prove that a coordinated deployment produces one linked validation rather
+  than duplicate E2E runs.
+- Exercise a product-test failure, a retryable workflow/setup failure, and a
+  snapshot change during testing; verify each produces the specified truthful
+  result.
 - Prove frontend activity does not globally block unrelated backend work.
 - Verify Check Run and UI state against the exact GitHub workflow and runtime.
 - Verify that new operations and every queue or state transition appear in an
@@ -137,13 +161,19 @@ Exit criteria:
 
 - No duplicate logical deployments.
 - No successful status without exact runtime proof.
+- No staging success without terminal snapshot-bound baseline E2E.
 - No unexplained environment drift.
-- No global FE/BE blocking outside an explicit shared validation window.
+- No global FE/BE blocking; a validation window blocks mutation only to the
+  same environment.
 - No shadow identity possesses a shared-environment mutation capability.
 
 ## Phase 5 — Production pilot and establishment
 
 - Run low-risk production pilots for frontend and backend.
+- Require the complete production-safe E2E baseline against each resulting
+  exact production snapshot before reporting success.
+- Exercise and reconcile a controlled production-validation failure without
+  hiding the fact that deployment already occurred.
 - Route Codex deployment tools to Deploy Hub.
 - Make Deploy Hub the normal deployment entry point.
 - Verify that a merge to `deploy-hub/main` publishes one internally consistent
@@ -151,7 +181,8 @@ Exit criteria:
 - Keep canonical manual workflows as break-glass fallback.
 - Disable the old Release Bus request UI and operator route.
 - Complete an agreed burn-in covering all four deployment adapters and at least
-  one stale, duplicate, failure, retry, and cancellation scenario.
+  one stale, duplicate, failure, retry, cancellation, and snapshot-drift
+  scenario.
 
 Important limitation:
 
@@ -169,6 +200,8 @@ Deploy Hub acceptance gate.
 - Remove candidate, train, operation, manifest, lock, control, and UI routes.
 - Remove the reconciler Lambda and scheduled triggers.
 - Remove Release Bus-specific frontend workflows.
+- Remove Release Bus-only E2E train/manifest inputs, authorization, and
+  callbacks after the generic environment-snapshot paths are established.
 - Remove Release Bus-only inputs, authorization, and callbacks from canonical
   backend workflows.
 - Remove Release Bus readiness dependencies from canonical manual workflows.

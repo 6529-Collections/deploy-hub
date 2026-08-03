@@ -44,6 +44,7 @@ a genuine blocker requires user input.
 ### Deploy Hub owns
 
 - Accepting one exact deployment operation.
+- Accepting one exact environment-snapshot validation operation.
 - Validating request identity and authorization.
 - Idempotency and minimal durable request tracking.
 - Target-scoped waiting and concurrency protection.
@@ -80,6 +81,22 @@ requestDeployment({
 getDeployment(requestId)
 cancelDeployment(requestId)
 retryDeployment(requestId)
+
+requestValidation({
+  validationId,
+  environment,
+  frontendRuntimeSha,
+  backendRuntimeVersionsByService,
+  linkedDeploymentRequestIds,
+  testToolingSha,
+  packPolicy,
+  requestedBy,
+  taskReference
+})
+
+getValidation(validationId)
+cancelValidation(validationId)
+retryValidation(validationId)
 ```
 
 Requirements:
@@ -93,6 +110,11 @@ Requirements:
 - An operation remains queryable if the initiating agent becomes idle.
 - Terminal events contain enough identity to resume the correct Codex task.
 - Every state can be reconstructed from durable evidence after interruption.
+- A validation binds immutable deployed identities, not mutable branch names.
+- Repeating the same `validationId` and identical snapshot returns the same
+  logical validation; conflicting reuse is rejected.
+- A coordinated frontend/backend deployment uses one validation after every
+  intended component is deployed and links that result to each request.
 
 ## 5. Canonical deployment adapters
 
@@ -136,6 +158,9 @@ stale
 
 Workflow-level detail may be displayed from GitHub Actions without duplicating
 every workflow step as Deploy Hub state.
+Deployment and validation remain distinguishable within `running`: the UI and
+Check Runs must show phases such as `deploying`, `deployed; validating`, and
+`deployed; validation failed` without expanding the durable state machine.
 
 ## 7. Concurrency and waiting
 
@@ -147,8 +172,11 @@ every workflow step as Deploy Hub state.
 - Builds and isolated CI may run independently.
 - Shared integration validation has capacity one while it requires a stable
   complete environment.
-- The shared integration lock covers only the required stable validation
-  window, not candidate preparation or unrelated builds.
+- Staging and production validation locks are independent.
+- An environment validation lock blocks mutation only to that same environment
+  while its exact snapshot is verified and E2E runs.
+- The validation lock does not block PR CI, non-mutating preparation, agent
+  work, or the other environment.
 - Waiting must be visible, durable, and attributable to a specific scoped
   blocker.
 
@@ -160,11 +188,28 @@ every workflow step as Deploy Hub state.
 - Repository workflows perform build, deployment, health, and exact-version
   checks.
 - Health and exact-version proof are required for every real deployment.
+- Every requested staging outcome requires terminal successful baseline
+  read-only E2E after all intended components are deployed.
+- Every requested production outcome requires terminal successful
+  production-safe read-only E2E.
+- The initial mandatory baseline is all 12 current staging post-deploy packs and
+  all 11 current production post-deploy packs. A partial diagnostic pack run
+  cannot satisfy the baseline.
+- E2E is bound to an exact environment snapshot containing the frontend runtime
+  SHA and backend runtime versions by service. The snapshot is verified before
+  and after testing.
+- The E2E workflows and Playwright implementation remain owned by the frontend
+  repository; Deploy Hub dispatches and observes them but does not copy their
+  implementation.
 - The Codex task selects targeted feature-specific staging validation by
   default.
-- Full cross-system E2E is required only by explicit policy or change risk.
+- Deeper authenticated, mutating, feature-specific, or cross-system validation
+  is required only by explicit policy or change risk.
 - Validation failure affects the owning operation and does not stop unrelated
   targets unless the environment itself is unsafe.
+- Product E2E failure does not auto-retry. Retryable workflow/setup
+  infrastructure failure may retry the same validation identity within a
+  bounded policy.
 
 ### Shadow integration branch
 
@@ -203,6 +248,7 @@ The Check Run must expose:
 - Current operation state and scoped blocking reason.
 - Request ID and originating task identity.
 - Links to Deploy Hub and the canonical workflow run.
+- Baseline validation identity, environment snapshot, E2E phase, and E2E run.
 - Stale-head status.
 - Terminal conclusion and concise failure information.
 
@@ -254,6 +300,8 @@ The UI must show:
 - Deployment history and terminal outcomes.
 - Retry and cancel controls subject to authorization.
 - Shared integration-validation ownership.
+- Validation phase, exact environment snapshot, pack policy, elapsed time, and
+  rolling estimated completion time.
 
 The UI must not expose release trains or a single opaque global lane.
 Static files from GitHub never serve as operational state; the authenticated
@@ -270,6 +318,11 @@ Deploy Hub API supplies snapshots, live events, history, and commands.
 - Stale SHAs fail closed.
 - One failed operation does not pause unrelated environments or repositories.
 - Failed component deployment wakes the owning agent with structured evidence.
+- A staging E2E failure is reported as `deployed but validation failed` and
+  prevents that exact result from progressing to production.
+- A production E2E failure is reported as `deployed but validation failed` and
+  blocks later production mutation until exact reconciliation, explicit
+  acceptance, or known-good exact redeployment.
 - A known-good exact version can be redeployed explicitly through the
   repository-owned canonical workflow.
 - Automatic cross-repository rollback is not part of the MVP.
@@ -295,6 +348,8 @@ The MVP includes:
 - Frontend staging and production adapters.
 - Backend staging and production adapters.
 - Exact-SHA validation and deployed-version proof.
+- Exact environment-snapshot validation records.
+- Mandatory staging and production baseline read-only E2E adapters.
 - Idempotent request/status/cancel/retry operations.
 - Minimal durable request tracking.
 - GitHub-native durable evidence without an MVP database or S3 request ledger.
@@ -320,6 +375,7 @@ The MVP includes:
 - Release trains.
 - A duplicated PR CI system.
 - Deploy Hub-owned build or cloud deployment implementation.
+- Deploy Hub-owned Playwright or duplicated E2E implementation.
 - A complete mirror of GitHub workflow state in a database.
 - A continuously running reconciler unless later evidence proves it necessary.
 - Automatic cross-repository rollback or transaction semantics.

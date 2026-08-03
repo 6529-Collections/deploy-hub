@@ -26,6 +26,10 @@ Initial specification and architecture definition.
   beginning with a physically read-only shadow installation.
 - Deployment health and exact-version proof are always required. Targeted
   staging validation is normal; full cross-system E2E is risk- or policy-based.
+- Every staging and production outcome requires mandatory baseline read-only
+  E2E bound to one exact environment snapshot. Coordinated deployments share
+  one validation result after all intended components are deployed; deeper
+  feature-specific and cross-system validation remains risk-based.
 - MVP rollback is an explicit agent-guided or manual exact-version redeployment
   through the canonical repository workflow.
 - Release Bus is already OFF for both staging and production and is not
@@ -46,13 +50,24 @@ Initial specification and architecture definition.
   integration branch with a credentialless workflow that cannot mutate shared
   environments.
 
+## Current repository workflow
+
+- The repository is private and specification-only. Documentation changes may
+  be committed and pushed directly to `main` during this phase.
+- Before executable application code, GitHub Actions, permissions,
+  credentials, or deployment authority are added, protect `main` and use
+  task-owned branches with ready-for-review pull requests.
+
 ## Current documents
 
 - Requirements v1.0 agreed.
-- Target architecture and agent-to-production sequence drafted.
-- Migration and test strategies drafted.
+- Target architecture and agent-to-production sequence agreed at v1.0.
+- Migration and test strategies updated with mandatory environment-snapshot
+  E2E gates.
 - Current staging and production E2E workflows, coverage, integration gaps, and
   recent GitHub Actions durations analyzed in `docs/e2e-validation-analysis.md`.
+- Mandatory environment-snapshot E2E accepted in ADR 0004.
+- Root implementation tracker created in `TODO.md`; Task 1 is the next task.
 - `1a-deploy-hub` frontend shadow-branch design documented across requirements,
   architecture, migration, and testing.
 - Initial architecture and MVP foundation decisions recorded.
@@ -84,13 +99,10 @@ Initial specification and architecture definition.
   regardless.
 - Define the exact GitHub-native representation for waiting order and
   idempotency during implementation design.
-- Decide whether to accept the recommendation that every staging and production
-  outcome requires baseline read-only E2E bound to one exact environment
-  snapshot, while deeper feature-specific validation remains risk-based.
 
 ## Next recommended work
 
-Resolve the baseline E2E recommendation, inventory the exact changes required
-in the frontend and backend canonical workflows, verify the backend's
-live-stream support, and define the GitHub-native request representation before
-any live migration action.
+Execute Task 1 in `TODO.md`: inventory and verify the dormant Release Bus
+baseline, all four canonical deployment paths, both E2E workflows, and the
+existing backend capabilities needed by Deploy Hub. Make no live migration
+change during the inventory.
