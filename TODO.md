@@ -39,7 +39,7 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `93150e4fe9254c2121196e0234dd5746baa9e544`.
+  is open at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides lower-level primitives
@@ -219,9 +219,14 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `93150e4fe9254c2121196e0234dd5746baa9e544` contains the
+  at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
+- The latest follow-up hardens workflow provenance, GitHub retry/timeout
+  behavior, mergeability polling, newest-status selection, reconciliation race
+  checks, and terminal error preservation. It also fixes the task-owned Jest
+  typecheck failure; 122 focused tests, the Jest ratchet, and changed-code
+  quality checks pass locally.
 - The static UI registers each exact request in one fixed GitHub commit-status
   context before dispatch. The surviving controller discovers and claims every
   pending request in explicit batch order, so GitHub's replaceable concurrency
@@ -270,7 +275,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `93150e4fe9254c2121196e0234dd5746baa9e544` contains the
+  at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App
