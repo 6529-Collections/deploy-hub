@@ -128,7 +128,9 @@ Canonical manual workflows remain the fallback throughout rollout.
 - Frontend and unrelated backend work must not be globally serialized.
 - Staging and production remain independent.
 - Canonical GitHub Actions concurrency groups own conflicting mutation order.
-- Deploy Hub shows GitHub's queued/in-progress state and waiting reason.
+- Deploy Hub shows GitHub's queued/in-progress state. GitHub's run API does not
+  expose a dependable concurrency group or queue cause, so queued runs use the
+  honest generic label `Queued in GitHub Actions` and link the exact run.
 - Deploy Hub has no lock table, lease, heartbeat, queue, scheduler, or
   continuously running reconciler.
 - E2E records the environment snapshot before and after. Snapshot drift yields

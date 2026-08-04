@@ -63,8 +63,10 @@ or new AWS-IAM test suites unless an approved implementation adds that boundary.
 - Publish and roll back UI independently of backend deployments.
 - Show a newly discovered workflow run by the next normal poll, no later than
   five seconds.
-- Update phase, GitHub waiting reason, blocker, runtime identity, validation,
-  communication link, and terminal result without browser refresh.
+- Update phase, GitHub run state, blocker, runtime identity, validation,
+  communication link, and terminal result without browser refresh. Queued runs
+  use `Queued in GitHub Actions` because the run API does not expose a reliable
+  concurrency cause.
 - Interrupt polling and prove the next complete snapshot repairs the view with
   no cursor or event replay.
 - Respect GitHub conditional responses and rate-limit guidance.

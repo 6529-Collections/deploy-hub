@@ -126,7 +126,9 @@ and staging does not block production.
 
 Deploy Hub has no queue ownership, claims, acceptance sequence, heartbeat,
 lock recovery, or scheduler. The UI shows GitHub's queued or running state and
-the known concurrency reason.
+links the exact run. Because GitHub's run API does not expose a dependable
+concurrency group or queue cause, the UI labels queued runs `Queued in GitHub
+Actions` rather than inventing a more specific reason.
 
 E2E records the environment versions before and after the suite. Snapshot
 drift produces a stale result and rerun; Deploy Hub does not create a

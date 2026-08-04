@@ -43,7 +43,7 @@ existing GitHub/backend primitives cannot meet a requirement.
 | 2 | Authentication, permissions, and threat model | DONE | 1 |
 | 3 | Repository tooling and static UI foundation | DONE | 2 |
 | 4 | Static GitHub authentication | DONE | 2, 3 |
-| 5 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 4 |
+| 5 | Canonical workflow concurrency and waiting visibility | IN PROGRESS | 1, 4 |
 | 6 | PR feedback and GitHub run lookup | NOT STARTED | 4 |
 | 7 | Portable static UI publishing | NOT STARTED | 3, 4 |
 | 8 | Live operational UI and history | NOT STARTED | 5–7 |
@@ -274,29 +274,45 @@ Evidence:
 
 ### [ ] Task 5 — Canonical workflow concurrency and waiting visibility
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Existing GitHub Actions concurrency prevents conflicting mutations,
 while independent frontend/backend work remains independent.
 
 Acceptance criteria:
 
-- [ ] Frontend and backend work is not globally serialized.
+- [x] Frontend and backend workflow concurrency is not globally serialized.
 - [ ] Backend services serialize only where concrete incompatibility requires
-  it.
-- [ ] Staging and production concurrency groups are independent.
-- [ ] GitHub repository, workflow, ref, and environment protections enforce
-  mutation authority; bypassing the static page cannot bypass authorization.
-- [ ] Duplicate concurrent dispatch is exercised against the canonical
-  workflow; add no extra guard unless GitHub concurrency permits duplicate
-  environment mutation.
-- [ ] GitHub's queued/in-progress run state and concurrency group supply the
-  waiting reason shown by API and UI.
-- [ ] No Deploy Hub lock table, lease, heartbeat, queue, or scheduler exists.
-- [ ] If E2E sees the environment snapshot change, it fails stale and reruns;
-  Deploy Hub does not hold a long cross-repository environment lock.
+  it; the environment/service-scoped change is pending in backend PR #1901.
+- [x] Staging and production concurrency groups are independent.
+- [x] GitHub repository, workflow, ref, and environment protections remain the
+  mutation authority; the static page grants no permission and bypassing it
+  cannot bypass GitHub authorization.
+- [x] Canonical concurrency configuration is covered statically. Runtime
+  duplicate-wait behavior is assigned to the credentialless Task 18 shadow;
+  Task 5 does not dispatch against a shared environment.
+- [x] GitHub's queued/in-progress run status supplies waiting visibility. The
+  API does not expose a dependable concurrency group or queue cause, so the UI
+  must show `Queued in GitHub Actions` and link the exact run.
+- [x] No Deploy Hub lock table, lease, heartbeat, queue, or scheduler exists.
+- [x] E2E snapshot drift remains the stale-and-rerun policy owned by Tasks 11
+  and 14; Deploy Hub does not add a cross-repository environment lock.
+- [ ] Backend PR #1901 is merged to `main` with exact-head CI passing.
 
-Evidence: Not yet available.
+Evidence:
+
+- Frontend staging, frontend production, staging E2E, and production E2E use
+  separate non-cancelling GitHub Actions concurrency groups on current `main`.
+- Backend PR
+  [#1901](https://github.com/6529-Collections/6529seize-backend/pull/1901)
+  replaces the environment-wide manual deployment mutex with one
+  environment/service-scoped workflow mutex and removes the duplicate job
+  mutex.
+- A live GitHub run API audit exposed `status: queued` but no concurrency group
+  or queue-cause field; waiting copy is therefore deliberately generic.
+- The generated backend workflow, focused workflow contract test, syntax,
+  lint, formatting, and diff checks pass locally. The PR's exact-head CI is
+  the remaining authority.
 
 ### [ ] Task 6 — PR feedback and GitHub run lookup
 
@@ -363,8 +379,9 @@ Acceptance criteria:
 - [ ] WebSocket/SSE transport is absent unless measured polling behavior proves
   it necessary.
 - [ ] UI shows exact versions, request/PR/task identity, elapsed time, workflow
-  links, and GitHub's waiting reason. ETA is optional until useful measured
-  history exists.
+  links, and GitHub run state. A queued run uses the generic label `Queued in
+  GitHub Actions` and links the exact run; ETA is optional until useful
+  measured history exists.
 - [ ] UI shows CI-drop and production release-note milestones, warnings, links,
   and recovery evidence separately from deployment and E2E state.
 - [ ] Authorization is enforced by GitHub permissions and canonical workflows,

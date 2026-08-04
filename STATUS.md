@@ -5,7 +5,8 @@ Last updated: 2026-08-04
 ## Current position
 
 Tasks 0–4 are complete. Task 5, canonical workflow concurrency and waiting
-visibility, is next.
+visibility, is in progress. Backend PR #1901 contains the only workflow change
+found necessary: scope deployment concurrency by environment and service.
 
 Release Bus is OFF for staging and production and is not expected to return.
 Canonical manual workflows remain the deployment path and fallback while
@@ -49,5 +50,7 @@ write actor.
 
 ## Next work
 
-Implement Task 5 using the existing canonical workflows and GitHub Actions
-concurrency. Do not create another control plane.
+Carry backend PR #1901 through review and exact-head CI. Task 5 remains open
+until that workflow change reaches backend `main`; no staging or production
+dispatch is required to review it. Runtime duplicate-wait proof belongs in the
+credentialless shadow phase, not on a shared environment.
