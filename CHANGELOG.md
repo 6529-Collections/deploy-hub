@@ -2,6 +2,11 @@
 
 ## 2026-08-04
 
+- Extended backend PR #1901 with the matching manual-readiness change so
+  different backend staging services can run concurrently while the same
+  service queues in GitHub Actions. Production, frontend, and dormant Release
+  Bus safety behavior remains unchanged. Task 5 stays open pending exact-head
+  CI and merge.
 - Started Task 5. Current frontend workflow groups already separate frontend,
   backend, staging, production, and E2E work; backend PR #1901 contains the one
   required change to scope manual staging by service while preserving the

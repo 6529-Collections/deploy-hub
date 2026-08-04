@@ -5,9 +5,10 @@ Last updated: 2026-08-04
 ## Current position
 
 Tasks 0–4 are complete. Task 5, canonical workflow concurrency and waiting
-visibility, is in progress. Backend PR #1901 contains the only workflow change
-found necessary: scope manual staging concurrency by service while preserving
-the existing production and dormant Release Bus safety lanes.
+visibility, is in progress. Backend PR #1901 now contains the paired minimal
+change needed for safe manual backend staging concurrency: service-scoped
+GitHub Actions waiting plus a compatible manual-readiness guard. Production,
+frontend, and dormant Release Bus safety behavior remains unchanged.
 
 Release Bus is OFF for staging and production and is not expected to return.
 Canonical manual workflows remain the deployment path and fallback while
@@ -51,7 +52,7 @@ write actor.
 
 ## Next work
 
-Carry backend PR #1901 through review and exact-head CI. Task 5 remains open
-until that workflow change reaches backend `main`; no staging or production
-dispatch is required to review it. Runtime duplicate-wait proof belongs in the
-credentialless shadow phase, not on a shared environment.
+Carry backend PR #1901 head `ddb238bc` through review and exact-head CI. The
+previous policy-digest CI failure is fixed; the new full build is pending.
+Task 5 remains open until the PR reaches backend `main`. Runtime duplicate-wait
+proof belongs in the credentialless shadow phase, not on a shared environment.

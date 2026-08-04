@@ -283,9 +283,9 @@ Acceptance criteria:
 
 - [x] Frontend and backend workflow concurrency is not globally serialized.
 - [ ] Backend services serialize only where concrete incompatibility requires
-  it; the manual-staging service-scoped change is pending in backend PR #1901,
-  while production break-glass and dormant Release Bus safety lanes remain
-  unchanged.
+  it; backend PR #1901 head `ddb238bc` scopes manual staging by service and
+  makes the existing readiness guard compatible with that GitHub-native queue.
+  Production break-glass and dormant Release Bus safety lanes remain unchanged.
 - [x] Staging and production concurrency groups are independent.
 - [x] GitHub repository, workflow, ref, and environment protections remain the
   mutation authority; the static page grants no permission and bypassing it
@@ -307,14 +307,17 @@ Evidence:
   separate non-cancelling GitHub Actions concurrency groups on current `main`.
 - Backend PR
   [#1901](https://github.com/6529-Collections/6529seize-backend/pull/1901)
-  scopes only manual staging concurrency by service. It preserves Release Bus
-  operation-key concurrency, the globally serialized manual-production
-  break-glass lane, and the final environment/service job mutex.
+  head `ddb238bc` scopes manual staging concurrency by service and lets the
+  existing readiness guard defer manual backend overlap to that workflow
+  queue. It preserves Release Bus operation-key concurrency, the globally
+  serialized manual-production break-glass lane, and the final
+  environment/service job mutex.
 - A live GitHub run API audit exposed `status: queued` but no concurrency group
   or queue-cause field; waiting copy is therefore deliberately generic.
-- The generated backend workflow, focused workflow contract test, syntax,
-  lint, formatting, and diff checks pass locally. The PR's exact-head CI is
-  the remaining authority.
+- The generated backend workflow, focused readiness/classification/workflow
+  contract tests, policy-digest check, lint, formatting, and diff checks pass
+  locally. The prior exact-head digest failure is fixed; the new full CI build
+  is pending.
 
 ### [ ] Task 6 — PR feedback and GitHub run lookup
 
