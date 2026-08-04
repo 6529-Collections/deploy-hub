@@ -2,16 +2,19 @@
 
 ## 2026-08-04
 
-- Corrected the tracker so only Task 2 is `IN PROGRESS`. Tasks 1, 3, and 4 are
-  `PENDING INTEGRATION` through the deliberately parked frontend PR, while the
-  unfinished agent-facing Task 5 is `NOT STARTED`.
-
-- Kept frontend PR
+- Re-audited frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`
-  and explicitly pending merge until the static UI and controlled integration
-  test plan are ready. Task 2 may proceed in `deploy-hub` without activating
-  the live frontend workflows early.
+  at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`
+  against every tracker criterion. Task 1 is `DONE — PENDING` that linked PR;
+  Tasks 2, 3, and 4 are `IN PROGRESS`; Task 5 is `NOT STARTED`.
+- Marked the 14 Task 3 staging criteria and 11 Task 4 production criteria that
+  are actually implemented. Left only three concrete code gaps unchecked:
+  durable intake behind an active operation, terminal outcomes for later
+  cohorts after an earlier stop, and required-check revalidation immediately
+  before production mutation.
+- Removed the ambiguous `PENDING INTEGRATION` status and generic extra suffix
+  from the tracker. Frontend PR #3586 remains open, and no workflow was
+  dispatched.
 - Started Task 2, the live static frontend UI.
 - Implemented the Task 2 static operation dashboard: exact-head request review,
   fixed GitHub workflow dispatch, five-second full-snapshot refresh,
@@ -20,14 +23,6 @@
   the existing GitHub token; GitHub remains the source of truth. All 16 local
   authentication and operation tests plus formatting and lint pass.
 
-- Linked open frontend PR
-  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` from the active
-  tracker and marked Tasks 3–5 in progress. The PR contains the in-review
-  canonical staging/production controller, stop boundaries, bounded failure
-  isolation, and forward-only removal of one tracked staging PR with automatic
-  restore and E2E revalidation. It is not merged, and no operation was
-  dispatched.
 
 - Merged the dormant Task 1 frontend shadow workflow through PR #3579 at exact
   head `abbabaff6f032daf448d6d9eb2433066fa19aabf`; frontend `main` merge commit

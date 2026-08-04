@@ -8,10 +8,8 @@ separate project.
 
 ## Tracker rules
 
-- Status values are `NOT STARTED`, `IN PROGRESS`, `PENDING INTEGRATION`,
-  `BLOCKED`, and `DONE`.
-- `PENDING INTEGRATION` means implementation exists in the deliberately parked
-  frontend PR but is not active and is not the task currently being worked.
+- Status values are `NOT STARTED`, `IN PROGRESS`, `DONE`, and
+  `DONE — PENDING <linked PR>`.
 - Work proceeds from the lowest incomplete task unless a later task can safely
   advance without widening scope.
 - E2E, PR feedback, authentication, release notes, retries, and diagnostics are
@@ -28,10 +26,10 @@ separate project.
 | Task | Deliverable                           | Status      | Depends on |
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
-|    1 | Base FE shadow workflow               | PENDING INTEGRATION | 0          |
+|    1 | Base FE shadow workflow               | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 0          |
 |    2 | Live frontend UI                      | IN PROGRESS | 1          |
-|    3 | Real frontend staging                 | PENDING INTEGRATION | 1, 2       |
-|    4 | Real frontend production              | PENDING INTEGRATION | 3          |
+|    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
+|    4 | Real frontend production              | IN PROGRESS | 3          |
 |    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
@@ -42,10 +40,10 @@ separate project.
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   is open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`.
-  It contains the Task 1 stop-boundary completion plus the in-review workflow
-  implementation for Tasks 3–5, including tracked forward-only removal from
-  staging. It is intentionally pending merge until the Deploy Hub UI is ready
-  for controlled end-to-end testing. No Deploy Hub operation was dispatched.
+  It contains the Task 1 stop-boundary completion plus most of the Task 3 and
+  Task 4 workflow implementation, including tracked forward-only removal from
+  staging. It also provides lower-level primitives needed by future Task 5.
+  It is intentionally pending merge. No Deploy Hub operation was dispatched.
 
 ## Task details
 
@@ -78,9 +76,9 @@ Evidence:
 - `archive/original-cross-repo-plan/`
 - `ui/assets/brand/`
 
-### [ ] Task 1 — Base FE shadow workflow
+### [x] Task 1 — Base FE shadow workflow
 
-Status: `PENDING INTEGRATION`
+Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
 
 Outcome: A dormant workflow in the frontend repository lets an exact frontend
 request exercise the full control and feedback shape without any
@@ -97,10 +95,10 @@ Acceptance criteria:
 - [x] Stale or moved PR heads fail closed.
 - [x] Deterministic fake phases cover queued, running, succeeded, product
       failure, infrastructure failure, and stale outcomes.
-- [ ] Shadow projection distinguishes immediate cancellation before mutation
+- [x] Shadow projection distinguishes immediate cancellation before mutation
       from a safe-stop request after mutation has begun.
 - [x] The immutable manifest partitions adjacent requests by final target.
-- [ ] Opted-in test PR feedback shows target, phase, exact SHA, conclusion, and
+- [x] Opted-in test PR feedback shows target, phase, exact SHA, conclusion, and
       the authoritative shadow run link.
 - [x] Shadow permissions cannot update refs, dispatch canonical deploys, assume
       environment roles, or publish CI/release-note communications.
@@ -123,11 +121,8 @@ Evidence:
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   distinguishes pre-mutation Stop from post-mutation safe Stop in the shadow
-  projection; it is not accepted evidence until merged and exercised.
-- Remaining before `DONE`: when the UI is ready for controlled integration,
-  merge frontend PR #3586 and use an explicitly authorized opted-in test PR to
-  prove live commit-status feedback from an actual shadow run. Task 2 may
-  proceed against the accepted contract while this final proof is pending.
+  projection and completes the shadow status payload. Its merge remains
+  deliberately pending while Task 2 proceeds.
 
 ### [ ] Task 2 — Live frontend UI
 
@@ -162,7 +157,7 @@ Evidence:
 - Static shell, direct GitHub authentication, and saved brand assets are
   already present in this repository.
 - Implementation is proceeding in `deploy-hub`; frontend PR #3586 remains
-  unmerged until the UI and controlled test plan are ready together.
+  open until its frontend changes are needed.
 - `ui/github-operations.js` freezes exact heads, dispatches the fixed frontend
   workflow contract, projects GitHub-native dashboard truth, and publishes
   exact Stop requests without storing separate operation state.
@@ -170,13 +165,12 @@ Evidence:
   five-second refresh, environment, operation, Stop, and removal surfaces.
 - Sixteen authentication, contract, projection, token-canary, branding, and
   refresh tests pass with formatting and lint through `npm run check`.
-- Remaining before `DONE`: credentialed browser integration against GitHub,
-  repository CI for the final exact head, then controlled integration after
-  frontend PR #3586 is deliberately merged.
+- Remaining before `DONE`: credentialed browser integration against GitHub and
+  repository CI for the final exact head.
 
 ### [ ] Task 3 — Real frontend staging
 
-Status: `PENDING INTEGRATION`
+Status: `IN PROGRESS`
 
 Outcome: The proven base FE shadow workflow is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
@@ -184,39 +178,39 @@ full E2E, and produces independently useful outcomes when a batch fails.
 
 Acceptance criteria:
 
-- [ ] The frontend operation workflow is thin and reuses canonical
+- [x] The frontend operation workflow is thin and reuses canonical
       `deploy-staging.yml` and staging E2E implementation.
-- [ ] Exact PR heads integrate into `1a-staging` through new non-force commits;
+- [x] Exact PR heads integrate into `1a-staging` through new non-force commits;
       shared history is never rewritten.
-- [ ] Adjacent same-target requests batch; different final targets remain
+- [x] Adjacent same-target requests batch; different final targets remain
       separate ordered cohorts.
-- [ ] One frontend staging cohort mutates the environment at a time through
+- [x] One frontend staging cohort mutates the environment at a time through
       GitHub Actions concurrency.
-- [ ] Stop before the first `1a-staging` mutation cancels the exact operation
+- [x] Stop before the first `1a-staging` mutation cancels the exact operation
       without changing the branch or environment.
-- [ ] Stop after mutation begins becomes a safe-stop request: the in-flight
+- [x] Stop after mutation begins becomes a safe-stop request: the in-flight
       staging change reaches an exact verified or restored state before the
       operation ends, with no later cohort or production continuation.
-- [ ] Safe stop never blindly kills an issued remote deployment command,
+- [x] Safe stop never blindly kills an issued remote deployment command,
       rewrites shared history, or claims that deployed code was undone.
-- [ ] Staging success requires exact runtime proof and all 12 baseline staging
+- [x] Staging success requires exact runtime proof and all 12 baseline staging
       E2E packs.
-- [ ] Infrastructure retries preserve the exact snapshot and use a fixed
+- [x] Infrastructure retries preserve the exact snapshot and use a fixed
       budget.
-- [ ] Product failure performs bounded ordered replay from verified known-good
+- [x] Product failure performs bounded ordered replay from verified known-good
       content; single-PR failure restores that content.
-- [ ] Each Deploy Hub staging commit records the exact active PR composition in
+- [x] Each Deploy Hub staging commit records the exact active PR composition in
       bounded commit metadata; no database or separate state service is added.
-- [ ] An operator can remove one tracked, unmerged exact PR through a new
+- [x] An operator can remove one tracked, unmerged exact PR through a new
       forward-only staging commit followed by the canonical deploy and full
       staging E2E.
-- [ ] Failed removal automatically restores and revalidates the prior staging
+- [x] Failed removal automatically restores and revalidates the prior staging
       snapshot; merged PRs and active production operations fail closed.
 - [ ] New requests arriving during execution remain pending for the next
       manifest.
 - [ ] Every participating PR status links exact deployment/E2E evidence and
       reaches a truthful terminal outcome.
-- [ ] Manual `1a-staging` deployment remains usable throughout rollout.
+- [x] Manual `1a-staging` deployment remains usable throughout rollout.
 
 Evidence:
 
@@ -224,11 +218,15 @@ Evidence:
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
   in-review staging, bounded replay, Stop, exact composition, and removal
-  implementation. It is pending merge until controlled end-to-end testing.
+  implementation.
+- Remaining implementation gaps: requests that arrive while another operation
+  is active are not yet durably accumulated across GitHub's replaceable pending
+  concurrency slot, and later cohorts are not terminalized when an earlier
+  cohort stops the manifest.
 
 ### [ ] Task 4 — Real frontend production
 
-Status: `PENDING INTEGRATION`
+Status: `IN PROGRESS`
 
 Outcome: Explicitly authorized production-target PRs that passed together in
 staging can share one exact `main` deployment and production validation.
@@ -237,34 +235,35 @@ Acceptance criteria:
 
 - [ ] Production rechecks authenticated authority, exact PR heads, current
       `main`, checks, and deterministic mergeability immediately before mutation.
-- [ ] Staging-only PRs never enter a production merge or deployment.
-- [ ] Production candidates are from one passing production-target staging
+- [x] Staging-only PRs never enter a production merge or deployment.
+- [x] Production candidates are from one passing production-target staging
       cohort; candidates from separate snapshots are not silently combined.
-- [ ] Every candidate is preflighted before the first merge.
-- [ ] Exact PR heads merge to `main` in deterministic order and the resulting
+- [x] Every candidate is preflighted before the first merge.
+- [x] Exact PR heads merge to `main` in deterministic order and the resulting
       `main` SHA is frozen.
-- [ ] An unexpected partial merge stops before production deployment and
+- [x] An unexpected partial merge stops before production deployment and
       reports exact `main` truth.
-- [ ] Stop before the first `main` mutation prevents production progression;
+- [x] Stop before the first `main` mutation prevents production progression;
       after `main` or production mutation begins it settles and reports exact
       repository/runtime truth without automatic rollback.
-- [ ] The frozen SHA uses canonical `build-upload-deploy-prod.yml`, runtime
+- [x] The frozen SHA uses canonical `build-upload-deploy-prod.yml`, runtime
       proof, and all 11 production-safe E2E packs.
-- [ ] Infrastructure retry repeats only the same frozen SHA within a fixed
+- [x] Infrastructure retry repeats only the same frozen SHA within a fixed
       budget; product/runtime failure never auto-isolates or rolls back PRs.
-- [ ] Existing CI deployment communication and asynchronous production release
+- [x] Existing CI deployment communication and asynchronous production release
       notes remain repository-owned and non-gating.
-- [ ] Production can continue independently while the staging lane processes
+- [x] Production can continue independently while the staging lane processes
       its next cohort.
-- [ ] Manual production workflow remains the break-glass fallback.
+- [x] Manual production workflow remains the break-glass fallback.
 
 Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
-  in-review bot-only production continuation. It is pending merge until
-  controlled end-to-end testing.
+  in-review bot-only production continuation.
+- Remaining implementation gap: the production preflight does not yet require
+  current successful PR checks immediately before mutating `main`.
 
 ### [ ] Task 5 — Agent operations and recovery
 
@@ -292,7 +291,7 @@ Evidence:
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   provides the in-repository Stop and forward-only removal/recovery primitives.
-  The agent command and UI entry points remain unfinished.
+  The agent command remains unimplemented; the Task 2 UI entry points exist.
 
 ### [ ] Task 6 — Canary, burn-in, and establishment
 
@@ -346,4 +345,4 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 1 — Base FE shadow workflow.
+Task 2 — Live frontend UI.
