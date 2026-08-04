@@ -25,7 +25,7 @@ separate project.
 | Task | Deliverable                           | Status      | Depends on |
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
-|    1 | Base FE shadow workflow               | NOT STARTED | 0          |
+|    1 | Base FE shadow workflow               | IN PROGRESS | 0          |
 |    2 | Live frontend UI                      | NOT STARTED | 1          |
 |    3 | Real frontend staging                 | NOT STARTED | 1, 2       |
 |    4 | Real frontend production              | NOT STARTED | 3          |
@@ -66,7 +66,7 @@ Evidence:
 
 ### [ ] Task 1 — Base FE shadow workflow
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: A dormant workflow in the frontend repository lets an exact frontend
 request exercise the full control and feedback shape without any
@@ -74,24 +74,33 @@ shared-environment authority.
 
 Acceptance criteria:
 
-- [ ] Inputs freeze repository, PR, exact head SHA, final target, requester, and
+- [x] Inputs freeze repository, PR, exact head SHA, final target, requester, and
       request time.
-- [ ] The workflow is explicitly dispatched, uses only the frontend
+- [x] The workflow is explicitly dispatched, uses only the frontend
       repository's automatic `GITHUB_TOKEN`, and needs no stored credential.
-- [ ] Permissions are limited to reading repository/PR data and writing the
+- [x] Permissions are limited to reading repository/PR data and writing the
       dedicated shadow commit status.
-- [ ] Stale or moved PR heads fail closed.
-- [ ] Deterministic fake phases cover queued, running, succeeded, product
+- [x] Stale or moved PR heads fail closed.
+- [x] Deterministic fake phases cover queued, running, succeeded, product
       failure, infrastructure failure, cancelled, and stale outcomes.
-- [ ] The immutable manifest partitions adjacent requests by final target.
+- [x] The immutable manifest partitions adjacent requests by final target.
 - [ ] Opted-in test PR feedback shows target, phase, exact SHA, conclusion, and
       the authoritative shadow run link.
-- [ ] Shadow permissions cannot update refs, dispatch canonical deploys, assume
+- [x] Shadow permissions cannot update refs, dispatch canonical deploys, assume
       environment roles, or publish CI/release-note communications.
-- [ ] No database, custom queue, callback, server, or agent polling is added.
+- [x] No database, custom queue, callback, server, or agent polling is added.
 - [ ] Focused tests and exact-head CI pass.
 
-Evidence: Not yet available.
+Evidence:
+
+- Frontend PR
+  [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
+  at exact head `3629b55e52926f09afd84253ac8ab2e49eec3806`.
+- The focused shadow tests, changed-file checks, Jest diagnostic ratchet,
+  workflow-security validation, and secret scan pass locally.
+- Remaining before `DONE`: latest-head PR CI/review must finish, the workflow
+  must be explicitly authorized and merged to frontend `main`, and an opted-in
+  test PR must prove live commit-status feedback from an actual shadow run.
 
 ### [ ] Task 2 — Live frontend UI
 

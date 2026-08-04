@@ -2,6 +2,11 @@
 
 ## 2026-08-04
 
+- Started Task 1 with frontend PR
+  [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579):
+  a dormant exact-input shadow workflow with read-only repository/PR access and
+  one dedicated shadow-status write. It has no ref, deployment, environment,
+  OIDC, stored-secret, or workflow-dispatch authority.
 - Renamed Task 1 to `Base FE shadow workflow` and clarified that FE involvement
   begins with a dormant, permission-limited shadow workflow; real staging
   activation remains a separate Task 3 change.

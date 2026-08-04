@@ -7,7 +7,9 @@ Last updated: 2026-08-04
 The repository has been reset around a frontend-only MVP. The previous broad
 frontend/backend plan is archived and no longer controls implementation.
 
-Task 0 is complete. Task 1, the base FE shadow workflow, is the next task.
+Task 0 is complete. Task 1, the base FE shadow workflow, is in progress through
+frontend PR
+[#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579).
 
 ## Retained foundation
 
@@ -49,16 +51,16 @@ deliberately saved but not connected to the current UI yet.
 
 ## Safety boundary
 
-No real deployment or repository mutation capability has been added. The next
-task adds a dormant, explicitly dispatched workflow to the frontend repository.
+No real deployment or repository mutation capability has been added. The Task
+1 PR adds a dormant, explicitly dispatched workflow to the frontend repository.
 It uses only the repository's automatic `GITHUB_TOKEN`, with read access plus
-permission to write its dedicated shadow commit status. It must remain
-physically unable to mutate `1a-staging`, `main`, staging, production, CI
-notifications, or release notes.
+permission to write its dedicated shadow commit status. It is physically unable
+to mutate `1a-staging`, `main`, staging, production, CI notifications, or
+release notes.
 
 ## Next work
 
-Implement Task 1 as the smallest exact-input base FE shadow workflow. It must
-exercise target, status, success, failure, stale-head, and batch-manifest
-projection without possessing deployment authority. Real staging activation is
+Finish latest-head review of frontend PR #3579. After explicit owner approval
+to merge it, run the workflow against an opted-in test PR and verify the live
+shadow status and authoritative Action link. Real staging activation remains
 deferred to Task 3.
