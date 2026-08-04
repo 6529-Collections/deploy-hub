@@ -4,8 +4,14 @@
 
 - Completed the Task 3 and Task 4 implementation in frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` and marked both
+  at exact head `93150e4fe9254c2121196e0234dd5746baa9e544` and marked both
   tasks `DONE — PENDING` that PR.
+- Followed up PR #3586 by requiring the installed App PR CI check, revalidating
+  each production PR against the `main` produced by the preceding merge, and
+  fixing both open Sonar findings. Replaced the canonical production workflow's
+  exact-latest-`main` equality gate with frozen-SHA ancestry and current
+  production rollback protection, so ordinary `main` advancement no longer
+  invalidates an already authorized build.
 - Added a KISS durable-intake path: the static UI registers exact pending
   requests in one fixed GitHub commit-status context, and the surviving
   frontend controller discovers, orders, and claims them without a database,

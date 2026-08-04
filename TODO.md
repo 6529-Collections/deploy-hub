@@ -39,7 +39,7 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382`.
+  is open at exact head `93150e4fe9254c2121196e0234dd5746baa9e544`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides lower-level primitives
@@ -219,7 +219,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` contains the
+  at exact head `93150e4fe9254c2121196e0234dd5746baa9e544` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The static UI registers each exact request in one fixed GitHub commit-status
@@ -255,6 +255,9 @@ Acceptance criteria:
       repository/runtime truth without automatic rollback.
 - [x] The frozen SHA uses canonical `build-upload-deploy-prod.yml`, runtime
       proof, and all 11 production-safe E2E packs.
+- [x] The canonical deploy allows `main` to advance after the SHA is frozen
+      only while that SHA remains in `main` history, and blocks deploying
+      behind current production unless rollback is explicitly authorized.
 - [x] Infrastructure retry repeats only the same frozen SHA within a fixed
       budget; product/runtime failure never auto-isolates or rolls back PRs.
 - [x] Existing CI deployment communication and asynchronous production release
@@ -267,11 +270,14 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` contains the
+  at exact head `93150e4fe9254c2121196e0234dd5746baa9e544` contains the
   complete in-review bot-only production continuation.
-- Immediately before the first merge it now rechecks every retained requester,
-  exact open PR head, current `main` base, non-draft clean mergeability, current
-  check runs, and external commit statuses, then fails closed if `main` moves.
+- Before every merge it rechecks the retained requester, exact open PR head,
+  current `main` base, non-draft clean mergeability, the required installed App
+  PR CI check, all current check runs, and external commit statuses. The
+  canonical production preflight separately preserves the frozen SHA across
+  ordinary `main` advancement while preventing removed-history candidates and
+  unintended rollback.
 
 ### [ ] Task 5 — Agent operations and recovery
 

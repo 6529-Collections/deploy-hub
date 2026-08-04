@@ -15,12 +15,13 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382`.
+is open at exact head `93150e4fe9254c2121196e0234dd5746baa9e544`.
 It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
-production preflight, and forward-only removal with automatic restore on
-failure. It also contains lower-level primitives needed by Task 5. The PR
+production preflight, frozen-SHA ancestry and rollback protection, and
+forward-only removal with automatic restore on failure. It also contains
+lower-level primitives needed by Task 5. The PR
 remains open, and no Deploy Hub operation was dispatched.
 
 Task 2 is **DONE**. Tasks 3 and 4 are **DONE — PENDING** frontend PR
@@ -31,9 +32,11 @@ Task 5 is **NOT STARTED**.
   pending requests until the surviving controller claims them; later cohorts
   are terminalized if an earlier cohort stops or fails. Queued work remains
   visible and cancellable under its original Stop identity.
-- Task 4 has all 12 criteria implemented. Production rechecks each requester,
-  exact heads, current `main`, mergeability, check runs, and external statuses
-  immediately before mutation and fails closed if `main` moves.
+- Task 4 has all 13 criteria implemented. Production requires the installed App
+  PR CI check and rechecks each requester, exact head, current `main`,
+  mergeability, check runs, and external statuses immediately before that PR's
+  merge. The canonical deploy keeps its frozen SHA valid if `main` advances,
+  while blocking removed-history candidates and unintended rollbacks.
 
 The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
 live workflow contract, refreshes GitHub truth every five seconds, shows
