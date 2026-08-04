@@ -95,9 +95,12 @@ Evidence:
 
 - Frontend PR
   [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
-  at exact head `3629b55e52926f09afd84253ac8ab2e49eec3806`.
+  at exact head `aa23dc95e5dd2b7e7100353114068bd7d18d1e24`.
 - The focused shadow tests, changed-file checks, Jest diagnostic ratchet,
   workflow-security validation, and secret scan pass locally.
+- Review follow-up ensures validation failures still produce a visible Action
+  summary and best-effort terminal error statuses replace partial pending
+  projections after a GitHub API interruption.
 - Remaining before `DONE`: latest-head PR CI/review must finish, the workflow
   must be explicitly authorized and merged to frontend `main`, and an opted-in
   test PR must prove live commit-status feedback from an actual shadow run.
