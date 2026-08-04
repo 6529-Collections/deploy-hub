@@ -30,6 +30,7 @@ const elements = {
   operationMessage: document.querySelector('#operation-message'),
   operationsEmpty: document.querySelector('#operations-empty'),
   operationsList: document.querySelector('#operations-list'),
+  operationsPanel: document.querySelector('#operations-panel'),
   prNumbers: document.querySelector('#pr-numbers'),
   preview: document.querySelector('#request-preview'),
   previewList: document.querySelector('#preview-list'),
@@ -104,6 +105,7 @@ function showSignedOut(message = 'Connect GitHub to continue.') {
   elements.dashboard.hidden = true;
   elements.forgetButton.hidden = true;
   elements.connectButton.disabled = false;
+  elements.tokenInput.focus();
 }
 
 function showSignedIn(identity, token) {
@@ -116,6 +118,7 @@ function showSignedIn(identity, token) {
   elements.forgetButton.hidden = false;
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
+  elements.prNumbers.focus();
   clearRefreshTimer();
   refreshTimer = globalThis.setInterval(() => {
     void refreshDashboard();
@@ -255,6 +258,7 @@ function renderOperation(operation) {
   const state = operation.status?.state ?? operation.run?.status ?? 'pending';
   card.className = 'operation-card';
   card.dataset.state = state;
+  card.setAttribute('role', 'listitem');
 
   const top = document.createElement('div');
   top.className = 'operation-top';
@@ -360,6 +364,7 @@ async function refreshDashboard({ announce = false } = {}) {
   if (!activeToken || refreshInFlight) return;
   refreshInFlight = true;
   elements.refreshButton.disabled = true;
+  elements.operationsPanel.setAttribute('aria-busy', 'true');
   if (announce) elements.refreshState.textContent = 'Reading GitHub truth…';
   try {
     renderDashboard(await readDashboard(activeToken));
@@ -373,6 +378,7 @@ async function refreshDashboard({ announce = false } = {}) {
   } finally {
     refreshInFlight = false;
     elements.refreshButton.disabled = false;
+    elements.operationsPanel.setAttribute('aria-busy', 'false');
   }
 }
 
@@ -380,11 +386,16 @@ function showOperationForm() {
   frozenPreview = null;
   elements.operationForm.hidden = false;
   elements.preview.hidden = true;
+  elements.prNumbers.focus();
 }
 
 function renderFrozenPreview(items, target) {
   elements.previewTarget.textContent =
     target === 'production' ? 'Target: Production' : 'Target: Staging';
+  elements.startOperation.textContent =
+    target === 'production'
+      ? 'Start production operation'
+      : 'Start staging operation';
   elements.previewList.replaceChildren(
     ...items.map((item) => {
       const row = document.createElement('li');
@@ -402,6 +413,7 @@ function renderFrozenPreview(items, target) {
   );
   elements.operationForm.hidden = true;
   elements.preview.hidden = false;
+  elements.previewTarget.focus();
 }
 
 elements.authForm.addEventListener('submit', (event) => {

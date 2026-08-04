@@ -362,7 +362,7 @@ textarea:focus-visible {
 
 .field-hint {
   margin: 6px 0 20px;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.75rem;
 }
 
@@ -397,6 +397,11 @@ legend {
 .target-option:has(input:checked) {
   border-color: #2563eb;
   background: rgb(37 99 235 / 10%);
+}
+
+.target-option:focus-within {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 .target-option input {
@@ -440,6 +445,12 @@ legend {
   color: #dbeafe;
   font-weight: 700;
   text-decoration: none;
+}
+
+.inline-link:hover,
+.preview-list a:hover,
+.request-link:hover {
+  text-decoration: underline;
 }
 
 .sha,
@@ -550,7 +561,7 @@ code {
 
 footer {
   padding-top: 22px;
-  color: #536176;
+  color: #94a3b8;
   font-size: 0.73rem;
   text-align: right;
 }
