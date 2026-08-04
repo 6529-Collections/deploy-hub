@@ -7,7 +7,7 @@ Last updated: 2026-08-04
 The repository has been reset around a frontend-only MVP. The previous broad
 frontend/backend plan is archived and no longer controls implementation.
 
-Task 0 is complete. Task 1, the base FE shadow workflow, is in progress. Frontend
+Task 0 is complete. Task 1, the base FE shadow workflow, is pending integration. Frontend
 PR [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
 merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 `main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`.
@@ -22,7 +22,9 @@ with automatic restore on failure. The PR is intentionally pending merge until
 the Deploy Hub UI and controlled end-to-end test plan are ready together. No
 Deploy Hub operation was dispatched.
 
-Task 2, the live static frontend UI, is now in progress in this repository.
+Task 2, the live static frontend UI, is the only task currently in progress in
+this repository. Tasks 1, 3, and 4 are pending integration through the parked
+frontend PR; Task 5 is not started.
 Work may proceed against the accepted operation contract without merging the
 frontend workflow early.
 

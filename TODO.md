@@ -8,7 +8,10 @@ separate project.
 
 ## Tracker rules
 
-- Status values are `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, and `DONE`.
+- Status values are `NOT STARTED`, `IN PROGRESS`, `PENDING INTEGRATION`,
+  `BLOCKED`, and `DONE`.
+- `PENDING INTEGRATION` means implementation exists in the deliberately parked
+  frontend PR but is not active and is not the task currently being worked.
 - Work proceeds from the lowest incomplete task unless a later task can safely
   advance without widening scope.
 - E2E, PR feedback, authentication, release notes, retries, and diagnostics are
@@ -25,11 +28,11 @@ separate project.
 | Task | Deliverable                           | Status      | Depends on |
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
-|    1 | Base FE shadow workflow               | IN PROGRESS | 0          |
+|    1 | Base FE shadow workflow               | PENDING INTEGRATION | 0          |
 |    2 | Live frontend UI                      | IN PROGRESS | 1          |
-|    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
-|    4 | Real frontend production              | IN PROGRESS | 3          |
-|    5 | Agent operations and recovery         | IN PROGRESS | 3, 4       |
+|    3 | Real frontend staging                 | PENDING INTEGRATION | 1, 2       |
+|    4 | Real frontend production              | PENDING INTEGRATION | 3          |
+|    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
 
@@ -77,7 +80,7 @@ Evidence:
 
 ### [ ] Task 1 — Base FE shadow workflow
 
-Status: `IN PROGRESS`
+Status: `PENDING INTEGRATION`
 
 Outcome: A dormant workflow in the frontend repository lets an exact frontend
 request exercise the full control and feedback shape without any
@@ -173,7 +176,7 @@ Evidence:
 
 ### [ ] Task 3 — Real frontend staging
 
-Status: `IN PROGRESS`
+Status: `PENDING INTEGRATION`
 
 Outcome: The proven base FE shadow workflow is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
@@ -225,7 +228,7 @@ Evidence:
 
 ### [ ] Task 4 — Real frontend production
 
-Status: `IN PROGRESS`
+Status: `PENDING INTEGRATION`
 
 Outcome: Explicitly authorized production-target PRs that passed together in
 staging can share one exact `main` deployment and production validation.
@@ -265,7 +268,7 @@ Evidence:
 
 ### [ ] Task 5 — Agent operations and recovery
 
-Status: `IN PROGRESS`
+Status: `NOT STARTED`
 
 Outcome: Codex operates the same frontend contract without the browser or a
 Deploy Hub credential.

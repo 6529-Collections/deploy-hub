@@ -2,6 +2,10 @@
 
 ## 2026-08-04
 
+- Corrected the tracker so only Task 2 is `IN PROGRESS`. Tasks 1, 3, and 4 are
+  `PENDING INTEGRATION` through the deliberately parked frontend PR, while the
+  unfinished agent-facing Task 5 is `NOT STARTED`.
+
 - Kept frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`
