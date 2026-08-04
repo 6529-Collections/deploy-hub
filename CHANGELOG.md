@@ -2,6 +2,11 @@
 
 ## 2026-08-04
 
+- Added the review-only `FE-REVISIONS/` diagram set for the complete frontend
+  lifecycle: PR-visible target/status, cumulative staging batches, bounded
+  workflow-driven isolation of a failed batch, mixed staging/production
+  targets, and production batching. The proposal is deliberately not accepted
+  architecture yet and changes no task status.
 - Extended backend PR #1901 with the matching manual-readiness change so
   different backend staging services can run concurrently while the same
   service queues in GitHub Actions. Production, frontend, and dormant Release

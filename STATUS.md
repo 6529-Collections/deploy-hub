@@ -10,6 +10,13 @@ change needed for safe manual backend staging concurrency: service-scoped
 GitHub Actions waiting plus a compatible manual-readiness guard. Production,
 frontend, and dormant Release Bus safety behavior remains unchanged.
 
+A frontend-only lifecycle revision is now proposed under `FE-REVISIONS/`. It
+defines explicit-request staging batching, bounded workflow-driven staging
+failure isolation, mixed staging/production targets, and production batching.
+It is review material, not accepted architecture or implementation: no task
+status changed, and the current no-batching/no-automatic-reconciliation
+boundary remains authoritative until the revision is explicitly accepted.
+
 Release Bus is OFF for staging and production and is not expected to return.
 Canonical manual workflows remain the deployment path and fallback while
 Deploy Hub is built and proven.
@@ -56,3 +63,6 @@ Carry backend PR #1901 head `ddb238bc` through review and exact-head CI. The
 previous policy-digest CI failure is fixed; the new full build is pending.
 Task 5 remains open until the PR reaches backend `main`. Runtime duplicate-wait
 proof belongs in the credentialless shadow phase, not on a shared environment.
+Review `FE-REVISIONS/` as one frontend decision; if accepted, revise the
+requirements, architecture, testing strategy, and affected tracker tasks
+before implementation.

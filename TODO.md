@@ -34,6 +34,11 @@ scheduler, reconciler, callback service, second backend runtime, GitHub App,
 SSE, or WebSocket is excluded unless a later concrete failure proves that the
 existing GitHub/backend primitives cannot meet a requirement.
 
+Frontend revision note: `FE-REVISIONS/` proposes explicit-request batching and
+a bounded workflow failure branch for staging isolation. It has not changed
+this tracker or any task status. If accepted, Tasks 0, 5, 6, 8, 9, 11, 12, 14,
+and 16 must be revised together before implementation starts.
+
 ## Summary
 
 | Task | Deliverable | Status | Depends on |
