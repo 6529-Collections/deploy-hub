@@ -7,8 +7,7 @@ Last updated: 2026-08-04
 The repository has been reset around a frontend-only MVP. The previous broad
 frontend/backend plan is archived and no longer controls implementation.
 
-Task 0 is complete. Task 1, the credentialless frontend shadow operation, is
-the next task.
+Task 0 is complete. Task 1, the base FE shadow workflow, is the next task.
 
 ## Retained foundation
 
@@ -51,11 +50,15 @@ deliberately saved but not connected to the current UI yet.
 ## Safety boundary
 
 No real deployment or repository mutation capability has been added. The next
-task must remain credentialless and physically unable to mutate `1a-staging`,
-`main`, staging, production, CI notifications, or release notes.
+task adds a dormant, explicitly dispatched workflow to the frontend repository.
+It uses only the repository's automatic `GITHUB_TOKEN`, with read access plus
+permission to write its dedicated shadow commit status. It must remain
+physically unable to mutate `1a-staging`, `main`, staging, production, CI
+notifications, or release notes.
 
 ## Next work
 
-Implement Task 1 as the smallest exact-input frontend shadow operation. It must
+Implement Task 1 as the smallest exact-input base FE shadow workflow. It must
 exercise target, status, success, failure, stale-head, and batch-manifest
-projection without possessing deployment authority.
+projection without possessing deployment authority. Real staging activation is
+deferred to Task 3.

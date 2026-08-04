@@ -18,10 +18,12 @@ throughout rollout.
 - Five-second polling replacement and recovery after a failed poll.
 - Token canary proving credentials never enter visible or durable output.
 
-## 2. Credentialless shadow
+## 2. Base FE shadow workflow
 
 Exercise the full request, cohort, status, UI, cancel, and retry shape with
-deterministic fake phases.
+deterministic fake phases. The explicitly dispatched workflow lives in the
+frontend repository and uses only its automatic, permission-limited
+`GITHUB_TOKEN`; it needs no stored credential.
 
 The shadow identity must be physically unable to:
 

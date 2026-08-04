@@ -22,16 +22,16 @@ separate project.
 
 ## Summary
 
-| Task | Deliverable                              | Status      | Depends on |
-| ---: | ---------------------------------------- | ----------- | ---------- |
-|    0 | FE-only repository baseline              | DONE        | —          |
-|    1 | Credentialless frontend shadow operation | NOT STARTED | 0          |
-|    2 | Live frontend UI                         | NOT STARTED | 1          |
-|    3 | Real frontend staging                    | NOT STARTED | 1, 2       |
-|    4 | Real frontend production                 | NOT STARTED | 3          |
-|    5 | Agent operations and recovery            | NOT STARTED | 3, 4       |
-|    6 | Canary, burn-in, and establishment       | NOT STARTED | 2–5        |
-|    7 | Deferred frontend Release Bus cleanup    | NOT STARTED | 6          |
+| Task | Deliverable                           | Status      | Depends on |
+| ---: | ------------------------------------- | ----------- | ---------- |
+|    0 | FE-only repository baseline           | DONE        | —          |
+|    1 | Base FE shadow workflow               | NOT STARTED | 0          |
+|    2 | Live frontend UI                      | NOT STARTED | 1          |
+|    3 | Real frontend staging                 | NOT STARTED | 1, 2       |
+|    4 | Real frontend production              | NOT STARTED | 3          |
+|    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
+|    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
+|    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
 
 ## Task details
 
@@ -64,17 +64,22 @@ Evidence:
 - `archive/original-cross-repo-plan/`
 - `ui/assets/brand/`
 
-### [ ] Task 1 — Credentialless frontend shadow operation
+### [ ] Task 1 — Base FE shadow workflow
 
 Status: `NOT STARTED`
 
-Outcome: An exact frontend request can exercise the full control and feedback
-shape without any shared-environment authority.
+Outcome: A dormant workflow in the frontend repository lets an exact frontend
+request exercise the full control and feedback shape without any
+shared-environment authority.
 
 Acceptance criteria:
 
 - [ ] Inputs freeze repository, PR, exact head SHA, final target, requester, and
       request time.
+- [ ] The workflow is explicitly dispatched, uses only the frontend
+      repository's automatic `GITHUB_TOKEN`, and needs no stored credential.
+- [ ] Permissions are limited to reading repository/PR data and writing the
+      dedicated shadow commit status.
 - [ ] Stale or moved PR heads fail closed.
 - [ ] Deterministic fake phases cover queued, running, succeeded, product
       failure, infrastructure failure, cancelled, and stale outcomes.
@@ -118,9 +123,9 @@ Evidence: Not yet available.
 
 Status: `NOT STARTED`
 
-Outcome: An exact frontend request reaches staging through the canonical path,
-receives runtime proof and full E2E, and produces independently useful outcomes
-when a batch fails.
+Outcome: The proven base FE shadow workflow is extended so an exact frontend
+request reaches staging through the canonical path, receives runtime proof and
+full E2E, and produces independently useful outcomes when a batch fails.
 
 Acceptance criteria:
 
@@ -244,4 +249,4 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 1 — Credentialless frontend shadow operation.
+Task 1 — Base FE shadow workflow.

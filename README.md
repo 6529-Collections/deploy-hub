@@ -38,6 +38,10 @@ own the canonical deployment and E2E workflows. This repository owns the UI,
 frontend operation contract, agent entry point, documentation, and shadow
 fixtures.
 
+Task 1 introduces that frontend operation workflow in dormant shadow-only form.
+It cannot deploy or mutate refs. Task 3 later extends the proven workflow to
+real staging while preserving the existing manual path.
+
 ## Current state
 
 - The static UI shell and direct GitHub-token authentication are implemented.

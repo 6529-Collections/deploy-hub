@@ -2,6 +2,9 @@
 
 ## 2026-08-04
 
+- Renamed Task 1 to `Base FE shadow workflow` and clarified that FE involvement
+  begins with a dormant, permission-limited shadow workflow; real staging
+  activation remains a separate Task 3 change.
 - Reset the active repository around a frontend-only MVP with eight top-level
   tasks, promoted the accepted lifecycle diagrams under `docs/frontend/`, and
   archived the original cross-repository plan without deleting its evidence.

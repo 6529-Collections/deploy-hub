@@ -16,6 +16,12 @@ workflow composes exact requests and calls the repository's existing canonical
 deployment and E2E implementations. Deploy Hub never receives AWS credentials
 or duplicates deployment logic.
 
+The first implementation is the Task 1 base FE shadow workflow. It is dormant
+unless explicitly dispatched, uses the frontend repository's automatic
+`GITHUB_TOKEN`, and receives only repository/PR read access plus permission to
+write its dedicated shadow commit status. It has no ref, Actions-dispatch,
+environment, or OIDC authority. Task 3 separately adds real staging behavior.
+
 ```mermaid
 flowchart LR
     U["Developer"] --> UI["Deploy Hub static UI"]
