@@ -15,21 +15,25 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`.
-It completes Task 1 and carries most of the Task 3 and Task 4 workflow
-implementation: canonical staging and production dispatch, bounded
-reconciliation, exact staging composition, and forward-only removal with
-automatic restore on failure. It also contains lower-level primitives needed
-by Task 5. The PR remains open, and no Deploy Hub operation was dispatched.
+is open at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382`.
+It completes Task 1, Task 3, and Task 4: canonical staging and production
+dispatch, durable GitHub-native request intake, bounded reconciliation,
+truthful terminal cohort outcomes, exact staging composition, current
+production preflight, and forward-only removal with automatic restore on
+failure. It also contains lower-level primitives needed by Task 5. The PR
+remains open, and no Deploy Hub operation was dispatched.
 
-Task 2 is **DONE**. Tasks 3 and 4 are **IN PROGRESS**. Task 5 is **NOT
-STARTED**.
+Task 2 is **DONE**. Tasks 3 and 4 are **DONE — PENDING** frontend PR
+[#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
+Task 5 is **NOT STARTED**.
 
-- Task 3 has 14 of 16 criteria implemented in PR #3586. The two remaining code
-  gaps are durable handling of requests arriving behind an active operation
-  and terminalizing later cohorts when an earlier cohort stops the manifest.
-- Task 4 has 11 of 12 criteria implemented in PR #3586. Production must still
-  recheck successful required PR checks immediately before mutating `main`.
+- Task 3 has all 16 criteria implemented. One fixed commit-status context holds
+  pending requests until the surviving controller claims them; later cohorts
+  are terminalized if an earlier cohort stops or fails. Queued work remains
+  visible and cancellable under its original Stop identity.
+- Task 4 has all 12 criteria implemented. Production rechecks each requester,
+  exact heads, current `main`, mergeability, check runs, and external statuses
+  immediately before mutation and fails closed if `main` moves.
 
 The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
 live workflow contract, refreshes GitHub truth every five seconds, shows
@@ -90,7 +94,7 @@ inactive while the PR is open; this follow-up did not dispatch them.
 
 ## Next work
 
-Complete the two Task 3 code gaps recorded in `TODO.md`, then complete the one
-Task 4 code gap. Keep PR #3586 open until its frontend changes are actually
-needed. Any real staging operation still requires a separate explicit owner
-instruction.
+Start Task 5, the small agent-facing submit/status/stop/retry surface that uses
+the same GitHub contract. Keep PR #3586 open until its frontend changes are
+actually needed. Any real staging operation still requires a separate explicit
+owner instruction.

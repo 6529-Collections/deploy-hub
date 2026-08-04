@@ -2,6 +2,20 @@
 
 ## 2026-08-04
 
+- Completed the Task 3 and Task 4 implementation in frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` and marked both
+  tasks `DONE — PENDING` that PR.
+- Added a KISS durable-intake path: the static UI registers exact pending
+  requests in one fixed GitHub commit-status context, and the surviving
+  frontend controller discovers, orders, and claims them without a database,
+  custom queue, server, or agent polling. Queued requests remain visible and
+  preserve their exact Stop identity when a later controller claims them.
+- Ensured every later cohort reaches terminal status after an earlier stop or
+  failure, and made production recheck retained requester authority, exact PR
+  heads, current `main`, clean mergeability, check runs, and external statuses
+  immediately before mutation. Focused FE tests and changed-file quality checks
+  pass; no workflow was dispatched.
 - Completed Task 2, the live static frontend UI, at commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
   Added explicit keyboard focus transitions, busy-state semantics, clearer

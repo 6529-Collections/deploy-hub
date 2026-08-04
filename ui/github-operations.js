@@ -4,8 +4,11 @@ const GITHUB_GRAPHQL = `${GITHUB_API}/graphql`;
 export const FRONTEND_REPOSITORY = '6529-Collections/6529seize-frontend';
 export const FRONTEND_DEFAULT_BRANCH = 'main';
 export const LIVE_WORKFLOW = 'deploy-hub.yml';
+export const QUEUED_REQUEST_CONTEXT = 'Deploy Hub Request';
 
 const SHA_PATTERN = /^[a-f0-9]{40}$/;
+const QUEUED_REQUEST_PATTERN =
+  /^(Queued|Cancelled|Registration failed|Dispatch failed) ([1-9]\d?)\/([1-9]\d?) for (Staging|Production) · ([A-Za-z0-9][A-Za-z0-9._-]{0,79}) · (\S+)$/;
 const TARGETS = new Set(['staging', 'production']);
 const MAX_REQUESTS = 20;
 
@@ -228,23 +231,87 @@ export async function dispatchOperation({
   fetchImpl = globalThis.fetch
 }) {
   const confirmation = action === 'remove-from-staging' ? 'REMOVE' : 'DEPLOY';
-  await githubRequest(
-    `/repos/${FRONTEND_REPOSITORY}/actions/workflows/${LIVE_WORKFLOW}/dispatches`,
-    token,
-    {
-      method: 'POST',
-      body: {
-        ref: FRONTEND_DEFAULT_BRANCH,
-        inputs: {
-          operation_id: operationId,
-          action,
-          manifest: JSON.stringify(requests),
-          confirmation
+  const workflowUrl = `https://github.com/${FRONTEND_REPOSITORY}/actions/workflows/${LIVE_WORKFLOW}`;
+
+  function requestDescription(label, request, index) {
+    const target = request.target === 'production' ? 'Production' : 'Staging';
+    return `${label} ${index + 1}/${requests.length} for ${target} · ${operationId} · ${request.requested_at}`;
+  }
+
+  async function publishRequestState(request, state, description) {
+    return githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/statuses/${request.sha}`,
+      token,
+      {
+        method: 'POST',
+        body: {
+          state,
+          target_url: workflowUrl,
+          description,
+          context: QUEUED_REQUEST_CONTEXT
         }
-      }
-    },
-    fetchImpl
-  );
+      },
+      fetchImpl
+    );
+  }
+
+  if (action === 'deploy') {
+    try {
+      await Promise.all(
+        requests.map((request, index) =>
+          publishRequestState(
+            request,
+            'pending',
+            requestDescription('Queued', request, index)
+          )
+        )
+      );
+    } catch (error) {
+      await Promise.allSettled(
+        requests.map((request, index) =>
+          publishRequestState(
+            request,
+            'error',
+            requestDescription('Registration failed', request, index)
+          )
+        )
+      );
+      throw error;
+    }
+  }
+
+  try {
+    await githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/workflows/${LIVE_WORKFLOW}/dispatches`,
+      token,
+      {
+        method: 'POST',
+        body: {
+          ref: FRONTEND_DEFAULT_BRANCH,
+          inputs: {
+            operation_id: operationId,
+            action,
+            manifest: JSON.stringify(requests),
+            confirmation
+          }
+        }
+      },
+      fetchImpl
+    );
+  } catch (error) {
+    if (action === 'deploy') {
+      await Promise.allSettled(
+        requests.map((request, index) =>
+          publishRequestState(
+            request,
+            'error',
+            requestDescription('Dispatch failed', request, index)
+          )
+        )
+      );
+    }
+    throw error;
+  }
   return operationId;
 }
 
@@ -252,6 +319,7 @@ export async function requestStop({
   operationId,
   requests,
   runUrl,
+  queued = false,
   token,
   fetchImpl = globalThis.fetch
 }) {
@@ -271,6 +339,27 @@ export async function requestStop({
       fetchImpl
     );
   }
+  if (queued) {
+    for (const request of requests) {
+      await githubRequest(
+        `/repos/${FRONTEND_REPOSITORY}/statuses/${request.sha}`,
+        token,
+        {
+          method: 'POST',
+          body: {
+            state: 'error',
+            target_url: runUrl,
+            description: request.queueDescription.replace(
+              QUEUED_REQUEST_PATTERN,
+              'Cancelled $2/$3 for $4 · $5 · $6'
+            ),
+            context: QUEUED_REQUEST_CONTEXT
+          }
+        },
+        fetchImpl
+      );
+    }
+  }
 }
 
 function normalizeStatus(status) {
@@ -287,6 +376,19 @@ function targetFromContext(context) {
   const match =
     /^(Deploy Hub(?: Shadow)? — Target): (Staging|Production)$/.exec(context);
   return match?.[2].toLowerCase() ?? '';
+}
+
+function queuedRequestFromStatus(status) {
+  if (status.context !== QUEUED_REQUEST_CONTEXT || status.state === 'success') {
+    return null;
+  }
+  const match = QUEUED_REQUEST_PATTERN.exec(status.description);
+  if (!match) return null;
+  return {
+    operationId: match[5],
+    requestedAt: match[6],
+    target: match[4].toLowerCase()
+  };
 }
 
 function operationIdFromRun(run) {
@@ -335,6 +437,9 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
   );
   const runsByUrl = new Map(runs.map((run) => [run.html_url, run]));
   const runsById = new Map(runs.map((run) => [String(run.id), run]));
+  const operationRunsById = new Map(
+    operationRuns.map((run) => [operationIdFromRun(run), run])
+  );
   const operationsByKey = new Map();
 
   for (const pull of pulls) {
@@ -347,23 +452,39 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
     );
 
     for (const status of statuses) {
-      const target = targetFromContext(status.context);
+      const queuedRequest = queuedRequestFromStatus(status);
+      const target = queuedRequest?.target ?? targetFromContext(status.context);
       if (!target) continue;
-      const key = status.targetUrl || `${commit?.oid}:${status.context}`;
-      const run = runsByUrl.get(status.targetUrl) ?? null;
+      const queued = Boolean(queuedRequest);
+      const candidateRun = queuedRequest
+        ? operationRunsById.get(queuedRequest.operationId)
+        : runsByUrl.get(status.targetUrl);
+      const run =
+        queued && candidateRun?.status === 'completed'
+          ? null
+          : (candidateRun ?? null);
+      const operationId =
+        queuedRequest?.operationId ??
+        (run ? operationIdFromEvidenceRun(run, runsById) : '');
+      const key = operationId
+        ? `operation:${operationId}`
+        : status.targetUrl || `${commit?.oid}:${status.context}`;
       const existing = operationsByKey.get(key) ?? {
-        conclusion: run?.conclusion ?? status.state,
-        createdAt: run?.created_at ?? status.createdAt,
-        id: run ? operationIdFromEvidenceRun(run, runsById) : '',
+        conclusion: queued ? status.state : (run?.conclusion ?? status.state),
+        createdAt:
+          queuedRequest?.requestedAt ?? run?.created_at ?? status.createdAt,
+        id: operationId,
+        queued,
         requests: [],
         run,
         runUrl: run?.html_url ?? '',
         shadow: status.context.startsWith('Deploy Hub Shadow'),
         status,
         target,
-        terminal:
-          run?.status === 'completed' ||
-          ['error', 'failure', 'success'].includes(status.state)
+        terminal: queued
+          ? ['error', 'failure'].includes(status.state)
+          : run?.status === 'completed' ||
+            ['error', 'failure', 'success'].includes(status.state)
       };
       existing.requests.push({
         canRemove:
@@ -374,7 +495,8 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
         sha: commit?.oid ?? pull.headRefOid,
         state: pull.state,
         title: pull.title,
-        url: pull.url
+        url: pull.url,
+        ...(queued ? { queueDescription: status.description } : {})
       });
       operationsByKey.set(key, existing);
     }
@@ -393,6 +515,7 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
       conclusion: run.conclusion ?? run.status,
       createdAt: run.created_at,
       id: operationId,
+      queued: false,
       requests: [],
       run,
       runUrl: run.html_url,
@@ -412,8 +535,10 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
       (right.createdAt ?? '').localeCompare(left.createdAt ?? '')
     ),
     refreshedAt,
-    waiting: operationRuns.filter((run) =>
-      ['pending', 'queued', 'waiting'].includes(run.status)
+    waiting: [...operationsByKey.values()].filter(
+      (operation) =>
+        (operation.queued && operation.status?.state === 'pending') ||
+        ['pending', 'queued', 'waiting'].includes(operation.run?.status)
     ).length
   };
 }

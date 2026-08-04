@@ -28,8 +28,8 @@ separate project.
 |    0 | FE-only repository baseline           | DONE        | —          |
 |    1 | Base FE shadow workflow               | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 0          |
 |    2 | Live frontend UI                      | DONE        | 1          |
-|    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
-|    4 | Real frontend production              | IN PROGRESS | 3          |
+|    3 | Real frontend staging                 | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 1, 2       |
+|    4 | Real frontend production              | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3          |
 |    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
@@ -39,11 +39,12 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`.
-  It contains the Task 1 stop-boundary completion plus most of the Task 3 and
-  Task 4 workflow implementation, including tracked forward-only removal from
-  staging. It also provides lower-level primitives needed by future Task 5.
-  It is intentionally pending merge. No Deploy Hub operation was dispatched.
+  is open at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382`.
+  It completes Task 1, Task 3, and Task 4, including durable request intake,
+  truthful terminal cohort outcomes, current production preflight, and tracked
+  forward-only removal from staging. It also provides lower-level primitives
+  needed by future Task 5. It is intentionally pending merge. No Deploy Hub
+  operation was dispatched.
 
 ## Task details
 
@@ -170,9 +171,9 @@ Evidence:
   passed exact-head repository
   [CI](https://github.com/6529-Collections/deploy-hub/actions/runs/30916099582).
 
-### [ ] Task 3 — Real frontend staging
+### [x] Task 3 — Real frontend staging
 
-Status: `IN PROGRESS`
+Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
 
 Outcome: The proven base FE shadow workflow is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
@@ -208,9 +209,9 @@ Acceptance criteria:
       staging E2E.
 - [x] Failed removal automatically restores and revalidates the prior staging
       snapshot; merged PRs and active production operations fail closed.
-- [ ] New requests arriving during execution remain pending for the next
+- [x] New requests arriving during execution remain pending for the next
       manifest.
-- [ ] Every participating PR status links exact deployment/E2E evidence and
+- [x] Every participating PR status links exact deployment/E2E evidence and
       reaches a truthful terminal outcome.
 - [x] Manual `1a-staging` deployment remains usable throughout rollout.
 
@@ -218,24 +219,28 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
-  in-review staging, bounded replay, Stop, exact composition, and removal
-  implementation.
-- Remaining implementation gaps: requests that arrive while another operation
-  is active are not yet durably accumulated across GitHub's replaceable pending
-  concurrency slot, and later cohorts are not terminalized when an earlier
-  cohort stops the manifest.
+  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` contains the
+  complete in-review staging, bounded replay, Stop, exact composition, and
+  removal implementation.
+- The static UI registers each exact request in one fixed GitHub commit-status
+  context before dispatch. The surviving controller discovers and claims every
+  pending request in explicit batch order, so GitHub's replaceable concurrency
+  slot cannot lose queued work and no custom queue is added. A queued request
+  remains visible and preserves its exact Stop identity if a later controller
+  claims it.
+- Later cohorts now receive terminal status when an earlier cohort stops or
+  fails, including an unexpected controller failure.
 
-### [ ] Task 4 — Real frontend production
+### [x] Task 4 — Real frontend production
 
-Status: `IN PROGRESS`
+Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
 
 Outcome: Explicitly authorized production-target PRs that passed together in
 staging can share one exact `main` deployment and production validation.
 
 Acceptance criteria:
 
-- [ ] Production rechecks authenticated authority, exact PR heads, current
+- [x] Production rechecks authenticated authority, exact PR heads, current
       `main`, checks, and deterministic mergeability immediately before mutation.
 - [x] Staging-only PRs never enter a production merge or deployment.
 - [x] Production candidates are from one passing production-target staging
@@ -262,10 +267,11 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
-  in-review bot-only production continuation.
-- Remaining implementation gap: the production preflight does not yet require
-  current successful PR checks immediately before mutating `main`.
+  at exact head `8b79e3ecdc2e10ab0353788f7a19634dc96ad382` contains the
+  complete in-review bot-only production continuation.
+- Immediately before the first merge it now rechecks every retained requester,
+  exact open PR head, current `main` base, non-draft clean mergeability, current
+  check runs, and external commit statuses, then fails closed if `main` moves.
 
 ### [ ] Task 5 — Agent operations and recovery
 
@@ -347,4 +353,4 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 3 — Real frontend staging.
+Task 5 — Agent operations and recovery.

@@ -200,7 +200,8 @@ async function stopOperation(operation, button) {
     await requestStop({
       operationId: operation.id,
       requests: operation.requests,
-      runUrl: operation.runUrl,
+      runUrl: operation.runUrl || operation.status?.targetUrl,
+      queued: operation.queued,
       token: activeToken
     });
     elements.operationMessage.textContent =
@@ -326,7 +327,7 @@ function renderOperation(operation) {
     !operation.shadow &&
     !operation.terminal &&
     operation.id &&
-    operation.runUrl &&
+    (operation.runUrl || operation.queued) &&
     operation.requests.length > 0
   ) {
     const stopButton = makeButton(

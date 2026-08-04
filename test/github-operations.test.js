@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   FRONTEND_REPOSITORY,
   GitHubOperationError,
+  QUEUED_REQUEST_CONTEXT,
   buildDashboardModel,
   createOperationId,
   dispatchOperation,
@@ -107,7 +108,7 @@ test('freezes exact open PR heads without exposing the token', async () => {
 });
 
 test('dispatches the immutable live workflow contract', async () => {
-  let captured;
+  const captured = [];
   const manifest = {
     pr: 12,
     repository: FRONTEND_REPOSITORY,
@@ -118,8 +119,10 @@ test('dispatches the immutable live workflow contract', async () => {
   };
   await dispatchOperation({
     fetchImpl: async (url, options) => {
-      captured = { options, url };
-      return jsonResponse(204);
+      captured.push({ options, url });
+      return url.includes('/dispatches')
+        ? jsonResponse(204)
+        : jsonResponse(201);
     },
     operationId: 'ui-operation-1',
     requests: [manifest],
@@ -127,10 +130,18 @@ test('dispatches the immutable live workflow contract', async () => {
   });
 
   assert.match(
-    captured.url,
+    captured[1].url,
     /actions\/workflows\/deploy-hub\.yml\/dispatches$/
   );
-  assert.deepEqual(JSON.parse(captured.options.body), {
+  assert.deepEqual(JSON.parse(captured[0].options.body), {
+    context: QUEUED_REQUEST_CONTEXT,
+    description:
+      'Queued 1/1 for Staging · ui-operation-1 · 2026-08-04T12:00:00.000Z',
+    state: 'pending',
+    target_url:
+      'https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-hub.yml'
+  });
+  assert.deepEqual(JSON.parse(captured[1].options.body), {
     inputs: {
       action: 'deploy',
       confirmation: 'DEPLOY',
@@ -138,6 +149,45 @@ test('dispatches the immutable live workflow contract', async () => {
       operation_id: 'ui-operation-1'
     },
     ref: 'main'
+  });
+});
+
+test('clears durable queued status when workflow dispatch fails', async () => {
+  const captured = [];
+  const manifest = {
+    pr: 12,
+    repository: FRONTEND_REPOSITORY,
+    requested_at: '2026-08-04T12:00:00.000Z',
+    requester: 'prxt6529',
+    sha: SHA_A,
+    target: 'production'
+  };
+
+  await assert.rejects(
+    dispatchOperation({
+      fetchImpl: async (url, options) => {
+        captured.push({ options, url });
+        return url.includes('/dispatches')
+          ? jsonResponse(404)
+          : jsonResponse(201);
+      },
+      operationId: 'ui-operation-2',
+      requests: [manifest],
+      token: TOKEN
+    }),
+    (error) =>
+      error instanceof GitHubOperationError &&
+      error.code === 'workflow_unavailable'
+  );
+
+  assert.equal(captured.length, 3);
+  assert.deepEqual(JSON.parse(captured[2].options.body), {
+    context: QUEUED_REQUEST_CONTEXT,
+    description:
+      'Dispatch failed 1/1 for Production · ui-operation-2 · 2026-08-04T12:00:00.000Z',
+    state: 'error',
+    target_url:
+      'https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-hub.yml'
   });
 });
 
@@ -160,6 +210,91 @@ test('publishes an exact stop request for every participating SHA', async () => 
     'Deploy Hub Stop — ui-operation-1'
   );
   assert.equal(JSON.parse(calls[0].options.body).target_url, RUN_URL);
+});
+
+test('cancels a queued request and publishes its exact stop boundary', async () => {
+  const calls = [];
+  const queueDescription =
+    'Queued 1/1 for Staging · ui-operation-1 · 2026-08-04T12:00:00.000Z';
+  await requestStop({
+    fetchImpl: async (url, options) => {
+      calls.push({ options, url });
+      return jsonResponse(201, {});
+    },
+    operationId: 'ui-operation-1',
+    queued: true,
+    requests: [{ queueDescription, sha: SHA_A }],
+    runUrl: RUN_URL,
+    token: TOKEN
+  });
+
+  assert.equal(calls.length, 2);
+  assert.deepEqual(JSON.parse(calls[1].options.body), {
+    context: QUEUED_REQUEST_CONTEXT,
+    description:
+      'Cancelled 1/1 for Staging · ui-operation-1 · 2026-08-04T12:00:00.000Z',
+    state: 'error',
+    target_url: RUN_URL
+  });
+});
+
+test('shows durable queued requests even when no controller run survives', () => {
+  const queueDescription =
+    'Queued 1/1 for Production · ui-operation-1 · 2026-08-04T12:00:00.000Z';
+  const repository = {
+    pullRequests: {
+      nodes: [
+        {
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  oid: SHA_A,
+                  statusCheckRollup: {
+                    contexts: {
+                      nodes: [
+                        {
+                          __typename: 'StatusContext',
+                          context: QUEUED_REQUEST_CONTEXT,
+                          createdAt: '2026-08-04T12:00:00.000Z',
+                          description: queueDescription,
+                          state: 'PENDING',
+                          targetUrl:
+                            'https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-hub.yml'
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          headRefOid: SHA_A,
+          number: 12,
+          state: 'OPEN',
+          title: 'Queued feature',
+          url: 'https://github.com/example/pull/12'
+        }
+      ]
+    }
+  };
+
+  const model = buildDashboardModel(
+    repository,
+    { workflow_runs: [] },
+    '2026-08-04T12:00:05.000Z'
+  );
+
+  assert.equal(model.waiting, 1);
+  assert.equal(model.operations.length, 1);
+  assert.equal(model.operations[0].id, 'ui-operation-1');
+  assert.equal(model.operations[0].queued, true);
+  assert.equal(model.operations[0].target, 'production');
+  assert.equal(model.operations[0].terminal, false);
+  assert.equal(
+    model.operations[0].requests[0].queueDescription,
+    queueDescription
+  );
 });
 
 test('derives operations, waiting work, and environment runs from GitHub truth', () => {
