@@ -83,6 +83,8 @@ Acceptance criteria:
 - [x] Stale or moved PR heads fail closed.
 - [x] Deterministic fake phases cover queued, running, succeeded, product
       failure, infrastructure failure, cancelled, and stale outcomes.
+- [ ] Shadow projection distinguishes immediate cancellation before mutation
+      from a safe-stop request after mutation has begun.
 - [x] The immutable manifest partitions adjacent requests by final target.
 - [ ] Opted-in test PR feedback shows target, phase, exact SHA, conclusion, and
       the authoritative shadow run link.
@@ -104,9 +106,10 @@ Evidence:
   projections after a GitHub API interruption.
 - Latest review follow-up uses the repository's actual default branch and
   rejects malformed request timestamps with the intended validation error.
-- Remaining before `DONE`: latest-head PR CI/review must finish, the workflow
-  must be explicitly authorized and merged to frontend `main`, and an opted-in
-  test PR must prove live commit-status feedback from an actual shadow run.
+- Remaining before `DONE`: latest-head PR CI/review must finish, the shadow
+  must distinguish both stop boundaries, the workflow must be explicitly
+  authorized and merged to frontend `main`, and an opted-in test PR must prove
+  live commit-status feedback from an actual shadow run.
 
 ### [ ] Task 2 — Live frontend UI
 
@@ -126,6 +129,8 @@ Acceptance criteria:
       seconds without manual refresh.
 - [ ] Current environment, waiting cohorts, target, phase, elapsed time,
       blocker, runtime proof, E2E, PR, and exact GitHub run links are visible.
+- [ ] Every non-terminal operation exposes Stop and clearly shows whether it
+      cancelled before mutation or is settling the environment safely.
 - [ ] The next complete GitHub read repairs a failed or missed poll without
       event replay.
 - [ ] The saved Deploy Hub icon and favicons are integrated accessibly.
@@ -152,6 +157,13 @@ Acceptance criteria:
       separate ordered cohorts.
 - [ ] One frontend staging cohort mutates the environment at a time through
       GitHub Actions concurrency.
+- [ ] Stop before the first `1a-staging` mutation cancels the exact operation
+      without changing the branch or environment.
+- [ ] Stop after mutation begins becomes a safe-stop request: the in-flight
+      staging change reaches an exact verified or restored state before the
+      operation ends, with no later cohort or production continuation.
+- [ ] Safe stop never blindly kills an issued remote deployment command,
+      rewrites shared history, or claims that deployed code was undone.
 - [ ] Staging success requires exact runtime proof and all 12 baseline staging
       E2E packs.
 - [ ] Infrastructure retries preserve the exact snapshot and use a fixed
@@ -185,6 +197,9 @@ Acceptance criteria:
       `main` SHA is frozen.
 - [ ] An unexpected partial merge stops before production deployment and
       reports exact `main` truth.
+- [ ] Stop before the first `main` mutation prevents production progression;
+      after `main` or production mutation begins it settles and reports exact
+      repository/runtime truth without automatic rollback.
 - [ ] The frozen SHA uses canonical `build-upload-deploy-prod.yml`, runtime
       proof, and all 11 production-safe E2E packs.
 - [ ] Infrastructure retry repeats only the same frozen SHA within a fixed
@@ -206,12 +221,13 @@ Deploy Hub credential.
 
 Acceptance criteria:
 
-- [ ] One small command or skill supports submit, status, cancel, and retry.
+- [ ] One small command or skill supports submit, status, stop, and retry.
 - [ ] It uses existing GitHub authentication and the same fixed repositories,
       workflows, refs, exact-SHA checks, and production-intent rules as the UI.
 - [ ] It retains exact run identity and can resume from GitHub/runtime truth.
-- [ ] Retry preserves the same exact SHA and target; cancellation targets the
-      exact active GitHub run.
+- [ ] Stop targets the exact operation and uses the same immediate-cancel or
+      post-mutation safe-stop contract as the UI; it requires no agent polling.
+- [ ] Retry preserves the same exact SHA and target.
 - [ ] A closed agent task is not required for operation execution or recovery.
 - [ ] Direct canonical workflows remain documented fallback paths.
 
@@ -230,6 +246,9 @@ Acceptance criteria:
       feedback cases pass with no mutation authority.
 - [ ] Controlled low-risk staging canaries prove runtime identity, all baseline
       E2E, failure recovery, and manual fallback.
+- [ ] Canary evidence proves both stop boundaries: pre-mutation leaves staging
+      unchanged, while post-mutation settles to exact safe runtime truth and
+      prevents production continuation.
 - [ ] At least one same-target batch and one mixed-target sequence behave as
       documented.
 - [ ] A low-risk production canary proves merge, deploy, runtime, E2E,

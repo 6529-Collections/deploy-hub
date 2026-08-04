@@ -26,6 +26,20 @@ Every request contains:
 A moved PR head is stale. Retry uses the same exact SHA and target. Deploy Hub
 never silently follows a branch or upgrades staging intent to production.
 
+## Stopping an operation
+
+- Before repository or environment mutation, Stop cancels the exact operation
+  immediately and leaves the target unchanged.
+- After mutation begins, Stop becomes a safe-stop request. The active mutation
+  reaches exact verified or restored runtime truth before the operation ends.
+- Safe stop blocks later cohorts, retries beyond required safety
+  reconciliation, and production continuation.
+- Safe stop never blindly kills an issued remote deployment command, rewrites
+  shared history, rolls back production automatically, or claims completed
+  mutation was undone.
+- UI and agent actions use the same exact operation and GitHub evidence; no
+  browser or agent polling is required to complete the stop.
+
 ## Staging
 
 - Use `1a-staging` through non-force commits and the canonical frontend staging

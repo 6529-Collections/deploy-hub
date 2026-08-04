@@ -2,6 +2,9 @@
 
 ## 2026-08-04
 
+- Made Stop an explicit frontend requirement across the shadow, UI, staging,
+  production, agent, and canary tasks: cancel immediately before mutation and
+  settle to exact safe truth after mutation begins.
 - Started Task 1 with frontend PR
   [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579):
   a dormant exact-input shadow workflow with read-only repository/PR access and

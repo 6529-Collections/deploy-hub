@@ -39,8 +39,8 @@ Required shadow scenarios:
 - one production request through fake staging and production phases;
 - two adjacent same-target requests;
 - a mixed-target sequence;
-- stale source, cancellation, same-SHA retry, infrastructure failure, and
-  product failure/replay;
+- stale source, pre-mutation cancellation, post-mutation safe stop, same-SHA
+  retry, infrastructure failure, and product failure/replay;
 - a page opened before the request that updates without refresh.
 
 ## 3. Controlled staging canaries
@@ -54,7 +54,7 @@ immediately usable.
 - One mixed-target sequence proving cohorts remain separate.
 - Bounded infrastructure retry.
 - Product failure and non-force known-good restoration.
-- Cancellation and exact-SHA retry.
+- Pre-mutation cancellation, post-mutation safe stop, and exact-SHA retry.
 - PR feedback and live UI matching GitHub/runtime truth.
 - No request outside the canary is enrolled automatically.
 
