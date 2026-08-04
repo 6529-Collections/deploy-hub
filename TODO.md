@@ -26,7 +26,7 @@ separate project.
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
 |    1 | Base FE shadow workflow               | IN PROGRESS | 0          |
-|    2 | Live frontend UI                      | NOT STARTED | 1          |
+|    2 | Live frontend UI                      | IN PROGRESS | 1          |
 |    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
 |    4 | Real frontend production              | IN PROGRESS | 3          |
 |    5 | Agent operations and recovery         | IN PROGRESS | 3, 4       |
@@ -38,10 +38,11 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `5f4098c9680052501ed85e8088a991b99388cb1d`.
+  is open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`.
   It contains the Task 1 stop-boundary completion plus the in-review workflow
   implementation for Tasks 3–5, including tracked forward-only removal from
-  staging. It is not merged, and no Deploy Hub operation was dispatched.
+  staging. It is intentionally pending merge until the Deploy Hub UI is ready
+  for controlled end-to-end testing. No Deploy Hub operation was dispatched.
 
 ## Task details
 
@@ -120,39 +121,55 @@ Evidence:
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   distinguishes pre-mutation Stop from post-mutation safe Stop in the shadow
   projection; it is not accepted evidence until merged and exercised.
-- Remaining before `DONE`: merge and inspect the stop-boundary implementation,
-  then use an explicitly authorized opted-in test PR to prove live commit-status
-  feedback from an actual shadow run.
+- Remaining before `DONE`: when the UI is ready for controlled integration,
+  merge frontend PR #3586 and use an explicitly authorized opted-in test PR to
+  prove live commit-status feedback from an actual shadow run. Task 2 may
+  proceed against the accepted contract while this final proof is pending.
 
 ### [ ] Task 2 — Live frontend UI
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: The static page submits and observes frontend operations clearly and
 updates without a browser refresh.
 
 Acceptance criteria:
 
-- [ ] Existing GitHub-token authentication and operator verification remain
+- [x] Existing GitHub-token authentication and operator verification remain
       intact.
-- [ ] The UI accepts one or more frontend PRs and an explicit Staging or
+- [x] The UI accepts one or more frontend PRs and an explicit Staging or
       Production final target.
-- [ ] Submission freezes and displays exact PR heads before dispatch.
-- [ ] An open page discovers new operations and updates at least every five
+- [x] Submission freezes and displays exact PR heads before dispatch.
+- [x] An open page discovers new operations and updates at least every five
       seconds without manual refresh.
-- [ ] Current environment, waiting cohorts, target, phase, elapsed time,
+- [x] Current environment, waiting cohorts, target, phase, elapsed time,
       blocker, runtime proof, E2E, PR, and exact GitHub run links are visible.
-- [ ] Every non-terminal operation exposes Stop and clearly shows whether it
+- [x] Every non-terminal operation exposes Stop and clearly shows whether it
       cancelled before mutation or is settling the environment safely.
-- [ ] A tracked, unmerged PR currently in staging exposes Remove from staging,
+- [x] A tracked, unmerged PR currently in staging exposes Remove from staging,
       including removal progress, validation, failure, and restored state.
-- [ ] The next complete GitHub read repairs a failed or missed poll without
+- [x] The next complete GitHub read repairs a failed or missed poll without
       event replay.
-- [ ] The saved Deploy Hub icon and favicons are integrated accessibly.
-- [ ] The UI remains portable static files with no backend or proxy.
+- [x] The saved Deploy Hub icon and favicons are integrated accessibly.
+- [x] The UI remains portable static files with no backend or proxy.
 - [ ] Browser-module tests, accessibility checks, formatting, lint, and CI pass.
 
-Evidence: Not yet available.
+Evidence:
+
+- Static shell, direct GitHub authentication, and saved brand assets are
+  already present in this repository.
+- Implementation is proceeding in `deploy-hub`; frontend PR #3586 remains
+  unmerged until the UI and controlled test plan are ready together.
+- `ui/github-operations.js` freezes exact heads, dispatches the fixed frontend
+  workflow contract, projects GitHub-native dashboard truth, and publishes
+  exact Stop requests without storing separate operation state.
+- `ui/index.html`, `ui/app.js`, and `ui/styles.css` provide the submission,
+  five-second refresh, environment, operation, Stop, and removal surfaces.
+- Sixteen authentication, contract, projection, token-canary, branding, and
+  refresh tests pass with formatting and lint through `npm run check`.
+- Remaining before `DONE`: credentialed browser integration against GitHub,
+  repository CI for the final exact head, then controlled integration after
+  frontend PR #3586 is deliberately merged.
 
 ### [ ] Task 3 — Real frontend staging
 
@@ -202,9 +219,9 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` contains the
+  at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
   in-review staging, bounded replay, Stop, exact composition, and removal
-  implementation. It is not merged or activated.
+  implementation. It is pending merge until controlled end-to-end testing.
 
 ### [ ] Task 4 — Real frontend production
 
@@ -242,8 +259,9 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` contains the
-  in-review bot-only production continuation. It is not merged or activated.
+  at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94` contains the
+  in-review bot-only production continuation. It is pending merge until
+  controlled end-to-end testing.
 
 ### [ ] Task 5 — Agent operations and recovery
 

@@ -44,13 +44,16 @@ real staging while preserving the existing manual path.
 
 ## Current state
 
-- The static UI shell and direct GitHub-token authentication are implemented.
+- The static UI and direct GitHub-token authentication are implemented. The UI
+  freezes exact PR heads, submits the fixed operation contract, refreshes
+  GitHub truth every five seconds, and exposes Stop and tracked staging removal.
 - The supplied Deploy Hub mark and deterministic icon/favicon sizes are saved
-  under `ui/assets/brand/`; they are not wired into the current shell yet.
+  under `ui/assets/brand/` and integrated into the static UI.
 - The FE-only requirements, architecture, flows, and rollout strategy are the
   active design.
-- No workflow dispatch, ref mutation, staging access, production access, or
-  deployment implementation exists yet.
+- The static page contains no repository or environment authority of its own.
+  Live workflow dispatch remains unavailable until the pending frontend PR is
+  deliberately merged for controlled integration.
 - Frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   contains the open, in-review workflow implementation and staging removal

@@ -14,12 +14,25 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `5f4098c9680052501ed85e8088a991b99388cb1d`.
+is open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`.
 It completes the two shadow Stop projections and carries the in-review Tasks
 3–5 workflow implementation: canonical staging and production dispatch,
 bounded reconciliation, exact staging composition, and forward-only removal
-with automatic restore on failure. The PR is not merged, and no Deploy Hub
-operation was dispatched.
+with automatic restore on failure. The PR is intentionally pending merge until
+the Deploy Hub UI and controlled end-to-end test plan are ready together. No
+Deploy Hub operation was dispatched.
+
+Task 2, the live static frontend UI, is now in progress in this repository.
+Work may proceed against the accepted operation contract without merging the
+frontend workflow early.
+
+The current Task 2 implementation freezes and previews exact PR heads, submits
+the fixed live workflow contract, refreshes GitHub truth every five seconds,
+shows environment and operation evidence, and exposes exact Stop and tracked
+staging-removal actions. It remains static and stores no Deploy Hub operation
+state outside GitHub. Local formatting, lint, and all 16 focused tests pass.
+Credentialed browser integration and controlled live workflow testing remain
+pending; neither requires merging PR #3586 early.
 
 ## Retained foundation
 
@@ -72,6 +85,8 @@ inactive while the PR is open; this follow-up did not dispatch them.
 
 ## Next work
 
-Review and decide PR #3586, then complete the opted-in shadow status proof and
-build the Task 2 UI entry points, including Stop and Remove from staging. Any
-real staging canary still requires a separate explicit owner instruction.
+Build and verify the Task 2 UI entry points, including submission, automatic
+refresh, Stop, and Remove from staging. Keep PR #3586 pending until the UI is
+ready for controlled integration; then merge it, complete the opted-in shadow
+status proof, and begin explicitly authorized canaries. Any real staging canary
+still requires a separate explicit owner instruction.

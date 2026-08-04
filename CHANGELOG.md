@@ -2,6 +2,20 @@
 
 ## 2026-08-04
 
+- Kept frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  open at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`
+  and explicitly pending merge until the static UI and controlled integration
+  test plan are ready. Task 2 may proceed in `deploy-hub` without activating
+  the live frontend workflows early.
+- Started Task 2, the live static frontend UI.
+- Implemented the Task 2 static operation dashboard: exact-head request review,
+  fixed GitHub workflow dispatch, five-second full-snapshot refresh,
+  environment and operation evidence, exact Stop, tracked staging removal, and
+  accessible Deploy Hub branding. The browser holds no operation state beyond
+  the existing GitHub token; GitHub remains the source of truth. All 16 local
+  authentication and operation tests plus formatting and lint pass.
+
 - Linked open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` from the active

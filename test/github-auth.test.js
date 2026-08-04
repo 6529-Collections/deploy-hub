@@ -153,6 +153,14 @@ test('static shell restricts connections and loads no third-party script', async
   );
 
   assert.match(html, /connect-src https:\/\/api\.github\.com/);
+  assert.match(html, /deploy-hub-icon-192\.png/);
+  assert.match(html, /favicon-32\.png/);
   assert.match(html, /id="forget-github"/);
   assert.doesNotMatch(html, /<script[^>]+src="https?:/i);
+});
+
+test('dashboard refreshes from GitHub every five seconds', async () => {
+  const app = await readFile(new URL('../ui/app.js', import.meta.url), 'utf8');
+  assert.match(app, /REFRESH_INTERVAL_MS = 5_000/);
+  assert.match(app, /readDashboard\(activeToken\)/);
 });
