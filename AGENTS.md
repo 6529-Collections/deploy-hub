@@ -1,8 +1,8 @@
 # Deploy Hub Agent Instructions
 
-This repository is the durable source of truth for Deploy Hub requirements,
-architecture, decisions, diagrams, migration planning, and—after explicit
-approval—implementation.
+Deploy Hub is currently a frontend-only project. Do not widen active scope to
+backend deployment support without an explicit user decision made after the
+frontend pilot.
 
 ## Required reading order
 
@@ -11,76 +11,72 @@ Before changing the project, read:
 1. `README.md`
 2. `STATUS.md`
 3. `TODO.md`
-4. `docs/requirements.md`
-5. `docs/architecture.md`
-6. `docs/migration-plan.md`
-7. `docs/testing-strategy.md`
-8. All accepted records in `docs/decisions/`
+4. `docs/frontend/requirements.md`
+5. `docs/frontend/architecture.md`
+6. `docs/frontend/testing-and-rollout.md`
+7. Relevant flows under `docs/frontend/flows/`
 
-Read files under `docs/references/` when validating claims about Release Bus or
-the original Deploy Hub proposal. Treat those files as immutable source
-material.
+Files under `archive/original-cross-repo-plan/` are historical reference only.
+They are not active requirements, decisions, or tasks. Do not edit archived
+handoff sources.
+
+## Rule 1
+
+KISS: Keep It Simple, Silly.
+
+- Add only the smallest mechanism required by the current task.
+- Do not recreate Release Bus trains, candidate discovery, global claims, or a
+  second deployment implementation.
+- Do not add a Deploy Hub backend, proxy, Lambda, database, Git ledger, custom
+  queue, scheduler, callback receiver, SSE, or WebSocket.
+- A bounded failure branch inside a finite GitHub workflow is permitted; a
+  continuously running reconciler is not.
+- Put concerns such as PR feedback, E2E, release notes, retry, and diagnostics
+  inside the owning top-level task rather than creating new top-level projects.
 
 ## Persistence rules
 
-- Do not leave decisions, requirements, diagrams, open questions, or next steps
-  only in a Codex conversation.
-- Save material conclusions in the appropriate file during the same task.
-- Update `STATUS.md` after every material planning or implementation session.
-- Treat `TODO.md` as the canonical execution tracker. Update task status and
-  durable evidence in the same change that materially advances a task.
-- Never mark a task complete from assertion or checkbox state alone. Reinspect
-  its acceptance criteria and exact linked implementation, PR, workflow, and
-  runtime evidence when answering whether a task is done.
-- Add a dated entry to `CHANGELOG.md` for every material document change.
-- Record architectural decisions in `docs/decisions/` instead of silently
-  changing the architecture.
-- Mermaid source files in `docs/diagrams/` are canonical. Keep copies embedded
-  in architecture and migration documents synchronized.
-- Never edit the copied handoff documents in `docs/references/`.
+- Do not leave decisions, requirements, diagrams, or next steps only in a
+  conversation.
+- `TODO.md` is the sole active implementation tracker.
+- Update `STATUS.md` and `CHANGELOG.md` with material planning or implementation
+  changes.
+- Mark a task `DONE` only after inspecting every acceptance criterion and its
+  durable evidence.
+- Keep Mermaid diagrams and their adjacent explanation synchronized.
+- Keep the archived broad plan intact unless correcting archive navigation or
+  provenance.
 
 ## Current safety boundary
 
-- Static read-only GitHub authentication is owner-approved. No repository or
-  workflow mutation capability is approved merely by that authentication.
-- Do not add executable GitHub Actions, dependencies, live GitHub-token
-  handling, GitHub App permissions, repository secrets, environments, AWS
-  roles, or deployment credentials without explicit current-task
+- Static read-only GitHub authentication is implemented and owner-approved.
+- No deployment or repository mutation capability currently exists.
+- Task 1 must be physically unable to update refs, dispatch canonical deploys,
+  assume environment roles, or publish real CI/release-note communications.
+- Do not change `6529seize-frontend`, GitHub workflow permissions, staging,
+  production, AWS, or Release Bus controls without explicit current-task
   authorization.
-- Do not change frontend, backend, Release Bus, GitHub workflows, AWS resources,
-  live deployment state, or Release Bus controls from this repository without a
-  separately authorized operation.
-- Shadow behavior must be permission-isolated. A software flag alone is not a
-  sufficient boundary.
-- Do not add a Git remote other than the approved
-  `6529-Collections/deploy-hub` origin without explicit approval.
+- GitHub repository, workflow, ref, and environment protections—not client-side
+  UI checks—must enforce every later mutation.
+- Canonical manual frontend workflows remain available throughout rollout.
 
-## Development conventions
+## Repository workflow
 
-- Rule 1 is KISS: Keep It Simple, Silly. Add only the smallest abstraction,
-  dependency, service, state, or workflow proven necessary by the current task.
-- During the current owner-approved private static-app bootstrap, changes are
-  committed and pushed directly to `main`. Fetch `origin/main` immediately
-  before each push and stop on divergence or unexpected worktree changes.
-- Before adding GitHub mutation capability, a GitHub App, OAuth client, secret,
-  AWS role, repository/environment permission, deployment authority, or
-  additional write actor, revisit protected `main` and the task-branch/
-  ready-PR workflow as an explicit security gate.
-- When that later switch happens, new task-owned branches use the
-  `agent-prxt/` prefix followed by concise kebab-case.
-- Open normal ready-for-review pull requests unless the user explicitly asks
-  for a draft.
-- State requirements as testable outcomes.
-- Clearly separate MVP, later work, non-goals, and open decisions.
-- Optimize for agent-owned feature lifecycles and exact deployment operations;
-  do not recreate Release Bus trains or autonomous candidate claiming under new
-  terminology.
+- During the owner-approved private static-app bootstrap, commit and push
+  audited changes directly to `main`.
+- Fetch `origin/main` immediately before every push and stop on divergence or
+  unexpected worktree changes.
+- Reconsider protected main and reviewed PRs before adding deployment mutation
+  capability, a repository secret, an environment permission, or another write
+  actor.
+- Do not add another Git remote without explicit approval.
 
-## Static UI bootstrap commands
+## Development
 
 - Install: `npm install --ignore-scripts`
 - Full check: `npm run check`
 - Individual checks: `npm run format:check`, `npm run lint`, and `npm test`
-- Deploy Hub is a portable static app. Authentication and operations call the
-  GitHub API directly from the browser or the agent's existing GitHub tooling.
-- Do not add or modify a backend, proxy, Lambda, or other Deploy Hub runtime.
+- The app is plain static HTML, CSS, and JavaScript. Do not add or start a local
+  server unless the user explicitly requests one.
+- Humans authenticate directly with GitHub from the browser. Codex uses its
+  existing GitHub authentication.

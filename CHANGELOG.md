@@ -2,6 +2,12 @@
 
 ## 2026-08-04
 
+- Reset the active repository around a frontend-only MVP with eight top-level
+  tasks, promoted the accepted lifecycle diagrams under `docs/frontend/`, and
+  archived the original cross-repository plan without deleting its evidence.
+- Preserved the exact supplied Deploy Hub mark and saved deterministic UI,
+  apple-touch, and PNG favicon sizes under `ui/assets/brand/` for later UI
+  integration. No generated/redrawn icon is used.
 - Added the review-only `FE-REVISIONS/` diagram set for the complete frontend
   lifecycle: PR-visible target/status, cumulative staging batches, bounded
   workflow-driven isolation of a failed batch, mixed staging/production

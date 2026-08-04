@@ -1,65 +1,68 @@
 # Deploy Hub
 
-Deploy Hub is the proposed agent-oriented deployment control and observability
-layer for 6529.
+Deploy Hub is the frontend deployment control and observability UI for 6529.
 
-The intended operating model is:
+The current project is deliberately frontend-only. The goal is to prove a
+small, reliable path from an exact frontend pull request to staging or
+production before considering backend support.
 
-- A Codex task owns the feature lifecycle from implementation through the
-  environment explicitly requested by the developer.
-- Deploy Hub owns one exact deployment or environment-snapshot validation
-  operation from acceptance through terminal reporting.
-- Frontend and backend repositories retain ownership of their canonical build
-  and deployment workflows.
-- GitHub workflow checks, commit statuses, or—only if required—a narrow Check
-  Run provide current pull-request feedback.
-- The browser UI is a portable static app; it authenticates and operates
-  directly through GitHub using the user's existing token.
-- New deployments, queue changes, progress, and results appear in an open UI
-  automatically without manual browser refresh.
-- Every staging and production outcome passes the full baseline read-only E2E
-  suite against an unchanged exact environment snapshot.
-- Canonical workflows retain repository-owned CI deployment posts and
-  production release-note automation with exact, operation-scoped attribution;
-  Deploy Hub observes those non-gating outcomes instead of duplicating them.
-- Frontend and backend deployment capacity is independent; baseline E2E detects
-  snapshot drift and reruns without a custom cross-repository lock.
+## Required outcomes
 
-## Current status
+- A human or Codex can request `Take this frontend PR to staging` or
+  `Take this frontend PR to production`.
+- The request is bound to the exact PR-head SHA and explicit final target.
+- The PR shows live target and deployment progress with links to authoritative
+  GitHub Actions evidence.
+- The static UI updates operations, waiting, failures, validation, and history
+  without a browser refresh.
+- Existing frontend staging, production, E2E, CI-notification, and release-note
+  implementations remain canonical.
+- Independent staging and production work use their existing GitHub Actions
+  concurrency lanes.
+- Same-target requests may batch. Different final targets remain separate.
+- A failed staging batch is reduced to useful per-PR outcomes by a bounded
+  workflow path; no agent polling or Deploy Hub service is required.
 
-**Portable static app; Task 4 browser authentication is complete.**
+## Product boundary
 
-This repository contains the entire Deploy Hub implementation: a plain static
-UI that talks directly to GitHub and can be hosted anywhere.
+Deploy Hub is a portable static app in this repository. Humans use their
+existing GitHub token directly in the browser. Codex uses its existing GitHub
+authentication through one small command or skill.
 
-This repository currently contains read-only GitHub-token authentication but no
-GitHub App, OAuth client, AWS credential, repository environment, staging
-access, production access, state branch, or deployment implementation.
+GitHub and the frontend repository remain the mutation and execution
+authority. Deploy Hub has no backend, proxy API, Lambda, database, custom queue,
+callback service, SSE, or WebSocket.
 
-ADR 0005 makes Deploy Hub a portable static app. The browser stores the user's
-GitHub token locally, calls GitHub directly, and has no Deploy Hub server,
-backend dependency, OAuth system, or GitHub App broker.
+The frontend repository will own the thin operation workflow and continue to
+own the canonical deployment and E2E workflows. This repository owns the UI,
+frontend operation contract, agent entry point, documentation, and shadow
+fixtures.
 
-Release Bus is currently OFF for both staging and production and is not
-expected to be re-enabled. Existing manual and canonical repository workflows
-remain the operational deployment path while Deploy Hub is designed and tested.
+## Current state
 
-## Documentation
+- The static UI shell and direct GitHub-token authentication are implemented.
+- The supplied Deploy Hub mark and deterministic icon/favicon sizes are saved
+  under `ui/assets/brand/`; they are not wired into the current shell yet.
+- The FE-only requirements, architecture, flows, and rollout strategy are the
+  active design.
+- No workflow dispatch, ref mutation, staging access, production access, or
+  deployment implementation exists yet.
+- Release Bus is OFF. Canonical manual frontend workflows remain the fallback.
+
+## Active documentation
 
 - [Current status](STATUS.md)
 - [Implementation tracker](TODO.md)
-- [Requirements](docs/requirements.md)
-- [Architecture](docs/architecture.md)
-- [Authentication, permissions, and threat model](docs/security-model.md)
-- [Migration plan](docs/migration-plan.md)
-- [Testing strategy](docs/testing-strategy.md)
-- [Current deployment-system inventory](docs/current-system-inventory.md)
-- [E2E validation analysis](docs/e2e-validation-analysis.md)
-- [Deployment communications analysis](docs/deployment-communications-analysis.md)
-- [Architecture decisions](docs/decisions/)
-- [Saved diagrams](docs/diagrams/)
-- [Original handoff references](docs/references/)
+- [Frontend requirements](docs/frontend/requirements.md)
+- [Frontend architecture](docs/frontend/architecture.md)
+- [Frontend flows](docs/frontend/flows/)
+- [Testing and rollout](docs/frontend/testing-and-rollout.md)
+- [Brand assets](ui/assets/brand/README.md)
 - [Planning changelog](CHANGELOG.md)
+
+The original broad frontend/backend plan is preserved under
+[`archive/original-cross-repo-plan/`](archive/original-cross-repo-plan/) for
+reference only. It is not an active requirements or task source.
 
 ## Development
 
@@ -70,36 +73,10 @@ npm install --ignore-scripts
 npm run check
 ```
 
-The project uses Node.js 22.17.1 for formatting, lint, and browser-module unit
-tests. `npm run check` validates the static app and repository configuration.
-There is no server or production runtime.
+The project uses plain HTML, CSS, JavaScript, Node unit tests, and read-only
+credentialless CI. There is no local or hosted Deploy Hub server.
 
-Project boundaries:
-
-```text
-ui/             plain static UI files
-docs/           requirements, architecture, decisions, migration, and testing
-.github/        credentialless read-only CI
-```
-
-During the current private static-app bootstrap, changes are pushed directly to
-`main` after fetching and checking `origin/main`. Protected-main/PR workflow
-must be reconsidered before GitHub mutation capability, deployment authority,
-repository secrets, or another write actor is introduced.
-
-## Safety boundary
-
-Task 4 authentication is read-only: it can resolve GitHub identity and operator
-membership but cannot dispatch workflows, update refs, or reach AWS. Later
-mutation capabilities remain gated by their own tasks and exact allowlists.
-
-`1a-deploy-hub` is only an optional credentialless shadow trigger if real
-branch-trigger behavior must be tested. It is not a second staging lane and
-does not exist yet.
-
-## Resuming work
-
-Read [AGENTS.md](AGENTS.md), [STATUS.md](STATUS.md), and [TODO.md](TODO.md)
-before making changes.
-Material requirements, decisions, diagrams, and next steps must be saved in
-this repository rather than left only in a Codex conversation.
+During the current private bootstrap, audited changes are pushed directly to
+`main` after fetching and checking `origin/main`. Protected main must be
+reconsidered before adding deployment mutation capability or another write
+actor.

@@ -1,12 +1,10 @@
-# Frontend lifecycle revisions
+# Frontend lifecycle flows
 
-Status: **proposed for review; not yet part of the accepted architecture or an
-implementation task.**
+Status: Accepted FE-only MVP
 
-This folder describes the intended frontend-only Deploy Hub lifecycle after the
-latest failure and batching discussion. It is deliberately separate from the
-accepted documents so the proposal can be reviewed as one coherent change
-before requirements or implementation tasks are rewritten.
+These diagrams are the active frontend Deploy Hub lifecycle. They explain the
+happy paths, target-aware cohorting, staging recovery, and production batching
+that Tasks 1–6 must implement and prove.
 
 ## Diagram set
 
@@ -22,7 +20,7 @@ before requirements or implementation tasks are rewritten.
    — PR 2 targets production, PR 3 is faulty and targets staging, plus the case
    where multiple production-target PRs share one production deploy.
 
-## Proposed operating rules
+## Operating rules
 
 ### One explicit request
 
@@ -115,7 +113,7 @@ from its Checks/commit-status surface and links to the live operation.
 
 ## Small state model
 
-The proposal uses only GitHub-native durable facts:
+The design uses only GitHub-native durable facts:
 
 - exact PR-head commit statuses for request and per-PR progress;
 - workflow inputs for the current immutable batch manifest;
@@ -130,9 +128,9 @@ The workflow mechanics above follow GitHub's documented
 [`GITHUB_TOKEN` trigger rules](https://docs.github.com/en/actions/concepts/security/github_token)
 and [single-pending concurrency behavior](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency).
 
-## Decision required before implementation
+## Implementation boundary
 
-Accepting this proposal would revise the current no-batching/no-automatic-
-reconciliation boundary. The accepted requirements, architecture, tests, and
-Tasks 5, 6, 8, 9, 11, 12, 14, and 16 must be updated together before code is
-written.
+The diagrams specify behavior, not a second deployment implementation. The
+frontend operation workflow must reuse the canonical frontend deploy and E2E
+paths, while the static page and agent command submit and observe through
+GitHub.
