@@ -4,8 +4,8 @@
 
 - Started Task 5. Current frontend workflow groups already separate frontend,
   backend, staging, production, and E2E work; backend PR #1901 contains the one
-  required change from an environment-wide manual mutex to an
-  environment/service-scoped mutex.
+  required change to scope manual staging by service while preserving the
+  existing production, Release Bus, and final service safety mutexes.
 - Confirmed that GitHub exposes queued/in-progress run status but not a
   dependable concurrency group or queue cause. Deploy Hub will show the honest
   generic `Queued in GitHub Actions` state and link the run, without adding a

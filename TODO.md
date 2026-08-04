@@ -283,7 +283,9 @@ Acceptance criteria:
 
 - [x] Frontend and backend workflow concurrency is not globally serialized.
 - [ ] Backend services serialize only where concrete incompatibility requires
-  it; the environment/service-scoped change is pending in backend PR #1901.
+  it; the manual-staging service-scoped change is pending in backend PR #1901,
+  while production break-glass and dormant Release Bus safety lanes remain
+  unchanged.
 - [x] Staging and production concurrency groups are independent.
 - [x] GitHub repository, workflow, ref, and environment protections remain the
   mutation authority; the static page grants no permission and bypassing it
@@ -305,9 +307,9 @@ Evidence:
   separate non-cancelling GitHub Actions concurrency groups on current `main`.
 - Backend PR
   [#1901](https://github.com/6529-Collections/6529seize-backend/pull/1901)
-  replaces the environment-wide manual deployment mutex with one
-  environment/service-scoped workflow mutex and removes the duplicate job
-  mutex.
+  scopes only manual staging concurrency by service. It preserves Release Bus
+  operation-key concurrency, the globally serialized manual-production
+  break-glass lane, and the final environment/service job mutex.
 - A live GitHub run API audit exposed `status: queued` but no concurrency group
   or queue-cause field; waiting copy is therefore deliberately generic.
 - The generated backend workflow, focused workflow contract test, syntax,

@@ -6,7 +6,8 @@ Last updated: 2026-08-04
 
 Tasks 0–4 are complete. Task 5, canonical workflow concurrency and waiting
 visibility, is in progress. Backend PR #1901 contains the only workflow change
-found necessary: scope deployment concurrency by environment and service.
+found necessary: scope manual staging concurrency by service while preserving
+the existing production and dormant Release Bus safety lanes.
 
 Release Bus is OFF for staging and production and is not expected to return.
 Canonical manual workflows remain the deployment path and fallback while
