@@ -4,7 +4,7 @@ Status: Accepted
 
 Date: 2026-08-03
 
-Validation clarification: ADR 0004 requires the current full read-only baseline
+Validation clarification: ADR 0003 requires the current full read-only baseline
 pack inventory for every staging and production outcome. In this record,
 `full cross-system E2E` means deeper authenticated, mutating, feature-specific,
 or otherwise risk-selected validation beyond that universal baseline.
@@ -28,7 +28,7 @@ recreate Release Bus complexity or make shadow testing unsafe.
   read-only environment-snapshot E2E policy for staging and production. Deeper
   authenticated, mutating, or feature-specific validation remains risk-based.
 - Reuse the existing GitHub bearer-token and operator-policy authentication
-  path for humans and Codex tasks, as superseded and specified by ADR 0009.
+  path for humans and Codex tasks, as specified by ADR 0005.
 - For the MVP, rollback is agent-guided or manual redeployment of a known-good
   exact version through the repository-owned canonical workflow. Automatic
   component rollback remains later work until repo-owned primitives are proven
@@ -37,10 +37,8 @@ recreate Release Bus complexity or make shadow testing unsafe.
 ## Consequences
 
 - The MVP has no separate deployment-state database or S3 request ledger.
-- ADR 0006 and repository history preserve the retired Task 6 Git-ledger
-  experiment. Live MVP state comes from workflow-run/status/runtime evidence
-  and canonical GitHub concurrency; no live ledger or duplicate projection is
-  approved.
+- Live MVP state comes from workflow-run/status/runtime evidence and canonical
+  GitHub concurrency; no separate ledger or duplicate projection is approved.
 - Baseline snapshot E2E is universal; deeper validation is proportional to risk
   without allowing any deployment to claim success without runtime identity
   proof and unchanged-environment validation.

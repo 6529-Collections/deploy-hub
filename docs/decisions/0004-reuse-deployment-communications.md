@@ -1,4 +1,4 @@
-# ADR 0005: Reuse Repository Deployment Communications
+# ADR 0004: Reuse Repository Deployment Communications
 
 Status: Accepted
 

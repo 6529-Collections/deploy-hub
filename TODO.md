@@ -1,6 +1,6 @@
 # Deploy Hub Implementation Tracker
 
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
 This is the canonical top-level execution tracker. Stable task numbers are used
 so a later conversation can ask, for example, `Have we completed Task 1?` and
@@ -8,11 +8,7 @@ receive an evidence-based answer.
 
 ## Tracker rules
 
-- Status values are `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, `DONE`, and
-  `RETIRED`. `RETIRED` means an experiment was completed historically but is
-  deliberately absent from the current design and active code.
-- Retired tasks do not block the next task, and active tasks must not depend on
-  their removed implementation.
+- Status values are `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, and `DONE`.
 - The default next task is the lowest-numbered `NOT STARTED` or `IN PROGRESS`
   task whose active dependencies are complete. Work may overlap only when
   explicitly useful and safe.
@@ -26,12 +22,8 @@ receive an evidence-based answer.
   evidence.
 - Update this file, `STATUS.md`, and `CHANGELOG.md` in the same change that
   starts, blocks, unblocks, or completes a task.
-- Never reinterpret an existing task number silently. The owner explicitly
-  amended Tasks 7–25 on 2026-08-03 before implementation to remove speculative
-  machinery and apply KISS; their stable numbers remain unchanged.
-- On 2026-08-03 the owner also explicitly requested cleanup of the rejected
-  prototype work: Tasks 2, 5, and 6 became `RETIRED`, while Task 4 was narrowed
-  to the repository/static-UI foundation. ADR 0010 records that amendment.
+- Task numbers describe the current implementation plan. Removed ideas do not
+  remain as placeholder tasks.
 - Direct pushes to `main` remain owner-approved for the private static-app
   bootstrap. Reconsider protection before adding GitHub mutation capability,
   deployment authority, a repository secret, or another write actor.
@@ -48,30 +40,41 @@ existing GitHub/backend primitives cannot meet a requirement.
 | ---: | --- | --- | --- |
 | 0 | Requirements and architecture baseline | DONE | — |
 | 1 | Dormant-state and canonical-workflow inventory | DONE | 0 |
-| 2 | Overbuilt state-contract experiment | RETIRED | 1 |
-| 3 | Authentication, permissions, and threat model | DONE | 1 |
-| 4 | Repository tooling and static UI foundation | DONE | 3 |
-| 5 | Callback/event fake experiment | RETIRED | 4 |
-| 6 | Git-ledger experiment | RETIRED | 4 |
-| 7 | Static GitHub authentication | DONE | 3, 4 |
-| 8 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 7 |
-| 9 | PR feedback and GitHub run lookup | NOT STARTED | 7 |
-| 10 | Portable static UI publishing | NOT STARTED | 4, 7 |
-| 11 | Live operational UI and history | NOT STARTED | 8, 9, 10 |
-| 12 | Canonical frontend staging adapter | NOT STARTED | 1, 7–9 |
-| 13 | Canonical backend staging adapter | NOT STARTED | 1, 7–9 |
-| 14 | Staging environment-snapshot E2E phase | NOT STARTED | 12, 13 |
-| 15 | Canonical frontend production adapter | NOT STARTED | 1, 7–9, 12 |
-| 16 | Canonical backend production adapter | NOT STARTED | 1, 7–9, 13 |
-| 17 | Production environment-snapshot E2E phase | NOT STARTED | 14–16 |
-| 18 | Simple operational diagnostics | NOT STARTED | 9, 11, 14, 17 |
-| 19 | Cancellation, retry, and manual recovery | NOT STARTED | 8, 9, 12–17 |
-| 20 | Credentialless opt-in shadow validation | NOT STARTED | 3, 7–14 |
-| 21 | Controlled real-execution canaries | NOT STARTED | 15–20 |
-| 22 | Controlled shared-staging pilot and burn-in | NOT STARTED | 21 |
-| 23 | Production pilot and Deploy Hub establishment | NOT STARTED | 22, 25 |
-| 24 | Deferred Release Bus removal and cleanup | NOT STARTED | 23 |
-| 25 | Reuse deployment communications and release-note links | NOT STARTED | 3, 9, 12–19 |
+| 2 | Authentication, permissions, and threat model | DONE | 1 |
+| 3 | Repository tooling and static UI foundation | DONE | 2 |
+| 4 | Static GitHub authentication | DONE | 2, 3 |
+| 5 | Canonical workflow concurrency and waiting visibility | NOT STARTED | 1, 4 |
+| 6 | PR feedback and GitHub run lookup | NOT STARTED | 4 |
+| 7 | Portable static UI publishing | NOT STARTED | 3, 4 |
+| 8 | Live operational UI and history | NOT STARTED | 5–7 |
+| 9 | Canonical frontend staging adapter | NOT STARTED | 1, 4–6 |
+| 10 | Canonical backend staging adapter | NOT STARTED | 1, 4–6 |
+| 11 | Staging environment-snapshot E2E phase | NOT STARTED | 9, 10 |
+| 12 | Canonical frontend production adapter | NOT STARTED | 1, 4–6, 9 |
+| 13 | Canonical backend production adapter | NOT STARTED | 1, 4–6, 10 |
+| 14 | Production environment-snapshot E2E phase | NOT STARTED | 11–13 |
+| 15 | Simple operational diagnostics | NOT STARTED | 6, 8, 11, 14 |
+| 16 | Agent operations, cancellation, retry, and recovery | NOT STARTED | 5, 6, 9–14 |
+| 17 | Reuse deployment communications and release-note links | NOT STARTED | 2, 6, 9–16 |
+| 18 | Credentialless opt-in shadow validation | NOT STARTED | 2, 4–17 |
+| 19 | Controlled real-execution canaries | NOT STARTED | 12–18 |
+| 20 | Controlled shared-staging pilot and burn-in | NOT STARTED | 19 |
+| 21 | Production pilot and Deploy Hub establishment | NOT STARTED | 20 |
+| 22 | Deferred Release Bus removal and cleanup | NOT STARTED | 21 |
+
+## Requirement coverage
+
+| Required outcome | Owning tasks |
+| --- | --- |
+| Codex can take a feature to staging or production | 9–17, 21 |
+| Use the canonical frontend/backend deployment paths | 9, 10, 12, 13 |
+| Frontend and unrelated backend work do not block each other | 5, 11, 14, 20 |
+| Live PR feedback and no-refresh UI | 6, 8 |
+| GitHub authentication and authoritative mutation permissions | 2, 4, 5 |
+| Mandatory staging and production snapshot E2E | 11, 14 |
+| Correct CI posts and production release notes | 17 |
+| Safe shadow, canary, and colleague-safe rollout | 18–21 |
+| Release Bus removal after Deploy Hub is proven | 22 |
 
 ## Task details
 
@@ -106,8 +109,7 @@ Evidence:
 - `docs/testing-strategy.md`
 - `docs/e2e-validation-analysis.md`
 - `docs/deployment-communications-analysis.md`
-- ADRs 0001 through 0005 and portable-static-app ADR 0011 under
-  `docs/decisions/`
+- ADRs under `docs/decisions/`
 
 ### [x] Task 1 — Dormant-state and canonical-workflow inventory
 
@@ -131,8 +133,8 @@ Scope:
   endpoints, GitHub Deployments, manual fallback, and the complete canonical
   workflow → notifier → CI-alert receiver → release-note queue/generator
   path.
-- Inventory the backend hosting/auth/realtime capabilities that were considered
-  during planning; ADR 0011 later rejected them as Deploy Hub dependencies.
+- Confirm that Deploy Hub needs no backend hosting, authentication, or realtime
+  service.
 - Produce an exact change map per repository and workflow; do not implement it.
 
 Acceptance criteria:
@@ -157,30 +159,11 @@ Evidence:
 - Exact source and live-control snapshots recorded in that inventory on
   2026-08-03.
 
-### Task 2 — Overbuilt state-contract experiment
-
-Status: `RETIRED`
-
-Outcome: This experiment specified a ledger, callback envelopes, projections,
-and a separate validation lifecycle that the simplified architecture does not
-need. Its schemas and fixtures have been removed from the active tree.
-
-What survives:
-
-- Exact immutable SHA, explicit environment, fail-closed authorization,
-  requester/authority/contributor separation, and truthful partial outcomes
-  remain requirements in `docs/requirements.md`.
-- Live request and response types will be added only to the owning backend
-  OpenAPI endpoints as those endpoints are implemented.
-
-Historical evidence remains in Git history and retired ADR 0006. Task 2 is not
-a dependency of any active implementation task.
-
-### [x] Task 3 — Authentication, permissions, and threat model
+### [x] Task 2 — Authentication, permissions, and threat model
 
 Status: `DONE`
 
-Outcome: Human, Codex, backend, GitHub, and environment authority is explicit,
+Outcome: Human, Codex, GitHub, and environment authority is explicit,
 least-privilege, and staged by rollout phase.
 
 Scope:
@@ -206,16 +189,13 @@ Acceptance criteria:
 Evidence:
 
 - `docs/security-model.md`
-- ADR 0011 (`docs/decisions/0011-portable-static-app.md`), which retains the
-  simple GitHub-token choice without a backend
+- ADR 0005 (`docs/decisions/0005-portable-static-app.md`)
 - `docs/diagrams/security-trust-boundaries.mmd`
-- ADR 0011 and security-model v1.2 supersede both the original wallet/App
-  design and the mistaken backend-owned API. Direct GitHub identity, operator
-  membership, explicit production intent, and a pre-mutation exact-SHA recheck
-  are required; token canary tests exclude the credential from visible or
-  durable surfaces.
+- Direct GitHub identity, operator membership, explicit production intent, and
+  a pre-mutation exact-SHA recheck are required; token canary tests exclude the
+  credential from visible or durable surfaces.
 
-### [x] Task 4 — Repository tooling and static UI foundation
+### [x] Task 3 — Repository tooling and static UI foundation
 
 Status: `DONE`
 
@@ -243,52 +223,13 @@ authority, a repository secret, or another write actor is introduced.
 
 Evidence:
 
-- ADR 0010 (`docs/decisions/0010-remove-retired-prototypes.md`)
 - `package.json`, `eslint.config.mjs`, `.prettierrc.json`, `ui/`, and
   `.github/workflows/ci.yml`
 - Commit `a84041a226affd6b8e1e34aa04dd840cd1e2256d`.
 - GitHub Actions run
   `https://github.com/6529-Collections/deploy-hub/actions/runs/30818122104`
   passed on that exact head with read-only `contents` permission and no secrets.
-- The original completion evidence remains historical. ADR 0010 removed its
-  superseded server/TypeScript prototype and left only the useful static
-  foundation.
-
-### Task 5 — Callback/event fake experiment
-
-Status: `RETIRED`
-
-Outcome: This experiment modeled deployment, validation, communication,
-callbacks, and events as a separate fake state system. The live design instead
-reads canonical workflow runs and runtime evidence, so the implementation and
-tests have been removed.
-
-What survives:
-
-- Later tasks may add small fakes for exact workflow responses, runtime
-  identity, snapshot drift, cancellation, and retry when those tests are
-  actually needed.
-- No callback/event state model survives.
-
-Historical evidence remains in commit
-`54077fb04d025b7a4d6879d49834a9fd52aaac80` and its exact-head CI run. Task 5
-is not a dependency of any active implementation task.
-
-### Task 6 — Git-ledger experiment
-
-Status: `RETIRED`
-
-Outcome: This experiment implemented a 1,146-line event ledger, snapshots,
-compare-and-swap writes, queue ownership, and reconciliation. The owner
-rejected that control plane. Its code, tests, schemas, fixtures, and
-implementation document have been removed from the active tree.
-
-GitHub workflow runs, canonical concurrency, and runtime evidence are the live
-sources of truth. Historical evidence remains in retired ADR 0006, commit
-`ec725aacf0edf25dc7bc819f9803e536bdcf377a`, and Git history. Task 6 is not a
-dependency of any active implementation task.
-
-### [x] Task 7 — Static GitHub authentication
+### [x] Task 4 — Static GitHub authentication
 
 Status: `DONE`
 
@@ -316,8 +257,6 @@ Acceptance criteria:
 - [x] Codex needs no Deploy Hub credential or auth flow.
 - [x] No backend/proxy API, Lambda, OAuth service, GitHub App, database, ledger,
   queue, scheduler, callback system, SSE, or WebSocket is introduced.
-- [x] The mistaken backend PR #1900 is closed unmerged and its remote feature
-  branch is deleted.
 - [x] Focused tests, lint, formatting, and exact-head CI pass.
 
 Evidence:
@@ -325,17 +264,15 @@ Evidence:
 - `ui/github-auth.js`
 - `ui/app.js`
 - `test/github-auth.test.js`
-- ADR 0011 (`docs/decisions/0011-portable-static-app.md`)
+- ADR 0005 (`docs/decisions/0005-portable-static-app.md`)
 - Commit `c2bbb7a5458ef6c556b7f70447dc75fe2d03de06`
 - Exact-head GitHub Actions run
   `https://github.com/6529-Collections/deploy-hub/actions/runs/30827998834`
   passed formatting, lint, and all eight focused tests.
 - GitHub API response audit confirmed `access-control-allow-origin: *` for
   direct cross-origin browser use.
-- Backend PR #1900 is closed with `mergedAt: null`; its remote branch returns
-  GitHub `404`.
 
-### [ ] Task 8 — Canonical workflow concurrency and waiting visibility
+### [ ] Task 5 — Canonical workflow concurrency and waiting visibility
 
 Status: `NOT STARTED`
 
@@ -348,6 +285,11 @@ Acceptance criteria:
 - [ ] Backend services serialize only where concrete incompatibility requires
   it.
 - [ ] Staging and production concurrency groups are independent.
+- [ ] GitHub repository, workflow, ref, and environment protections enforce
+  mutation authority; bypassing the static page cannot bypass authorization.
+- [ ] Duplicate concurrent dispatch is exercised against the canonical
+  workflow; add no extra guard unless GitHub concurrency permits duplicate
+  environment mutation.
 - [ ] GitHub's queued/in-progress run state and concurrency group supply the
   waiting reason shown by API and UI.
 - [ ] No Deploy Hub lock table, lease, heartbeat, queue, or scheduler exists.
@@ -356,7 +298,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 9 — PR feedback and GitHub run lookup
+### [ ] Task 6 — PR feedback and GitHub run lookup
 
 Status: `NOT STARTED`
 
@@ -381,7 +323,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 10 — Portable static UI publishing
+### [ ] Task 7 — Portable static UI publishing
 
 Status: `NOT STARTED`
 
@@ -392,6 +334,8 @@ Acceptance criteria:
 
 - [ ] The chosen host serves one exact HTML/CSS/JavaScript release without
   mixing assets.
+- [ ] The approved release is served from a trusted HTTPS origin and identifies
+  its exact source commit.
 - [ ] The app works without a Deploy Hub backend or GitHub proxy.
 - [ ] Hosting receives no GitHub token from application code.
 - [ ] UI source version is visible.
@@ -400,7 +344,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 11 — Live operational UI and history
+### [ ] Task 8 — Live operational UI and history
 
 Status: `NOT STARTED`
 
@@ -423,13 +367,16 @@ Acceptance criteria:
   history exists.
 - [ ] UI shows CI-drop and production release-note milestones, warnings, links,
   and recovery evidence separately from deployment and E2E state.
-- [ ] Authorization is enforced by APIs, never by hidden/disabled controls.
+- [ ] Authorization is enforced by GitHub permissions and canonical workflows,
+  never by hidden/disabled controls or other client-only checks.
+- [ ] Recent history is explicitly bounded by GitHub retention; no duplicate
+  archive is added unless that bound proves insufficient.
 - [ ] No client event log, cursor protocol, SSE, or WebSocket is built for the
   MVP.
 
 Evidence: Not yet available.
 
-### [ ] Task 12 — Canonical frontend staging adapter
+### [ ] Task 9 — Canonical frontend staging adapter
 
 Status: `NOT STARTED`
 
@@ -449,7 +396,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 13 — Canonical backend staging adapter
+### [ ] Task 10 — Canonical backend staging adapter
 
 Status: `NOT STARTED`
 
@@ -467,7 +414,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 14 — Staging environment-snapshot E2E phase
+### [ ] Task 11 — Staging environment-snapshot E2E phase
 
 Status: `NOT STARTED`
 
@@ -491,7 +438,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 15 — Canonical frontend production adapter
+### [ ] Task 12 — Canonical frontend production adapter
 
 Status: `NOT STARTED`
 
@@ -509,7 +456,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 16 — Canonical backend production adapter
+### [ ] Task 13 — Canonical backend production adapter
 
 Status: `NOT STARTED`
 
@@ -528,7 +475,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 17 — Production environment-snapshot E2E phase
+### [ ] Task 14 — Production environment-snapshot E2E phase
 
 Status: `NOT STARTED`
 
@@ -549,7 +496,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 18 — Simple operational diagnostics
+### [ ] Task 15 — Simple operational diagnostics
 
 Status: `NOT STARTED`
 
@@ -573,20 +520,28 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 19 — Cancellation, retry, and manual recovery
+### [ ] Task 16 — Agent operations, cancellation, retry, and recovery
 
 Status: `NOT STARTED`
 
-Outcome: Operators can cancel or retry the exact GitHub workflow and use the
-canonical manual path when automation cannot proceed.
+Outcome: Codex can use one documented Deploy Hub command path with its existing
+GitHub authentication, and operators can cancel, retry, or fall back to the
+canonical manual workflow.
 
 Acceptance criteria:
 
+- [ ] This repository provides one small documented agent-facing command or
+  skill for staging, production, status, cancellation, and retry; it does not
+  require the browser or a Deploy Hub credential.
+- [ ] Agent operations use the same fixed repositories, workflows, refs,
+  inputs, exact-SHA checks, and production-intent rules as the page.
+- [ ] A Codex task can recover an operation from its exact run ID/URL and
+  continue until terminal success or a real blocker.
 - [ ] Waiting and running cancellation map to GitHub workflow cancellation and
   are tested.
 - [ ] Retry dispatches the same exact SHA/target and links the new run to the
   prior attempt.
-- [ ] API/server restart requires no reconstruction job: the next lookup polls
+- [ ] Page or agent restart requires no reconstruction job: the next lookup polls
   GitHub workflow and runtime truth.
 - [ ] Direct workflow cancellation and partial deployment are represented
   truthfully.
@@ -600,120 +555,7 @@ Acceptance criteria:
 
 Evidence: Not yet available.
 
-### [ ] Task 20 — Credentialless opt-in shadow validation
-
-Status: `NOT STARTED`
-
-Outcome: One credentialless, explicitly opted-in workflow exercises request
-planning and UI projection without changing shared refs or environments.
-
-Acceptance criteria:
-
-- [ ] Use `1a-deploy-hub` only if a real branch-trigger integration must be
-  tested; otherwise workflow dispatch with exact test SHAs is simpler.
-- [ ] At most one credentialless shadow workflow covers frontend and backend
-  planning; it does not create parallel deploy implementations.
-- [ ] Shadow identity cannot update `1a-staging`/`main`, dispatch real deploys,
-  assume staging/production roles, or publish real CI/release-note drops.
-- [ ] Any PR feedback write targets only opted-in test PRs.
-- [ ] Success, failure, waiting, stale, cancel, retry, UI, and status lookup are
-  exercised by reading workflow state, without callbacks.
-- [ ] Shadow results are never presented as real deployment evidence.
-
-Evidence: Not yet available.
-
-### [ ] Task 21 — Controlled real-execution canaries
-
-Status: `NOT STARTED`
-
-Outcome: Real mutation is tested during controlled low-risk windows without
-making Deploy Hub the only path or blocking colleagues.
-
-Acceptance criteria:
-
-- [ ] Start with canonical workflow dry runs and the least risky shared-staging
-  canary during an announced clear window.
-- [ ] No new isolated cloud environment is built unless a specific unsafe
-  behavior cannot be tested by fakes, shadowing, dry runs, or a controlled
-  shared-staging canary.
-- [ ] Exact runtime identities and environment-snapshot E2E are proven.
-- [ ] Concurrent frontend/unrelated backend scenarios behave as designed.
-- [ ] Failure, retry, cancellation, stale, missed-event, and recovery drills pass.
-- [ ] Production credentials and production mutation remain absent.
-
-Evidence: Not yet available.
-
-### [ ] Task 22 — Controlled shared-staging pilot and burn-in
-
-Status: `NOT STARTED`
-
-Outcome: Opted-in real work uses Deploy Hub on shared staging without blocking
-or endangering colleagues outside the documented short mutation/validation
-windows.
-
-Acceptance criteria:
-
-- [ ] Frontend-only, backend-only, and coordinated canaries succeed.
-- [ ] Baseline E2E binds exact environment snapshots.
-- [ ] Frontend and unrelated backend work are not globally serialized.
-- [ ] Waiting, UI, PR feedback, request lookup, retry, cancel, and failure
-  behavior match authoritative GitHub/runtime truth.
-- [ ] Staging CI drops show exact GitHub authority, Deploy Hub origin,
-  requester, and contributor attribution and remain release-note-ineligible.
-- [ ] A burn-in window and success/failure acceptance record are complete.
-- [ ] Manual canonical staging remains immediately usable.
-
-Evidence: Not yet available.
-
-### [ ] Task 23 — Production pilot and Deploy Hub establishment
-
-Status: `NOT STARTED`
-
-Outcome: Low-risk frontend and backend production releases prove the complete
-agent-to-production path, after which Deploy Hub becomes the normal entry point.
-
-Acceptance criteria:
-
-- [ ] Explicitly authorized low-risk backend and frontend pilots succeed.
-- [ ] Exact runtime proof and production-safe E2E are terminal and green.
-- [ ] Frontend and backend CI drops and production release notes have exact
-  authority, requester, PR, contributor, service, and release-group scope.
-- [ ] Release-note publication, skip, deduplication, and failure are visible and
-  do not alter healthy deployment/E2E truth.
-- [ ] At least one production failure/recovery or controlled equivalent is
-  proven without fabricating success.
-- [ ] Codex deployment tooling routes normal requests to Deploy Hub.
-- [ ] Manual canonical production remains documented and usable.
-- [ ] Establishment decision and burn-in evidence are recorded.
-
-Evidence: Not yet available.
-
-### [ ] Task 24 — Deferred Release Bus removal and cleanup
-
-Status: `NOT STARTED`
-
-Outcome: After Deploy Hub is established, obsolete Release Bus code,
-infrastructure, permissions, workflows, UI, docs, and operator tooling are
-removed without losing required audit history.
-
-Acceptance criteria:
-
-- [ ] Required audit history is exported and retained.
-- [ ] Candidate/train/manifest/operation/lock/control APIs, DB state, UI, and
-  reconciler scheduling are removed.
-- [ ] Release Bus-specific frontend workflows and backend workflow inputs,
-  callbacks, guards, credentials, alarms, and AWS resources are removed.
-- [ ] Release Train authority and train/operation notification contracts are
-  removed only after canonical Deploy Hub/manual CI posting and release notes
-  pass acceptance.
-- [ ] Canonical manual and Deploy Hub paths no longer import or call Release Bus.
-- [ ] Obsolete docs, skills, and terminology are removed or archived.
-- [ ] Staging and production deployment/E2E paths pass final acceptance without
-  Release Bus infrastructure.
-
-Evidence: Not yet available.
-
-### [ ] Task 25 — Reuse deployment communications and release-note links
+### [ ] Task 17 — Reuse deployment communications and release-note links
 
 Status: `NOT STARTED`
 
@@ -771,13 +613,126 @@ Acceptance criteria:
 Input evidence:
 
 - `docs/deployment-communications-analysis.md`
-- ADR 0005 under `docs/decisions/`
+- ADR 0004 under `docs/decisions/`
 - Source task `019faa0e-272b-7f62-843a-79fffb815a7e`
 - [Backend PR #1869](https://github.com/6529-Collections/6529seize-backend/pull/1869)
 - [Frontend PR #3504](https://github.com/6529-Collections/6529seize-frontend/pull/3504)
 
 Completion evidence: Not yet available.
 
+### [ ] Task 18 — Credentialless opt-in shadow validation
+
+Status: `NOT STARTED`
+
+Outcome: One credentialless, explicitly opted-in workflow exercises request
+planning and UI projection without changing shared refs or environments.
+
+Acceptance criteria:
+
+- [ ] Use `1a-deploy-hub` only if a real branch-trigger integration must be
+  tested; otherwise workflow dispatch with exact test SHAs is simpler.
+- [ ] At most one credentialless shadow workflow covers frontend and backend
+  planning; it does not create parallel deploy implementations.
+- [ ] Shadow identity cannot update `1a-staging`/`main`, dispatch real deploys,
+  assume staging/production roles, or publish real CI/release-note drops.
+- [ ] Any PR feedback write targets only opted-in test PRs.
+- [ ] Success, failure, waiting, stale, cancel, retry, UI, and status lookup are
+  exercised by reading workflow state, without callbacks.
+- [ ] Shadow results are never presented as real deployment evidence.
+
+Evidence: Not yet available.
+
+### [ ] Task 19 — Controlled real-execution canaries
+
+Status: `NOT STARTED`
+
+Outcome: Real mutation is tested during controlled low-risk windows without
+making Deploy Hub the only path or blocking colleagues.
+
+Acceptance criteria:
+
+- [ ] Start with canonical workflow dry runs and the least risky shared-staging
+  canary during an announced clear window.
+- [ ] No new isolated cloud environment is built unless a specific unsafe
+  behavior cannot be tested by fakes, shadowing, dry runs, or a controlled
+  shared-staging canary.
+- [ ] Exact runtime identities and environment-snapshot E2E are proven.
+- [ ] Concurrent frontend/unrelated backend scenarios behave as designed.
+- [ ] Failure, retry, cancellation, stale, missed-event, and recovery drills pass.
+- [ ] Production credentials and production mutation remain absent.
+
+Evidence: Not yet available.
+
+### [ ] Task 20 — Controlled shared-staging pilot and burn-in
+
+Status: `NOT STARTED`
+
+Outcome: Opted-in real work uses Deploy Hub on shared staging without blocking
+or endangering colleagues outside the documented short mutation/validation
+windows.
+
+Acceptance criteria:
+
+- [ ] Frontend-only, backend-only, and coordinated canaries succeed.
+- [ ] Baseline E2E binds exact environment snapshots.
+- [ ] Frontend and unrelated backend work are not globally serialized.
+- [ ] Waiting, UI, PR feedback, request lookup, retry, cancel, and failure
+  behavior match authoritative GitHub/runtime truth.
+- [ ] Staging CI drops show exact GitHub authority, Deploy Hub origin,
+  requester, and contributor attribution and remain release-note-ineligible.
+- [ ] A burn-in window and success/failure acceptance record are complete.
+- [ ] Manual canonical staging remains immediately usable.
+
+Evidence: Not yet available.
+
+### [ ] Task 21 — Production pilot and Deploy Hub establishment
+
+Status: `NOT STARTED`
+
+Outcome: Low-risk frontend and backend production releases prove the complete
+agent-to-production path, after which Deploy Hub becomes the normal entry point.
+
+Acceptance criteria:
+
+- [ ] Explicitly authorized low-risk backend and frontend pilots succeed.
+- [ ] Exact runtime proof and production-safe E2E are terminal and green.
+- [ ] Frontend and backend CI drops and production release notes have exact
+  authority, requester, PR, contributor, service, and release-group scope.
+- [ ] Release-note publication, skip, deduplication, and failure are visible and
+  do not alter healthy deployment/E2E truth.
+- [ ] At least one production failure/recovery or controlled equivalent is
+  proven without fabricating success.
+- [ ] Codex deployment tooling routes normal requests to Deploy Hub.
+- [ ] Manual canonical production remains documented and usable.
+- [ ] Establishment decision and burn-in evidence are recorded.
+
+Evidence: Not yet available.
+
+### [ ] Task 22 — Deferred Release Bus removal and cleanup
+
+Status: `NOT STARTED`
+
+Outcome: After Deploy Hub is established, obsolete Release Bus code,
+infrastructure, permissions, workflows, UI, docs, and operator tooling are
+removed without losing required audit history.
+
+Acceptance criteria:
+
+- [ ] Required audit history is exported and retained.
+- [ ] Candidate/train/manifest/operation/lock/control APIs, DB state, UI, and
+  reconciler scheduling are removed.
+- [ ] Release Bus-specific frontend workflows and backend workflow inputs,
+  callbacks, guards, credentials, alarms, and AWS resources are removed.
+- [ ] Release Train authority and train/operation notification contracts are
+  removed only after canonical Deploy Hub/manual CI posting and release notes
+  pass acceptance.
+- [ ] Canonical manual and Deploy Hub paths no longer import or call Release Bus.
+- [ ] Obsolete docs, skills, and terminology are removed or archived.
+- [ ] Staging and production deployment/E2E paths pass final acceptance without
+  Release Bus infrastructure.
+
+Evidence: Not yet available.
+
 ## Current next task
 
-Task 8 — Canonical workflow concurrency and waiting visibility.
+Task 5 — Canonical workflow concurrency and waiting visibility.

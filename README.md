@@ -27,19 +27,16 @@ The intended operating model is:
 
 ## Current status
 
-**Portable static app; Task 7 browser authentication is complete.**
+**Portable static app; Task 4 browser authentication is complete.**
 
-The rejected loopback server, callback/event model, strict ledger contracts,
-and Git-ledger prototype have been removed from the active tree. Git history
-and retired ADRs preserve why they were rejected. This repository contains the
-entire Deploy Hub implementation: a plain static UI that talks directly to
-GitHub and can be hosted anywhere.
+This repository contains the entire Deploy Hub implementation: a plain static
+UI that talks directly to GitHub and can be hosted anywhere.
 
-This repository contains no live GitHub-token handling, GitHub App, OAuth
-client, AWS credential, repository environment, staging access, production
-access, live state branch, or deployment implementation.
+This repository currently contains read-only GitHub-token authentication but no
+GitHub App, OAuth client, AWS credential, repository environment, staging
+access, production access, state branch, or deployment implementation.
 
-ADR 0011 makes Deploy Hub a portable static app. The browser stores the user's
+ADR 0005 makes Deploy Hub a portable static app. The browser stores the user's
 GitHub token locally, calls GitHub directly, and has no Deploy Hub server,
 backend dependency, OAuth system, or GitHub App broker.
 
@@ -92,7 +89,7 @@ repository secrets, or another write actor is introduced.
 
 ## Safety boundary
 
-Task 7 authentication is read-only: it can resolve GitHub identity and operator
+Task 4 authentication is read-only: it can resolve GitHub identity and operator
 membership but cannot dispatch workflows, update refs, or reach AWS. Later
 mutation capabilities remain gated by their own tasks and exact allowlists.
 

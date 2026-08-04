@@ -1,20 +1,14 @@
-# ADR 0011: Deploy Hub is a portable static app
+# ADR 0005: Deploy Hub Is a Portable Static App
 
 Status: Accepted
 
 Date: 2026-08-03
 
-Supersedes ADR 0003's backend-proxy requirement and the backend-owned API
-boundary previously recorded in ADRs 0009 and 0010.
-
 ## Context
 
-The backend proxy was discussed only as one possible way to host the static
-page. It was incorrectly promoted into a required Deploy Hub runtime and led to
-an unauthorized implementation in `6529seize-backend`.
-
-Deploy Hub should remain independently hostable and should use the GitHub
-credentials that humans and Codex already possess.
+Deploy Hub must be independently hostable and use the GitHub credentials that
+humans and Codex already possess. Hosting the page must not create another
+deployment backend or source of operational state.
 
 ## Decision
 
@@ -39,9 +33,6 @@ credentials that humans and Codex already possess.
 
 ## Consequences
 
-- Task 7 is browser GitHub authentication in this repository.
-- The mistaken backend PR #1900 was closed unmerged and its remote branch was
-  deleted.
 - Hosting and Deploy Hub releases are independent of backend deployments.
 - Browser-token security relies on a first-party static bundle, strict CSP, no
   third-party scripts, safe DOM APIs, token redaction, and a visible forget

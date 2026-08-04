@@ -245,21 +245,21 @@ propose the stronger foundation already summarized in
 - make backend multi-service release groups explicit.
 
 Because neither PR is merged, Deploy Hub contracts must describe these as
-required follow-up behavior, not claim they exist on `main`. Task 25 owns their
+required follow-up behavior, not claim they exist on `main`. Task 22 owns their
 eventual integration and compatibility audit.
 
 ## Existing backend capabilities
 
 | Capability | Current evidence | Deploy Hub implication |
 | --- | --- | --- |
-| HTTP hosting | Express API mounts `deploy.routes.ts` at `/deploy`; current HTML and JavaScript are rendered by backend TypeScript | Backend can host a Deploy Hub proxy/API without a new public application service, subject to Task 3 security design |
-| Static UI behavior | `/deploy/ui`, `/deploy/ui/app.js`, `/deploy/ui/bus`, and `/deploy/ui/bus/app.js` are public shells with `no-store`; code is compiled into backend renderers, not fetched from `deploy-hub/main` | Replace the source with a private GitHub-content proxy resolved to one exact Deploy Hub commit |
-| Current UI auth | Browser pastes a GitHub token, stores it in `localStorage`, and sends it as Bearer auth; backend checks viewer/repository write/operator status | Reuse this proven internal-tool model for Deploy Hub MVP; tighten CSP, DOM safety, token redaction, and the visible forget action rather than adding a second identity system |
-| HTTP user auth | `auth/auth.ts` provides Passport JWT required/optional middleware and profile resolution | Reusable primitive, but current deploy routes do not apply it |
-| Live transport | Production WebSocket support exists through API Gateway and authenticates the same JWT; current protocol handles auth, notification identity sync, wave subscription, and typing | Transport infrastructure is reusable in principle, but no Deploy Hub topic, authorization, replay cursor, or events exist |
-| Server-sent events | No `text/event-stream` or `EventSource` implementation exists at the inspected backend SHA | SSE support is unproven; the accepted no-refresh requirement must retain bounded polling fallback, and Task 3/10 selects the secured transport |
+| HTTP hosting | Express API mounts `deploy.routes.ts` at `/deploy`; current HTML and JavaScript are rendered by backend TypeScript | Useful precedent only; Deploy Hub is served by an ordinary static host and needs no backend proxy/API |
+| Static UI behavior | `/deploy/ui`, `/deploy/ui/app.js`, `/deploy/ui/bus`, and `/deploy/ui/bus/app.js` are public shells with `no-store`; code is compiled into backend renderers | Useful UX reference only; Deploy Hub publishes one static release directly from this repository |
+| Current UI auth | Browser pastes a GitHub token, stores it in `localStorage`, and sends it as Bearer auth; backend checks viewer/repository write/operator status | Reuse the token/operator model while calling GitHub directly from the Deploy Hub page |
+| HTTP user auth | `auth/auth.ts` provides Passport JWT required/optional middleware and profile resolution | Not used by Deploy Hub |
+| Live transport | Production WebSocket support exists through API Gateway and authenticates the same JWT | Not used by Deploy Hub; direct GitHub polling meets the no-refresh requirement |
+| Server-sent events | No `text/event-stream` or `EventSource` implementation exists at the inspected backend SHA | Not needed for the polling-first MVP |
 | Current UI refresh | Manual deploy UI polls run history every 15 seconds; Release Bus UI polls every 30 seconds when the user is not interacting | Polling is proven; shorten Deploy Hub's single snapshot poll to at most five seconds and add conditional responses before considering a push transport |
-| GitHub access | `deploy.github.service.ts` already reads refs/runs, resolves exact heads, checks repo write access, and dispatches canonical workflows using a user token | Reuse the generic behavior and caller credential; remove Release Bus guard coupling and keep route targets allowlisted |
+| GitHub access | `deploy.github.service.ts` already reads refs/runs, resolves exact heads, checks repo write access, and dispatches canonical workflows using a user token | Reuse the proven operation shapes, not the backend service; the page and agent call fixed GitHub endpoints directly |
 
 ## Release Bus dependency and change map
 
@@ -390,22 +390,17 @@ These are required outcomes, not optional designs:
 ## Proposed implementation choices, not audit facts
 
 The following direction came from the audit and is now governed by the active
-requirements and ADRs rather than a separate prototype contract system:
+requirements and ADRs:
 
 - GitHub-native Deploy Hub records instead of a new application database;
 - existing workflow checks or commit statuses as the first PR progress surface,
   with a narrow Check Run only if needed;
 - the existing GitHub Bearer-token/operator model rather than a new identity
   system;
-- the static UI fetched from one exact `deploy-hub/main` SHA through the
-  backend;
-- a single authenticated snapshot polled at least every five seconds;
+- one portable static UI release from an exact `deploy-hub` commit;
+- a direct GitHub snapshot polled at least every five seconds;
 - agent-owned coordinated plans composed from atomic repository operations;
 - explicit known-good redeployment rather than automatic rollback in MVP.
-
-Task 2 selected a durable Git representation, but the later owner KISS decision
-retired and removed that custom event ledger before live use. ADR 0009 selects
-polling-first delivery and existing GitHub-token authentication.
 
 ## Task 1 conclusion
 

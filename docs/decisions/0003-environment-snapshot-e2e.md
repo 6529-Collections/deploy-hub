@@ -1,4 +1,4 @@
-# ADR 0004: Environment-Snapshot E2E Validation
+# ADR 0003: Environment-Snapshot E2E Validation
 
 Status: Accepted
 
@@ -26,15 +26,14 @@ whole release lifecycle.
 Every requested staging and production outcome requires terminal successful
 baseline read-only E2E after deployment health and exact-version proof.
 
-Deploy Hub records a small exact validation identity containing the environment
-snapshot, linked deployment request IDs, test tooling SHA, pack policy,
-requester, and originating task. It dispatches repository-owned E2E workflows,
-observes their GitHub result and evidence, and publishes progress. Deploy Hub
-does not own or copy Playwright implementation.
+The canonical workflow carries an exact validation identity containing the
+environment snapshot, linked deployment run IDs, test tooling SHA, pack policy,
+requester, and originating task. Deploy Hub observes the repository-owned E2E
+workflow and its evidence; it does not own or copy Playwright implementation.
 
 For coordinated frontend/backend work, baseline E2E runs once after all
 intended components are deployed and links the same result to every deployment
-request. The environment snapshot records the frontend runtime SHA and backend
+run. The environment snapshot records the frontend runtime SHA and backend
 runtime versions by service.
 
 Deploy Hub does not add an environment mutation lock. The workflow records the
@@ -53,15 +52,13 @@ risk-based and owned by the initiating Codex task.
 - Production E2E failure means production was already mutated. Later production
   mutation is blocked until exact reconciliation, explicit acceptance, or a
   known-good exact redeployment.
-- Retryable infrastructure/setup failure may retry the same validation identity
+- Retryable infrastructure/setup failure may retry the same exact validation
   within a bounded policy.
 - Product-test failure does not auto-retry into success.
 - Staging and production validation ownership remain independent.
 
 ## Consequences
 
-- A validation record is not a release train: it does not discover candidates,
-  claim work, compose branches, or progress environments.
 - The E2E workflows need generic validation inputs and environment-snapshot
   evidence instead of Release Bus train/manifest authorization and callbacks.
 - Backend-only and coordinated staging validation become first-class paths.

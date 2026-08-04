@@ -97,6 +97,14 @@ Every mutation fixes the repository, workflow/ref, environment, and input
 shape in code. It rechecks current authority and exact source immediately
 before mutation. Production is a separate explicit action.
 
+Client checks are not security controls. GitHub repository permissions and the
+canonical workflow/ref/environment protections are the authoritative mutation
+boundary, including when a caller bypasses the page.
+
+The agent surface is one small command or skill in this repository that uses
+Codex's existing GitHub authentication and the same fixed operations. It does
+not call the browser or introduce another runtime.
+
 ## Canonical adapters
 
 | Component | Environment | Canonical entry point |

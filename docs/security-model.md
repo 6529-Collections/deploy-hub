@@ -1,6 +1,6 @@
 # Deploy Hub Authentication, Permissions, and Threat Model v1.2
 
-Status: Accepted; portable static app per ADR 0011
+Status: Accepted; portable static app per ADR 0005
 
 Date: 2026-08-03
 
@@ -21,6 +21,8 @@ The non-negotiable rules are:
    inputs, artifacts, or durable state.
 6. Deploy Hub invokes repository-owned workflows and never receives AWS
    credentials.
+7. Static-page checks are not trusted as authorization; GitHub and canonical
+   workflow/ref/environment protections enforce every real mutation.
 
 ## 2. Trust boundaries
 
@@ -123,6 +125,7 @@ deployment actions.
 | Duplicate request | Search correlated exact run; canonical workflow concurrency | Return existing run or reject |
 | Stale UI | Five-second GitHub polling and full view replacement | Next poll repairs view |
 | Static host compromise | CSP, source version visibility, rollback to known commit | Stop using compromised release and revoke token |
+| Static page bypass | GitHub permissions plus canonical workflow/ref/environment enforcement | Direct unauthorized dispatch fails before mutation |
 
 Security ambiguity never becomes success.
 
@@ -132,6 +135,7 @@ Before each new action type becomes live:
 
 - its GitHub repository, endpoint, workflow/ref, inputs, and permissions are
   fixed and documented;
+- direct API/workflow dispatch cannot bypass the same mutation policy;
 - the action rechecks operator and exact source immediately before mutation;
 - invalid, revoked, non-operator, arbitrary-target, moved-SHA, and
   staging-to-production cases fail first;

@@ -90,6 +90,11 @@ the exact allowlisted action. Production is always a separate explicit action.
 No caller-supplied login, workflow file, arbitrary repository/ref, callback
 URL, contributor identity, or AWS target is accepted.
 
+The static page is not an authorization boundary: its checks prevent mistakes
+but its JavaScript can be bypassed. GitHub repository permissions and the
+canonical workflow/ref/environment protections must enforce every real
+mutation and reject unauthorized direct dispatches.
+
 Duplicate requests first search for the same exact correlated run and rely on
 canonical workflow concurrency as the final mutation guard. Add stronger
 durable idempotency only after a reproduced duplicate mutation proves it is
@@ -201,7 +206,18 @@ are never deployment evidence.
   rollback path.
 - Direct canonical workflow execution remains the break-glass fallback.
 
-## 13. Explicit MVP exclusions
+## 13. Agent-facing operation
+
+- Deploy Hub provides one small documented command or skill in this repository
+  for Codex to plan, dispatch, inspect, cancel, and retry exact operations.
+- It uses Codex's existing GitHub authentication and the same fixed GitHub
+  operation contract as the page.
+- It does not require browser state, token transfer, a Deploy Hub service, or a
+  second deployment implementation.
+- The initiating task retains the exact run ID/URL and continues until terminal
+  success or a real blocker.
+
+## 14. Explicit MVP exclusions
 
 - Any Deploy Hub backend, API proxy, Lambda, container, database, S3/Git
   ledger, state branch, event journal, snapshot store, custom queue, scheduler,

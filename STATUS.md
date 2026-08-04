@@ -1,85 +1,53 @@
-# Deploy Hub Planning Status
+# Deploy Hub Status
 
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
-## Phase
+## Current position
 
-Tasks 0, 1, 3, 4, and 7 are complete. Tasks 2, 5, and 6 are `RETIRED`; their
-overbuilt contracts, server, callback/event fakes, and Git-ledger code have
-been removed from the active tree. Task 8 is next.
+Tasks 0–4 are complete. Task 5, canonical workflow concurrency and waiting
+visibility, is next.
 
-This repository owns the entire portable static app. It has no API server or
-deployment runtime.
+Release Bus is OFF for staging and production and is not expected to return.
+Canonical manual workflows remain the deployment path and fallback while
+Deploy Hub is built and proven.
 
-## Accepted direction
+## Accepted architecture
 
-- Rule 1 is KISS: complexity must answer a demonstrated current need.
-- Build Deploy Hub as a new, small control and observability surface; do not
-  salvage Release Bus or reproduce its control plane.
-- A Codex task owns the feature lifecycle. Deploy Hub owns one exact deployment
-  request through terminal reporting.
-- Existing frontend/backend workflows own build and deployment behavior.
-- Humans use the portable page and Codex uses existing GitHub tooling. Both
-  call GitHub directly with their own GitHub authentication.
-- Any ordinary static host may serve the page; hosting supplies files only.
-- A GitHub workflow run is the operation identity and source of progress truth.
-  Runtime/version endpoints provide deployed truth.
-- GitHub Actions concurrency owns waiting and conflicting mutation. Deploy Hub
-  has no database, Git ledger, custom queue, scheduler, lock service, callback
-  service, or reconciler.
-- PR feedback uses the canonical workflow check first, then at most one commit
-  status. A GitHub App Check Run is allowed only if both prove insufficient.
-- The UI polls relevant GitHub state at least every five seconds. There is no
-  snapshot server, SSE, WebSocket, cursor, or client event ledger in the MVP.
-- Baseline E2E is a linked phase of the deployment operation, not a separate
-  state machine. Snapshot drift yields a stale result and rerun instead of a
-  cross-repository lock that blocks colleagues.
-- Canonical workflows/existing backend retain CI posting and production release
-  notes. Deploy Hub links their outcome and does not mirror the pipeline.
-- Release Bus is OFF for staging and production and is not expected to return.
-  Canonical manual workflows remain the fallback until Deploy Hub is proven.
-- Dormant Release Bus code remains during rollout and is removed afterward as
-  Task 24 technical debt.
+- Deploy Hub is a portable static app contained entirely in this repository.
+- Humans use the page with their GitHub token; Codex uses its existing GitHub
+  authentication through one small agent-facing command or skill.
+- GitHub permissions and canonical workflows enforce mutation authorization;
+  the static page is not a security boundary.
+- GitHub workflow runs, checks, artifacts, and runtime-version evidence are the
+  sources of operational truth.
+- Existing frontend/backend workflows retain build and deployment ownership.
+- GitHub Actions concurrency owns waiting and conflicting mutations.
+- The UI polls GitHub at least every five seconds and updates without a browser
+  refresh.
+- Baseline environment-snapshot E2E is mandatory for staging and production.
+- Canonical workflows retain CI posting and production release notes; Deploy
+  Hub links their outcomes without duplicating that pipeline.
+- Deploy Hub has no backend, proxy API, Lambda, database, ledger, custom queue,
+  scheduler, reconciler, callback service, SSE, or WebSocket.
 
-## Current operational baseline
+## Completed foundation
 
-- Release Bus staging and production lanes are OFF.
-- Re-enabling Release Bus is not the fallback.
-- Existing canonical/manual workflows remain the deployment path.
-- Those workflows still contain Release Bus readiness/callback coupling that
-  must be generalized by the adapter tasks before final cleanup.
-- Current backend deployment is more globally serialized than desired; adapter
-  work must narrow concurrency using existing GitHub Actions primitives.
+- Requirements, architecture, migration, testing, and security are documented.
+- The current Release Bus and canonical workflow paths are inventoried.
+- The private repository, read-only CI, plain static UI shell, formatting,
+  linting, and tests are established.
+- Direct browser-to-GitHub identity and operator authentication works with
+  local token storage, a forget action, CSP, fixed safe errors, and token-canary
+  tests.
 
 ## Repository workflow
 
-- The repository is private and the owner approved direct pushes to `main`
-  during this static-app bootstrap.
-- Every push requires a fresh `origin/main` divergence check and intentional
-  file audit.
-- Reconsider protected-main/PR workflow before any task adds GitHub mutation
-  capability or another write actor.
-
-## Completed evidence
-
-- Task 1 inventoried the exact current workflows, Release Bus dependencies,
-  E2E, and communication pipeline in `docs/current-system-inventory.md`.
-- Tasks 2, 5, and 6 are retired experiments preserved only in Git history and
-  retired ADRs. Their active code, tests, schemas, and fixtures were removed by
-  ADR 0010.
-- Task 3 now settles direct browser/agent GitHub authentication in ADR 0011 and
-  `docs/security-model.md`; no Deploy Hub credential or backend exists.
-- Task 4 now consists only of the repository toolchain, static UI shell, and
-  read-only CI. The superseded loopback TypeScript server was removed.
-- Task 7 added direct browser-to-GitHub identity/operator authentication,
-  local token storage and forgetting, CSP, and eight focused tests. Exact-head
-  CI run `30827998834` passed. Mistaken backend PR #1900 is closed unmerged and
-  its branch is deleted.
-- The requirements, architecture, tracker, migration, testing, E2E, and
-  communications documents are stored in this repository.
+Direct pushes to `main` remain owner-approved during the private static-app
+bootstrap. Fetch and audit `origin/main` before every push. Reconsider protected
+main and reviewed PRs before adding deployment mutation capability or another
+write actor.
 
 ## Next work
 
-Proceed to Task 8 using GitHub Actions' existing concurrency and waiting state.
-Do not add a backend, proxy API, live ledger, state branch, database, scheduler,
-callback system, GitHub App, or realtime transport.
+Implement Task 5 using the existing canonical workflows and GitHub Actions
+concurrency. Do not create another control plane.

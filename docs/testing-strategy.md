@@ -31,9 +31,8 @@ Use small deterministic fakes only where they exercise current architecture:
 - communication link present, absent, published, skipped, and failed without
   changing deployment truth.
 
-The retired standalone server, callback/event fakes, ledger tests, and strict
-ledger contracts have been removed. Add only the smallest fakes needed to test
-the current workflow-run/runtime architecture.
+Add only the smallest fakes needed to test the current
+workflow-run/runtime architecture.
 
 ## 2. Authentication and security tests
 
@@ -46,6 +45,8 @@ the current workflow-run/runtime architecture.
 - Recheck explicit production authority and exact `main` SHA immediately before
   mutation.
 - Enforce fixed repository, workflow, ref, environment, and service allowlists.
+- Bypass the page and prove GitHub/canonical workflow protections still reject
+  an unauthorized repository, ref, environment, or production mutation.
 - Seed a fake token marker and prove it never reaches URLs, responses, logs,
   PR feedback, snapshots, fixtures, Sentry, or artifacts.
 - Prove the browser forget action removes its stored token.
@@ -127,6 +128,8 @@ time; do not build rolling ETA analytics before real use proves a need.
 - Publish a new static release without mixing assets.
 - Interrupt snapshot polling while operation state changes.
 - Redeploy a known-good exact version through the canonical manual path.
+- Run the same status, cancellation, and retry flow through the agent command
+  using existing GitHub authentication and no browser state.
 
 There is no event replay, callback recovery, lock-owner cleanup, or reconciler
 test because the MVP has none of those systems.

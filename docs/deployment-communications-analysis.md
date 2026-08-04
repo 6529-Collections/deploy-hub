@@ -134,7 +134,8 @@ The UI and task-facing evidence must distinguish at least:
 - exact diagnostic and recovery link when a side effect fails.
 
 These are communication side-effect states, not additional deployment state
-machine terminals. Their exact machine schema belongs to Task 2.
+machine terminals. Deploy Hub reads the smallest available outcome directly
+from the canonical workflow evidence.
 
 ## Verification still required
 
@@ -147,6 +148,6 @@ machine terminals. Their exact machine schema belongs to Task 2.
 - Define the exact GitHub-authority plus `Deploy Hub` origin evidence contract
   without retaining Release Bus train semantics.
 - Verify canonical frontend production baseline selection after Release Bus
-  workflows are retired and historical runs remain in GitHub.
+  workflows are removed and historical runs remain in GitHub.
 - Prove the backend-first compatibility and rollout order before any adapter
   depends on the new payload.
