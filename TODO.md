@@ -27,11 +27,21 @@ separate project.
 |    0 | FE-only repository baseline           | DONE        | —          |
 |    1 | Base FE shadow workflow               | IN PROGRESS | 0          |
 |    2 | Live frontend UI                      | NOT STARTED | 1          |
-|    3 | Real frontend staging                 | NOT STARTED | 1, 2       |
-|    4 | Real frontend production              | NOT STARTED | 3          |
-|    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
+|    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
+|    4 | Real frontend production              | IN PROGRESS | 3          |
+|    5 | Agent operations and recovery         | IN PROGRESS | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
+
+## Active frontend implementation PRs
+
+- [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
+  is merged and owns the dormant Task 1 shadow baseline.
+- [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  is open at exact head `5f4098c9680052501ed85e8088a991b99388cb1d`.
+  It contains the Task 1 stop-boundary completion plus the in-review workflow
+  implementation for Tasks 3–5, including tracked forward-only removal from
+  staging. It is not merged, and no Deploy Hub operation was dispatched.
 
 ## Task details
 
@@ -82,7 +92,7 @@ Acceptance criteria:
       dedicated shadow commit status.
 - [x] Stale or moved PR heads fail closed.
 - [x] Deterministic fake phases cover queued, running, succeeded, product
-      failure, infrastructure failure, cancelled, and stale outcomes.
+      failure, infrastructure failure, and stale outcomes.
 - [ ] Shadow projection distinguishes immediate cancellation before mutation
       from a safe-stop request after mutation has begun.
 - [x] The immutable manifest partitions adjacent requests by final target.
@@ -106,8 +116,12 @@ Evidence:
   projections after a GitHub API interruption.
 - Latest review follow-up uses the repository's actual default branch and
   rejects malformed request timestamps with the intended validation error.
-- Remaining before `DONE`: the shadow must distinguish both stop boundaries,
-  and an explicitly authorized opted-in test PR must prove live commit-status
+- Open frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  distinguishes pre-mutation Stop from post-mutation safe Stop in the shadow
+  projection; it is not accepted evidence until merged and exercised.
+- Remaining before `DONE`: merge and inspect the stop-boundary implementation,
+  then use an explicitly authorized opted-in test PR to prove live commit-status
   feedback from an actual shadow run.
 
 ### [ ] Task 2 — Live frontend UI
@@ -130,6 +144,8 @@ Acceptance criteria:
       blocker, runtime proof, E2E, PR, and exact GitHub run links are visible.
 - [ ] Every non-terminal operation exposes Stop and clearly shows whether it
       cancelled before mutation or is settling the environment safely.
+- [ ] A tracked, unmerged PR currently in staging exposes Remove from staging,
+      including removal progress, validation, failure, and restored state.
 - [ ] The next complete GitHub read repairs a failed or missed poll without
       event replay.
 - [ ] The saved Deploy Hub icon and favicons are integrated accessibly.
@@ -140,7 +156,7 @@ Evidence: Not yet available.
 
 ### [ ] Task 3 — Real frontend staging
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: The proven base FE shadow workflow is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
@@ -169,17 +185,30 @@ Acceptance criteria:
       budget.
 - [ ] Product failure performs bounded ordered replay from verified known-good
       content; single-PR failure restores that content.
+- [ ] Each Deploy Hub staging commit records the exact active PR composition in
+      bounded commit metadata; no database or separate state service is added.
+- [ ] An operator can remove one tracked, unmerged exact PR through a new
+      forward-only staging commit followed by the canonical deploy and full
+      staging E2E.
+- [ ] Failed removal automatically restores and revalidates the prior staging
+      snapshot; merged PRs and active production operations fail closed.
 - [ ] New requests arriving during execution remain pending for the next
       manifest.
 - [ ] Every participating PR status links exact deployment/E2E evidence and
       reaches a truthful terminal outcome.
 - [ ] Manual `1a-staging` deployment remains usable throughout rollout.
 
-Evidence: Not yet available.
+Evidence:
+
+- Open frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` contains the
+  in-review staging, bounded replay, Stop, exact composition, and removal
+  implementation. It is not merged or activated.
 
 ### [ ] Task 4 — Real frontend production
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Explicitly authorized production-target PRs that passed together in
 staging can share one exact `main` deployment and production validation.
@@ -209,11 +238,16 @@ Acceptance criteria:
       its next cohort.
 - [ ] Manual production workflow remains the break-glass fallback.
 
-Evidence: Not yet available.
+Evidence:
+
+- Open frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` contains the
+  in-review bot-only production continuation. It is not merged or activated.
 
 ### [ ] Task 5 — Agent operations and recovery
 
-Status: `NOT STARTED`
+Status: `IN PROGRESS`
 
 Outcome: Codex operates the same frontend contract without the browser or a
 Deploy Hub credential.
@@ -221,6 +255,8 @@ Deploy Hub credential.
 Acceptance criteria:
 
 - [ ] One small command or skill supports submit, status, stop, and retry.
+- [ ] The same command or UI contract can remove one tracked, unmerged PR from
+      staging without an agent polling loop.
 - [ ] It uses existing GitHub authentication and the same fixed repositories,
       workflows, refs, exact-SHA checks, and production-intent rules as the UI.
 - [ ] It retains exact run identity and can resume from GitHub/runtime truth.
@@ -230,7 +266,12 @@ Acceptance criteria:
 - [ ] A closed agent task is not required for operation execution or recovery.
 - [ ] Direct canonical workflows remain documented fallback paths.
 
-Evidence: Not yet available.
+Evidence:
+
+- Open frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  provides the in-repository Stop and forward-only removal/recovery primitives.
+  The agent command and UI entry points remain unfinished.
 
 ### [ ] Task 6 — Canary, burn-in, and establishment
 
@@ -248,6 +289,8 @@ Acceptance criteria:
 - [ ] Canary evidence proves both stop boundaries: pre-mutation leaves staging
       unchanged, while post-mutation settles to exact safe runtime truth and
       prevents production continuation.
+- [ ] A removal canary proves both successful removal and automatic restoration
+      after a deliberately failing removal snapshot.
 - [ ] At least one same-target batch and one mixed-target sequence behave as
       documented.
 - [ ] A low-risk production canary proves merge, deploy, runtime, E2E,

@@ -51,6 +51,10 @@ real staging while preserving the existing manual path.
   active design.
 - No workflow dispatch, ref mutation, staging access, production access, or
   deployment implementation exists yet.
+- Frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  contains the open, in-review workflow implementation and staging removal
+  flow; it is not merged or active.
 - Release Bus is OFF. Canonical manual frontend workflows remain the fallback.
 
 ## Active documentation

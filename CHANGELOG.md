@@ -2,6 +2,15 @@
 
 ## 2026-08-04
 
+- Linked open frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `5f4098c9680052501ed85e8088a991b99388cb1d` from the active
+  tracker and marked Tasks 3–5 in progress. The PR contains the in-review
+  canonical staging/production controller, stop boundaries, bounded failure
+  isolation, and forward-only removal of one tracked staging PR with automatic
+  restore and E2E revalidation. It is not merged, and no operation was
+  dispatched.
+
 - Merged the dormant Task 1 frontend shadow workflow through PR #3579 at exact
   head `abbabaff6f032daf448d6d9eb2433066fa19aabf`; frontend `main` merge commit
   is `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`. No workflow was dispatched.
