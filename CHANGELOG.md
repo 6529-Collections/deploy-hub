@@ -2,11 +2,17 @@
 
 ## 2026-08-04
 
+- Completed Task 2, the live static frontend UI, at commit
+  [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
+  Added explicit keyboard focus transitions, busy-state semantics, clearer
+  staging/production confirmation, improved muted-text contrast, and
+  dependency-free browser-entry and accessibility coverage. All 22 checks and
+  exact-head repository CI pass.
 - Re-audited frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   at exact head `fd85433ce4fe7870a13451a292bf536d8724bb94`
   against every tracker criterion. Task 1 is `DONE — PENDING` that linked PR;
-  Tasks 2, 3, and 4 are `IN PROGRESS`; Task 5 is `NOT STARTED`.
+  Task 2 is `DONE`; Tasks 3 and 4 are `IN PROGRESS`; Task 5 is `NOT STARTED`.
 - Marked the 14 Task 3 staging criteria and 11 Task 4 production criteria that
   are actually implemented. Left only three concrete code gaps unchecked:
   durable intake behind an active operation, terminal outcomes for later

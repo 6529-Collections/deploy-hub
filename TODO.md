@@ -27,7 +27,7 @@ separate project.
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
 |    1 | Base FE shadow workflow               | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 0          |
-|    2 | Live frontend UI                      | IN PROGRESS | 1          |
+|    2 | Live frontend UI                      | DONE        | 1          |
 |    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
 |    4 | Real frontend production              | IN PROGRESS | 3          |
 |    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
@@ -122,11 +122,11 @@ Evidence:
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   distinguishes pre-mutation Stop from post-mutation safe Stop in the shadow
   projection and completes the shadow status payload. Its merge remains
-  deliberately pending while Task 2 proceeds.
+  deliberately pending.
 
-### [ ] Task 2 — Live frontend UI
+### [x] Task 2 — Live frontend UI
 
-Status: `IN PROGRESS`
+Status: `DONE`
 
 Outcome: The static page submits and observes frontend operations clearly and
 updates without a browser refresh.
@@ -150,7 +150,7 @@ Acceptance criteria:
       event replay.
 - [x] The saved Deploy Hub icon and favicons are integrated accessibly.
 - [x] The UI remains portable static files with no backend or proxy.
-- [ ] Browser-module tests, accessibility checks, formatting, lint, and CI pass.
+- [x] Browser-module tests, accessibility checks, formatting, lint, and CI pass.
 
 Evidence:
 
@@ -163,10 +163,12 @@ Evidence:
   exact Stop requests without storing separate operation state.
 - `ui/index.html`, `ui/app.js`, and `ui/styles.css` provide the submission,
   five-second refresh, environment, operation, Stop, and removal surfaces.
-- Sixteen authentication, contract, projection, token-canary, branding, and
-  refresh tests pass with formatting and lint through `npm run check`.
-- Remaining before `DONE`: credentialed browser integration against GitHub and
-  repository CI for the final exact head.
+- Twenty-two authentication, contract, projection, token-canary, browser-entry,
+  accessibility, branding, and refresh tests pass with formatting and lint.
+- UI completion commit
+  [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
+  passed exact-head repository
+  [CI](https://github.com/6529-Collections/deploy-hub/actions/runs/30916099582).
 
 ### [ ] Task 3 — Real frontend staging
 
@@ -345,4 +347,4 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 2 — Live frontend UI.
+Task 3 — Real frontend staging.

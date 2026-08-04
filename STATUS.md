@@ -22,23 +22,22 @@ reconciliation, exact staging composition, and forward-only removal with
 automatic restore on failure. It also contains lower-level primitives needed
 by Task 5. The PR remains open, and no Deploy Hub operation was dispatched.
 
-Tasks 2, 3, and 4 are **IN PROGRESS**. Task 5 is **NOT STARTED**.
+Task 2 is **DONE**. Tasks 3 and 4 are **IN PROGRESS**. Task 5 is **NOT
+STARTED**.
 
-- Task 2 has one remaining acceptance criterion: browser-module,
-  accessibility, formatting, lint, and repository-CI evidence for the final
-  implementation.
 - Task 3 has 14 of 16 criteria implemented in PR #3586. The two remaining code
   gaps are durable handling of requests arriving behind an active operation
   and terminalizing later cohorts when an earlier cohort stops the manifest.
 - Task 4 has 11 of 12 criteria implemented in PR #3586. Production must still
   recheck successful required PR checks immediately before mutating `main`.
 
-The current Task 2 implementation freezes and previews exact PR heads, submits
-the fixed live workflow contract, refreshes GitHub truth every five seconds,
-shows environment and operation evidence, and exposes exact Stop and tracked
+The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
+live workflow contract, refreshes GitHub truth every five seconds, shows
+environment and operation evidence, and exposes exact Stop and tracked
 staging-removal actions. It remains static and stores no Deploy Hub operation
-state outside GitHub. Local formatting, lint, and all 16 focused tests pass.
-The remaining Task 2 criterion does not require merging PR #3586 early.
+state outside GitHub. All 22 checks and exact-head repository CI pass for
+completion commit
+[`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
 
 ## Retained foundation
 
@@ -91,7 +90,7 @@ inactive while the PR is open; this follow-up did not dispatch them.
 
 ## Next work
 
-Finish Task 2's remaining acceptance criterion. Then complete the two Task 3
-code gaps and the one Task 4 code gap recorded in `TODO.md`. Keep PR #3586 open
-until its frontend changes are actually needed. Any real staging operation
-still requires a separate explicit owner instruction.
+Complete the two Task 3 code gaps recorded in `TODO.md`, then complete the one
+Task 4 code gap. Keep PR #3586 open until its frontend changes are actually
+needed. Any real staging operation still requires a separate explicit owner
+instruction.
