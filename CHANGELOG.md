@@ -2,6 +2,9 @@
 
 ## 2026-08-04
 
+- Merged the dormant Task 1 frontend shadow workflow through PR #3579 at exact
+  head `abbabaff6f032daf448d6d9eb2433066fa19aabf`; frontend `main` merge commit
+  is `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`. No workflow was dispatched.
 - Made Stop an explicit frontend requirement across the shadow, UI, staging,
   production, agent, and canary tasks: cancel immediately before mutation and
   settle to exact safe truth after mutation begins.

@@ -91,14 +91,14 @@ Acceptance criteria:
 - [x] Shadow permissions cannot update refs, dispatch canonical deploys, assume
       environment roles, or publish CI/release-note communications.
 - [x] No database, custom queue, callback, server, or agent polling is added.
-- [ ] Focused tests and exact-head CI pass.
+- [x] Focused tests and exact-head CI pass.
 
 Evidence:
 
 - Frontend PR
   [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
-  at exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf`, synced with
-  frontend `main` at `2f86972442068ff344484bcaca322c5426344e3a`.
+  merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
+  `main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`.
 - The focused shadow tests, changed-file checks, Jest diagnostic ratchet,
   workflow-security validation, and secret scan pass locally.
 - Review follow-up ensures validation failures still produce a visible Action
@@ -106,10 +106,9 @@ Evidence:
   projections after a GitHub API interruption.
 - Latest review follow-up uses the repository's actual default branch and
   rejects malformed request timestamps with the intended validation error.
-- Remaining before `DONE`: latest-head PR CI/review must finish, the shadow
-  must distinguish both stop boundaries, the workflow must be explicitly
-  authorized and merged to frontend `main`, and an opted-in test PR must prove
-  live commit-status feedback from an actual shadow run.
+- Remaining before `DONE`: the shadow must distinguish both stop boundaries,
+  and an explicitly authorized opted-in test PR must prove live commit-status
+  feedback from an actual shadow run.
 
 ### [ ] Task 2 — Live frontend UI
 

@@ -7,10 +7,10 @@ Last updated: 2026-08-04
 The repository has been reset around a frontend-only MVP. The previous broad
 frontend/backend plan is archived and no longer controls implementation.
 
-Task 0 is complete. Task 1, the base FE shadow workflow, is in progress through
-frontend PR
-[#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579) at
-synced head `abbabaff6f032daf448d6d9eb2433066fa19aabf`.
+Task 0 is complete. Task 1, the base FE shadow workflow, is in progress. Frontend
+PR [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
+merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
+`main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`.
 
 ## Retained foundation
 
@@ -52,16 +52,16 @@ deliberately saved but not connected to the current UI yet.
 
 ## Safety boundary
 
-No real deployment or repository mutation capability has been added. The Task
-1 PR adds a dormant, explicitly dispatched workflow to the frontend repository.
-It uses only the repository's automatic `GITHUB_TOKEN`, with read access plus
+No real deployment or repository mutation capability has been added. Task 1
+added a dormant, explicitly dispatched workflow to the frontend repository. It
+uses only the repository's automatic `GITHUB_TOKEN`, with read access plus
 permission to write its dedicated shadow commit status. It is physically unable
-to mutate `1a-staging`, `main`, staging, production, CI notifications, or
-release notes.
+to mutate `1a-staging`, `main`, staging, production, CI notifications, or release
+notes.
 
 ## Next work
 
-Finish latest-head review of frontend PR #3579. After explicit owner approval
-to merge it, run the workflow against an opted-in test PR and verify the live
+Add the two stop-boundary shadow projections. Then, with explicit owner
+approval, run the workflow against an opted-in test PR and verify the live
 shadow status and authoritative Action link. Real staging activation remains
 deferred to Task 3.
