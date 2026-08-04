@@ -9,7 +9,8 @@ frontend/backend plan is archived and no longer controls implementation.
 
 Task 0 is complete. Task 1, the base FE shadow workflow, is in progress through
 frontend PR
-[#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579).
+[#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579) at
+synced head `abbabaff6f032daf448d6d9eb2433066fa19aabf`.
 
 ## Retained foundation
 

@@ -95,12 +95,15 @@ Evidence:
 
 - Frontend PR
   [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
-  at exact head `aa23dc95e5dd2b7e7100353114068bd7d18d1e24`.
+  at exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf`, synced with
+  frontend `main` at `2f86972442068ff344484bcaca322c5426344e3a`.
 - The focused shadow tests, changed-file checks, Jest diagnostic ratchet,
   workflow-security validation, and secret scan pass locally.
 - Review follow-up ensures validation failures still produce a visible Action
   summary and best-effort terminal error statuses replace partial pending
   projections after a GitHub API interruption.
+- Latest review follow-up uses the repository's actual default branch and
+  rejects malformed request timestamps with the intended validation error.
 - Remaining before `DONE`: latest-head PR CI/review must finish, the workflow
   must be explicitly authorized and merged to frontend `main`, and an opted-in
   test PR must prove live commit-status feedback from an actual shadow run.

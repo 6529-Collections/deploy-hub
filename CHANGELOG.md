@@ -10,6 +10,9 @@
 - Hardened the Task 1 shadow failure path so pre-execution failures retain a
   visible Action summary and interrupted status projection makes a best-effort
   transition from pending to terminal error.
+- Addressed the remaining frontend review findings by reading the repository's
+  default branch instead of assuming `main`, safely rejecting malformed
+  request timestamps, and syncing PR #3579 with current frontend `main`.
 - Renamed Task 1 to `Base FE shadow workflow` and clarified that FE involvement
   begins with a dormant, permission-limited shadow workflow; real staging
   activation remains a separate Task 3 change.
