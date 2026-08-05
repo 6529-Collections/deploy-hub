@@ -3,7 +3,7 @@ import {
   createOperationId,
   dispatchOperation,
   freezePullRequests,
-  parsePrNumbers,
+  listOpenPullRequests,
   readDashboard,
   requestStop
 } from './github-operations.js';
@@ -16,6 +16,7 @@ import {
 } from './github-auth.js';
 
 const REFRESH_INTERVAL_MS = 5_000;
+const MAX_SELECTED_PULL_REQUESTS = 20;
 
 const elements = {
   authBadge: document.querySelector('#auth-state'),
@@ -31,16 +32,21 @@ const elements = {
   operationsEmpty: document.querySelector('#operations-empty'),
   operationsList: document.querySelector('#operations-list'),
   operationsPanel: document.querySelector('#operations-panel'),
-  prNumbers: document.querySelector('#pr-numbers'),
+  prOptions: document.querySelector('#pr-options'),
+  prPickerState: document.querySelector('#pr-picker-state'),
+  prSearch: document.querySelector('#pr-search'),
   preview: document.querySelector('#request-preview'),
   previewList: document.querySelector('#preview-list'),
   previewTarget: document.querySelector('#preview-target'),
   productionLink: document.querySelector('#production-link'),
   productionState: document.querySelector('#production-state'),
   refreshButton: document.querySelector('#refresh-dashboard'),
+  refreshPrs: document.querySelector('#refresh-prs'),
   refreshState: document.querySelector('#refresh-state'),
   reviewButton: document.querySelector('#review-operation'),
   sourceSha: document.querySelector('#source-sha'),
+  selectedPrs: document.querySelector('#selected-prs'),
+  sessionPanel: document.querySelector('#session-panel'),
   stagingLink: document.querySelector('#staging-link'),
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
@@ -54,6 +60,9 @@ let currentIdentity = null;
 let refreshTimer = null;
 let frozenPreview = null;
 let refreshInFlight = false;
+let pullRequests = [];
+let pullRequestsInFlight = false;
+let selectedPrNumbers = [];
 
 const commit = document
   .querySelector('meta[name="deploy-hub-commit"]')
@@ -99,6 +108,7 @@ function showSignedOut(message = 'Connect GitHub to continue.') {
   activeToken = '';
   currentIdentity = null;
   frozenPreview = null;
+  elements.sessionPanel.hidden = true;
   elements.authBadge.textContent = 'Not connected';
   elements.authMessage.textContent = message;
   elements.authPanel.hidden = false;
@@ -111,6 +121,7 @@ function showSignedOut(message = 'Connect GitHub to continue.') {
 function showSignedIn(identity, token) {
   activeToken = token;
   currentIdentity = identity;
+  elements.sessionPanel.hidden = true;
   elements.authBadge.textContent = `@${identity.login}`;
   elements.authMessage.textContent = '';
   elements.authPanel.hidden = true;
@@ -118,11 +129,12 @@ function showSignedIn(identity, token) {
   elements.forgetButton.hidden = false;
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
-  elements.prNumbers.focus();
+  elements.prSearch.focus();
   clearRefreshTimer();
   refreshTimer = globalThis.setInterval(() => {
     void refreshDashboard();
   }, REFRESH_INTERVAL_MS);
+  void refreshPullRequests({ announce: true });
   void refreshDashboard({ announce: true });
 }
 
@@ -147,6 +159,91 @@ async function connect(token) {
     showSignedOut(
       safeMessage(error, 'GitHub authentication is temporarily unavailable.')
     );
+  }
+}
+
+function updateSelectedPrs() {
+  elements.selectedPrs.textContent =
+    selectedPrNumbers.length === 0
+      ? 'None selected'
+      : `Deployment order: ${selectedPrNumbers.map((pr) => `#${pr}`).join(' → ')}`;
+}
+
+function renderPullRequests() {
+  const query = elements.prSearch.value.trim().toLowerCase();
+  const visible = pullRequests.filter((pull) =>
+    [pull.number, pull.branch, pull.title, pull.author]
+      .join(' ')
+      .toLowerCase()
+      .includes(query)
+  );
+
+  elements.prOptions.replaceChildren(
+    ...visible.map((pull) => {
+      const label = document.createElement('label');
+      label.className = 'pr-option';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = selectedPrNumbers.includes(pull.number);
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          if (selectedPrNumbers.length >= MAX_SELECTED_PULL_REQUESTS) {
+            checkbox.checked = false;
+            elements.operationMessage.textContent =
+              'Select at most 20 pull requests.';
+            return;
+          }
+          if (!selectedPrNumbers.includes(pull.number)) {
+            selectedPrNumbers.push(pull.number);
+          }
+        } else {
+          selectedPrNumbers = selectedPrNumbers.filter(
+            (number) => number !== pull.number
+          );
+        }
+        updateSelectedPrs();
+      });
+
+      const copy = document.createElement('span');
+      const title = document.createElement('strong');
+      title.textContent = `#${pull.number} · ${pull.title}`;
+      const details = document.createElement('small');
+      details.textContent = `${pull.branch} · @${pull.author}`;
+      copy.append(title, details);
+      label.append(checkbox, copy);
+      return label;
+    })
+  );
+
+  elements.prPickerState.textContent =
+    visible.length === 0
+      ? query
+        ? 'No open PRs match this search.'
+        : 'No open frontend PRs found.'
+      : `${visible.length} open PR${visible.length === 1 ? '' : 's'}`;
+  updateSelectedPrs();
+}
+
+async function refreshPullRequests({ announce = false } = {}) {
+  if (!activeToken || pullRequestsInFlight) return;
+  pullRequestsInFlight = true;
+  elements.refreshPrs.disabled = true;
+  if (announce) elements.prPickerState.textContent = 'Loading open PRs…';
+  try {
+    pullRequests = await listOpenPullRequests({ token: activeToken });
+    const available = new Set(pullRequests.map(({ number }) => number));
+    selectedPrNumbers = selectedPrNumbers.filter((number) =>
+      available.has(number)
+    );
+    renderPullRequests();
+  } catch (error) {
+    elements.prPickerState.textContent = safeMessage(
+      error,
+      'Unable to load open pull requests.'
+    );
+  } finally {
+    pullRequestsInFlight = false;
+    elements.refreshPrs.disabled = false;
   }
 }
 
@@ -387,7 +484,7 @@ function showOperationForm() {
   frozenPreview = null;
   elements.operationForm.hidden = false;
   elements.preview.hidden = true;
-  elements.prNumbers.focus();
+  elements.prSearch.focus();
 }
 
 function renderFrozenPreview(items, target) {
@@ -429,6 +526,12 @@ elements.forgetButton.addEventListener('click', () => {
 
 elements.operationForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (selectedPrNumbers.length === 0) {
+    elements.operationMessage.textContent =
+      'Select at least one open pull request.';
+    elements.prSearch.focus();
+    return;
+  }
   elements.reviewButton.disabled = true;
   elements.operationMessage.textContent = 'Freezing exact PR heads…';
   try {
@@ -436,7 +539,7 @@ elements.operationForm.addEventListener('submit', async (event) => {
       'target'
     );
     const items = await freezePullRequests({
-      prNumbers: parsePrNumbers(elements.prNumbers.value),
+      prNumbers: selectedPrNumbers,
       requester: currentIdentity.login,
       target,
       token: activeToken
@@ -468,7 +571,9 @@ elements.startOperation.addEventListener('click', async () => {
       token: activeToken
     });
     elements.operationMessage.textContent = `Operation ${operationId} submitted to GitHub.`;
+    selectedPrNumbers = [];
     elements.operationForm.reset();
+    renderPullRequests();
     showOperationForm();
     await refreshDashboard();
   } catch (error) {
@@ -484,6 +589,12 @@ elements.startOperation.addEventListener('click', async () => {
 elements.refreshButton.addEventListener('click', () => {
   void refreshDashboard({ announce: true });
 });
+
+elements.refreshPrs.addEventListener('click', () => {
+  void refreshPullRequests({ announce: true });
+});
+
+elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
 if (storedToken) {

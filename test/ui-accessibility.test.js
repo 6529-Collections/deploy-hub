@@ -77,6 +77,7 @@ test('browser entry module initializes the signed-out UI without a server', asyn
 
     assert.equal(elements.get('#auth-state').textContent, 'Not connected');
     assert.equal(elements.get('#auth-panel').hidden, false);
+    assert.equal(elements.get('#session-panel').hidden, true);
     assert.equal(elements.get('#dashboard').hidden, true);
     assert.equal(elements.get('#forget-github').hidden, true);
     assert.equal(elements.get('#github-token').focused, true);
@@ -123,11 +124,8 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     html,
     /id="github-token"[\s\S]*aria-describedby="github-token-help"/
   );
-  assert.match(html, /for="pr-numbers"/);
-  assert.match(
-    html,
-    /id="pr-numbers"[\s\S]*aria-describedby="pr-numbers-help"/
-  );
+  assert.match(html, /for="pr-search"/);
+  assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
   assert.match(html, /id="auth-message" role="status"/);
   assert.match(html, /id="operation-message" role="status"/);
@@ -176,6 +174,19 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
   assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);
   assert.match(css, /body\s*{[\s\S]*?background: #050505;/);
   assert.doesNotMatch(css, /radial-gradient|linear-gradient/);
+});
+
+test('PR picker searches open work and keeps the bounded multi-select contract', async () => {
+  const [app, html] = await Promise.all([
+    readUiFile('app.js'),
+    readUiFile('index.html')
+  ]);
+
+  assert.match(html, /id="pr-search"/);
+  assert.match(html, /Search PR, branch, title, or author/);
+  assert.match(html, /Selection order is deployment order/);
+  assert.match(app, /listOpenPullRequests/);
+  assert.match(app, /MAX_SELECTED_PULL_REQUESTS = 20/);
 });
 
 test('declared icons exist at their exact expected dimensions', async () => {

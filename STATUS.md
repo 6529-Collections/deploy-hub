@@ -55,10 +55,12 @@ environment and operation evidence, and exposes exact Stop and tracked
 staging-removal actions. It remains static and stores no Deploy Hub operation
 state outside GitHub. The desktop UI now uses exact one-third/two-thirds panel
 alignment, a single-line `6529 Deploy Hub` header, non-wrapping actions, and
-neutral near-black surfaces. All 22 original completion checks and exact-head
-repository CI pass for completion commit
+neutral near-black surfaces. Initial load uses an explicit session-checking
+state, and operators select from a searchable, ordered list of current open
+frontend PRs instead of entering numbers manually. All 22 original completion
+checks and exact-head repository CI pass for completion commit
 [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
-The current visual regression test and all 33 repository tests also pass.
+The current UI regressions and all 35 repository tests also pass.
 
 ## Retained foundation
 

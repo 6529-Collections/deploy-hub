@@ -170,6 +170,10 @@ Evidence:
   one column, while the request and operations panels span exactly one and two.
   The header is one `6529 Deploy Hub` line, action labels do not wrap, and
   neutral near-black surfaces replace the prior blue-tinted gradient.
+- Initial load shows a dedicated session-checking state instead of flashing the
+  login form. The deployment form lists current open frontend PRs and supports
+  bounded multi-selection with search across PR number, branch, title, and
+  author; selection order remains deployment order.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

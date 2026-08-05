@@ -9,6 +9,7 @@ import {
   createOperationId,
   dispatchOperation,
   freezePullRequests,
+  listOpenPullRequests,
   parsePrNumbers,
   requestStop
 } from '../ui/github-operations.js';
@@ -48,6 +49,40 @@ test('creates compact workflow-safe operation identities', () => {
     createOperationId(() => 123456, cryptoImpl),
     'ui-2n9c-01020304'
   );
+});
+
+test('lists open main-targeted PRs for the searchable picker', async () => {
+  let requestedUrl = '';
+  const pulls = await listOpenPullRequests({
+    fetchImpl: async (url) => {
+      requestedUrl = url;
+      return jsonResponse(200, [
+        {
+          head: { ref: 'feature/searchable-picker', sha: SHA_A },
+          html_url: 'https://github.com/example/pull/12',
+          number: 12,
+          title: 'Searchable picker',
+          user: { login: 'developer' }
+        }
+      ]);
+    },
+    token: TOKEN
+  });
+
+  assert.match(
+    requestedUrl,
+    /pulls\?state=open&base=main&sort=updated&direction=desc&per_page=100$/
+  );
+  assert.deepEqual(pulls, [
+    {
+      author: 'developer',
+      branch: 'feature/searchable-picker',
+      number: 12,
+      sha: SHA_A,
+      title: 'Searchable picker',
+      url: 'https://github.com/example/pull/12'
+    }
+  ]);
 });
 
 test('freezes exact open PR heads without exposing the token', async () => {

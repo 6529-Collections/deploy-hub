@@ -2,6 +2,11 @@
 
 ## 2026-08-05
 
+- Replaced the stored-session login flash with a dedicated session-checking
+  state. Replaced manual PR-number entry with a bounded, ordered multi-select
+  of current open frontend PRs searchable by number, branch, title, or author;
+  exact heads are still re-fetched and frozen at review time. All 35 repository
+  tests pass.
 - Refined the static UI without changing operation behavior: replaced the
   mismatched summary/workspace grid formulas with one shared three-column grid,
   prevented action labels from wrapping, reduced the header to one

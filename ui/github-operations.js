@@ -159,6 +159,37 @@ export function parsePrNumbers(value) {
   return numbers;
 }
 
+export async function listOpenPullRequests({
+  token,
+  fetchImpl = globalThis.fetch
+}) {
+  const pulls = await githubRequest(
+    `/repos/${FRONTEND_REPOSITORY}/pulls?state=open&base=${FRONTEND_DEFAULT_BRANCH}&sort=updated&direction=desc&per_page=100`,
+    token,
+    {},
+    fetchImpl
+  );
+  if (!Array.isArray(pulls)) {
+    throw new GitHubOperationError(
+      'github_read_failed',
+      'GitHub returned an invalid pull-request list.'
+    );
+  }
+  return pulls
+    .filter(
+      (pull) =>
+        Number.isSafeInteger(pull.number) && SHA_PATTERN.test(pull.head?.sha)
+    )
+    .map((pull) => ({
+      author: pull.user?.login ?? 'unknown',
+      branch: pull.head.ref,
+      number: pull.number,
+      sha: pull.head.sha,
+      title: pull.title,
+      url: pull.html_url
+    }));
+}
+
 export function createOperationId(
   now = Date.now,
   cryptoImpl = globalThis.crypto
