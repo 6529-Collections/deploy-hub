@@ -2,6 +2,9 @@
 
 ## 2026-08-05
 
+- Reduced signed-out access to one compact vertical GitHub form with a
+  full-width token field and button. Removed the redundant access explanation,
+  oversized login treatment, source placeholder, and footer.
 - Replaced the stored-session login flash with a dedicated session-checking
   state. Replaced manual PR-number entry with a bounded, ordered multi-select
   of current open frontend PRs searchable by number, branch, title, or author;

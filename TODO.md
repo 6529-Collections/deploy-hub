@@ -174,6 +174,8 @@ Evidence:
   login form. The deployment form lists current open frontend PRs and supports
   bounded multi-selection with search across PR number, branch, title, and
   author; selection order remains deployment order.
+- Signed-out access is a compact single-column form with a full-width token
+  field and button. The redundant marketing copy and source footer are gone.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

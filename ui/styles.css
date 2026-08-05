@@ -165,23 +165,16 @@ p {
 }
 
 .auth-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr);
-  gap: 56px;
-  align-items: end;
-  max-width: 960px;
-  padding: clamp(24px, 5vw, 48px);
+  display: block;
+  max-width: 560px;
+  padding: 32px;
   margin: 72px auto;
 }
 
 .auth-panel h2 {
-  margin-bottom: 12px;
-  font-size: clamp(1.8rem, 4vw, 3.2rem);
-  letter-spacing: -0.045em;
-}
-
-.auth-panel p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 24px;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
 }
 
 label,
@@ -199,11 +192,17 @@ legend {
 
 .auth-controls {
   display: flex;
+  align-items: stretch;
+  flex-direction: column;
   gap: 10px;
 }
 
 .auth-controls input {
   flex: 1 1 auto;
+}
+
+.auth-controls .button {
+  width: 100%;
 }
 
 input[type='password'],
@@ -693,31 +692,18 @@ code {
   font-size: 0.82rem;
 }
 
-footer {
-  padding-top: 22px;
-  color: #94a3b8;
-  font-size: 0.73rem;
-  text-align: right;
-}
-
 [hidden] {
   display: none !important;
 }
 
 @media (max-width: 900px) {
   .summary-grid,
-  .workspace-grid,
-  .auth-panel {
+  .workspace-grid {
     grid-template-columns: 1fr;
   }
 
   .operations-panel {
     grid-column: 1;
-  }
-
-  .auth-panel {
-    gap: 28px;
-    max-width: 620px;
   }
 }
 
@@ -745,7 +731,6 @@ footer {
     min-height: 106px;
   }
 
-  .auth-controls,
   .operation-top,
   .request-row {
     align-items: stretch;

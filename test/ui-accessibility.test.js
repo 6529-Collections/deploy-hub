@@ -53,11 +53,6 @@ test('browser entry module initializes the signed-out UI without a server', asyn
     configurable: true,
     value: {
       querySelector(selector) {
-        if (selector === 'meta[name="deploy-hub-commit"]') {
-          const meta = new UiElement();
-          meta.setAttribute('content', 'test-sha');
-          return meta;
-        }
         if (!elements.has(selector)) elements.set(selector, new UiElement());
         return elements.get(selector);
       }
@@ -81,7 +76,6 @@ test('browser entry module initializes the signed-out UI without a server', asyn
     assert.equal(elements.get('#dashboard').hidden, true);
     assert.equal(elements.get('#forget-github').hidden, true);
     assert.equal(elements.get('#github-token').focused, true);
-    assert.equal(elements.get('#source-sha').textContent, 'test-sha');
   } finally {
     if (documentDescriptor) {
       Object.defineProperty(globalThis, 'document', documentDescriptor);
@@ -120,10 +114,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<h1>6529 Deploy Hub<\/h1>/);
   assert.doesNotMatch(html, /6529 engineering/i);
   assert.match(html, /for="github-token"/);
-  assert.match(
-    html,
-    /id="github-token"[\s\S]*aria-describedby="github-token-help"/
-  );
+  assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);
   assert.match(html, /for="pr-search"/);
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
@@ -150,6 +141,7 @@ test('links, images, buttons, and local modules use safe static markup', async (
   }
 
   assert.match(html, /<script type="module" src="\.\/app\.js"><\/script>/);
+  assert.doesNotMatch(html, /<footer|deploy-hub-commit|source-sha/);
   assert.doesNotMatch(html, /<(?:script|link)[^>]+(?:src|href)="https?:/i);
 });
 
@@ -160,7 +152,7 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /\.target-option:focus-within/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /\.field-hint\s*{[\s\S]*?color: #94a3b8;/);
-  assert.match(css, /footer\s*{[\s\S]*?color: #94a3b8;/);
+  assert.doesNotMatch(css, /footer\s*{/);
 });
 
 test('desktop layout stays aligned and the visual shell stays neutral black', async () => {

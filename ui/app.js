@@ -44,7 +44,6 @@ const elements = {
   refreshPrs: document.querySelector('#refresh-prs'),
   refreshState: document.querySelector('#refresh-state'),
   reviewButton: document.querySelector('#review-operation'),
-  sourceSha: document.querySelector('#source-sha'),
   selectedPrs: document.querySelector('#selected-prs'),
   sessionPanel: document.querySelector('#session-panel'),
   stagingLink: document.querySelector('#staging-link'),
@@ -63,13 +62,6 @@ let refreshInFlight = false;
 let pullRequests = [];
 let pullRequestsInFlight = false;
 let selectedPrNumbers = [];
-
-const commit = document
-  .querySelector('meta[name="deploy-hub-commit"]')
-  ?.getAttribute('content');
-if (elements.sourceSha && commit) {
-  elements.sourceSha.textContent = commit;
-}
 
 function safeMessage(error, fallback) {
   return error instanceof GitHubOperationError ||
@@ -103,7 +95,7 @@ function clearRefreshTimer() {
   refreshTimer = null;
 }
 
-function showSignedOut(message = 'Connect GitHub to continue.') {
+function showSignedOut(message = '') {
   clearRefreshTimer();
   activeToken = '';
   currentIdentity = null;

@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="deploy-hub-commit" content="development" />
     <meta name="referrer" content="no-referrer" />
     <meta
       http-equiv="Content-Security-Policy"
@@ -75,14 +74,7 @@
         aria-labelledby="auth-title"
         hidden
       >
-        <div>
-          <p class="eyebrow">Private operator access</p>
-          <h2 id="auth-title">Connect directly to GitHub.</h2>
-          <p id="github-token-help">
-            Your token stays in this browser and is sent only to GitHub. Deploy
-            Hub has no authentication server, proxy, or database.
-          </p>
-        </div>
+        <h2 id="auth-title">Connect GitHub</h2>
         <form class="auth-form" id="auth-form">
           <label for="github-token">GitHub token</label>
           <div class="auth-controls">
@@ -92,7 +84,6 @@
               type="password"
               autocomplete="off"
               spellcheck="false"
-              aria-describedby="github-token-help"
               required
             />
             <button
@@ -302,10 +293,6 @@
           </section>
         </div>
       </div>
-
-      <footer>
-        Static GitHub client · source <code id="source-sha">development</code>
-      </footer>
     </main>
   </body>
 </html>
