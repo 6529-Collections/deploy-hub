@@ -68,7 +68,7 @@ test('browser entry module initializes the signed-out UI without a server', asyn
   });
 
   try {
-    await import(new URL(`app.js?test=${Date.now()}`, UI_ROOT));
+    const app = await import(new URL(`app.js?test=${Date.now()}`, UI_ROOT));
 
     assert.equal(elements.get('#auth-state').textContent, 'Not connected');
     assert.equal(elements.get('#auth-panel').hidden, false);
@@ -76,6 +76,8 @@ test('browser entry module initializes the signed-out UI without a server', asyn
     assert.equal(elements.get('#dashboard').hidden, true);
     assert.equal(elements.get('#forget-github').hidden, true);
     assert.equal(elements.get('#github-token').focused, true);
+    assert.equal(app.formatDisplayState('in_progress'), 'In progress');
+    assert.equal(app.formatDisplayState('failure'), 'Failed');
   } finally {
     if (documentDescriptor) {
       Object.defineProperty(globalThis, 'document', documentDescriptor);
@@ -150,6 +152,8 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
 
   assert.match(css, /:focus-visible/);
   assert.match(css, /\.target-option:focus-within/);
+  assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
+  assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /\.field-hint\s*{[\s\S]*?color: #94a3b8;/);
   assert.doesNotMatch(css, /footer\s*{/);

@@ -90,6 +90,25 @@ function formatElapsed(value) {
   return `${Math.floor(elapsedMinutes / 60)}h ${elapsedMinutes % 60}m elapsed`;
 }
 
+export function formatDisplayState(value) {
+  const state = String(value ?? 'unknown').toLowerCase();
+  const labels = {
+    action_required: 'Action required',
+    cancelled: 'Cancelled',
+    failure: 'Failed',
+    in_progress: 'In progress',
+    queued: 'Queued',
+    skipped: 'Skipped',
+    success: 'Successful',
+    timed_out: 'Timed out',
+    unknown: 'Unknown'
+  };
+  return (
+    labels[state] ??
+    `${state.charAt(0).toUpperCase()}${state.slice(1).replaceAll('_', ' ')}`
+  );
+}
+
 function clearRefreshTimer() {
   if (refreshTimer) globalThis.clearInterval(refreshTimer);
   refreshTimer = null;
@@ -246,7 +265,7 @@ function setEnvironment(run, stateElement, linkElement) {
     return;
   }
   const state = run.status === 'completed' ? run.conclusion : run.status;
-  stateElement.textContent = `${state ?? 'unknown'} · ${run.head_sha?.slice(0, 12) ?? 'SHA pending'}`;
+  stateElement.textContent = `${formatDisplayState(state)} · ${run.head_sha?.slice(0, 12) ?? 'SHA pending'}`;
   linkElement.href = run.html_url;
   linkElement.hidden = false;
 }
@@ -364,7 +383,7 @@ function renderOperation(operation) {
   heading.append(title, meta);
   const badge = document.createElement('span');
   badge.className = 'operation-badge';
-  badge.textContent = operation.conclusion ?? state;
+  badge.textContent = formatDisplayState(operation.conclusion ?? state);
   top.append(heading, badge);
   card.append(top);
 
