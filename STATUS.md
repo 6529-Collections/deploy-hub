@@ -72,8 +72,9 @@ from their canonical workflows rather than inferred from only the repository's
 newest 100 Actions runs.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
-vertical-only scrolling.
-The current UI regressions and all 35 repository tests also pass.
+vertical-only scrolling. Signed-in identity and disconnect now share one joined
+control, with the username linking to the operator's GitHub profile.
+The current UI regressions and all 36 repository tests also pass.
 
 ## Retained foundation
 

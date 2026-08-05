@@ -2,6 +2,9 @@
 
 ## 2026-08-05
 
+- Replaced the mismatched username badge and `Forget GitHub` button with one
+  joined account control: a linked GitHub username and an icon-only disconnect
+  action.
 - Fixed missing Production history by reading the latest staging and production
   executions from their exact workflow endpoints instead of relying only on the
   repository's newest 100 Actions runs. Aligned `View workflow` to each card's

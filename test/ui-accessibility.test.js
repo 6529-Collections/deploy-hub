@@ -71,10 +71,11 @@ test('browser entry module initializes the signed-out UI without a server', asyn
     const app = await import(new URL(`app.js?test=${Date.now()}`, UI_ROOT));
 
     assert.equal(elements.get('#auth-state').textContent, 'Not connected');
+    assert.equal(elements.get('#account-control').hidden, true);
     assert.equal(elements.get('#auth-panel').hidden, false);
     assert.equal(elements.get('#session-panel').hidden, true);
     assert.equal(elements.get('#dashboard').hidden, true);
-    assert.equal(elements.get('#forget-github').hidden, true);
+    assert.equal(elements.get('#disconnect-github').hidden, true);
     assert.equal(elements.get('#github-token').focused, true);
     assert.equal(app.formatDisplayState('queued'), 'Queued');
     assert.equal(app.formatDisplayState('in_progress'), 'In Progress');
@@ -126,6 +127,10 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
   assert.match(html, /id="auth-message" role="status"/);
+  assert.match(
+    html,
+    /id="disconnect-github"[\s\S]*?aria-label="Disconnect GitHub"/
+  );
   assert.match(
     html,
     /id="operation-message" role="status">[\s\S]*?Select at least one open pull request\./

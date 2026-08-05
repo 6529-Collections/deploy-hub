@@ -155,7 +155,8 @@ test('static shell restricts connections and loads no third-party script', async
   assert.match(html, /connect-src https:\/\/api\.github\.com/);
   assert.match(html, /deploy-hub-icon-192\.png/);
   assert.match(html, /favicon-32\.png/);
-  assert.match(html, /id="forget-github"/);
+  assert.match(html, /id="disconnect-github"/);
+  assert.doesNotMatch(html, /Forget GitHub/);
   assert.match(html, /id="session-panel"[^>]*>[\s\S]*Checking GitHub session/);
   assert.match(html, /id="auth-panel"[\s\S]*?hidden/);
   assert.doesNotMatch(html, /<script[^>]+src="https?:/i);

@@ -19,14 +19,15 @@ const REFRESH_INTERVAL_MS = 5_000;
 const MAX_SELECTED_PULL_REQUESTS = 20;
 
 const elements = {
-  authBadge: document.querySelector('#auth-state'),
+  accountControl: document.querySelector('#account-control'),
   authForm: document.querySelector('#auth-form'),
   authMessage: document.querySelector('#auth-message'),
   authPanel: document.querySelector('#auth-panel'),
+  authProfile: document.querySelector('#auth-state'),
   connectButton: document.querySelector('#connect-github'),
   dashboard: document.querySelector('#dashboard'),
+  disconnectButton: document.querySelector('#disconnect-github'),
   editOperation: document.querySelector('#edit-operation'),
-  forgetButton: document.querySelector('#forget-github'),
   operationForm: document.querySelector('#operation-form'),
   operationMessage: document.querySelector('#operation-message'),
   operationsEmpty: document.querySelector('#operations-empty'),
@@ -110,11 +111,12 @@ function showSignedOut(message = '') {
   currentIdentity = null;
   frozenPreview = null;
   elements.sessionPanel.hidden = true;
-  elements.authBadge.textContent = 'Not connected';
+  elements.authProfile.textContent = 'Not connected';
   elements.authMessage.textContent = message;
   elements.authPanel.hidden = false;
+  elements.accountControl.hidden = true;
   elements.dashboard.hidden = true;
-  elements.forgetButton.hidden = true;
+  elements.disconnectButton.hidden = true;
   elements.connectButton.disabled = false;
   elements.tokenInput.focus();
 }
@@ -140,12 +142,14 @@ function showSignedIn(identity, token) {
   activeToken = token;
   currentIdentity = identity;
   elements.sessionPanel.hidden = true;
-  elements.authBadge.textContent = `@${identity.login}`;
+  elements.authProfile.textContent = `@${identity.login}`;
+  elements.authProfile.href = `https://github.com/${encodeURIComponent(identity.login)}`;
   elements.authMessage.textContent = '';
   elements.authPanel.hidden = true;
+  elements.accountControl.hidden = false;
   showDashboardLoading();
   elements.dashboard.hidden = false;
-  elements.forgetButton.hidden = false;
+  elements.disconnectButton.hidden = false;
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
   elements.prSearch.focus();
@@ -159,7 +163,7 @@ function showSignedIn(identity, token) {
 
 async function connect(token) {
   elements.connectButton.disabled = true;
-  elements.authBadge.textContent = 'Checking';
+  elements.authProfile.textContent = 'Checking';
   elements.authMessage.textContent = 'Verifying with GitHub…';
 
   try {
@@ -551,9 +555,9 @@ elements.authForm.addEventListener('submit', (event) => {
   void connect(elements.tokenInput.value);
 });
 
-elements.forgetButton.addEventListener('click', () => {
+elements.disconnectButton.addEventListener('click', () => {
   forgetToken(localStorage);
-  showSignedOut('GitHub token forgotten.');
+  showSignedOut('Disconnected from GitHub.');
 });
 
 elements.operationForm.addEventListener('submit', async (event) => {

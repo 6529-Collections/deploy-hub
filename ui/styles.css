@@ -108,7 +108,6 @@ p {
   text-transform: uppercase;
 }
 
-.badge,
 .repo-label,
 .operation-badge {
   border: 1px solid #2a2a2e;
@@ -119,8 +118,49 @@ p {
   font-weight: 700;
 }
 
-.badge {
-  padding: 7px 11px;
+.account-control {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid #303036;
+  border-radius: 10px;
+  background: #111113;
+}
+
+.account-profile,
+.account-disconnect {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.account-profile {
+  padding: 0 12px;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.account-disconnect {
+  justify-content: center;
+  width: 40px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #303036;
+  cursor: pointer;
+  background: transparent;
+  color: #a1a1aa;
+}
+
+.account-profile:hover,
+.account-disconnect:hover {
+  background: #18181b;
+  color: #f8fafc;
+}
+
+.account-disconnect:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: -3px;
 }
 
 .session-panel,
