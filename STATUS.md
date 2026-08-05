@@ -53,9 +53,12 @@ The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
 live workflow contract, refreshes GitHub truth every five seconds, shows
 environment and operation evidence, and exposes exact Stop and tracked
 staging-removal actions. It remains static and stores no Deploy Hub operation
-state outside GitHub. All 22 checks and exact-head repository CI pass for
-completion commit
+state outside GitHub. The desktop UI now uses exact one-third/two-thirds panel
+alignment, a single-line `6529 Deploy Hub` header, non-wrapping actions, and
+neutral near-black surfaces. All 22 original completion checks and exact-head
+repository CI pass for completion commit
 [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
+The current visual regression test and all 33 repository tests also pass.
 
 ## Retained foundation
 

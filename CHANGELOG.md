@@ -2,6 +2,11 @@
 
 ## 2026-08-05
 
+- Refined the static UI without changing operation behavior: replaced the
+  mismatched summary/workspace grid formulas with one shared three-column grid,
+  prevented action labels from wrapping, reduced the header to one
+  `6529 Deploy Hub` line, and replaced the blue-tinted page gradient and
+  surfaces with a neutral near-black palette. All 33 repository tests pass.
 - Synchronized frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   with current frontend `main` at exact head

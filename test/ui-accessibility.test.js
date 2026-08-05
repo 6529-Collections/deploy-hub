@@ -116,6 +116,8 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
 
   assert.match(html, /<html lang="en">/);
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
+  assert.match(html, /<h1>6529 Deploy Hub<\/h1>/);
+  assert.doesNotMatch(html, /6529 engineering/i);
   assert.match(html, /for="github-token"/);
   assert.match(
     html,
@@ -161,6 +163,19 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /\.field-hint\s*{[\s\S]*?color: #94a3b8;/);
   assert.match(css, /footer\s*{[\s\S]*?color: #94a3b8;/);
+});
+
+test('desktop layout stays aligned and the visual shell stays neutral black', async () => {
+  const css = await readUiFile('styles.css');
+
+  assert.match(
+    css,
+    /\.summary-grid,[\s\S]*?\.workspace-grid\s*{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
+  );
+  assert.match(css, /\.operations-panel\s*{[\s\S]*?grid-column: span 2;/);
+  assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);
+  assert.match(css, /body\s*{[\s\S]*?background: #050505;/);
+  assert.doesNotMatch(css, /radial-gradient|linear-gradient/);
 });
 
 test('declared icons exist at their exact expected dimensions', async () => {

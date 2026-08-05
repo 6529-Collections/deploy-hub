@@ -7,7 +7,7 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  background: #080b12;
+  background: #050505;
   color: #f8fafc;
   font-synthesis: none;
 }
@@ -20,13 +20,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 12% -10%,
-      rgb(37 99 235 / 22%),
-      transparent 34rem
-    ),
-    linear-gradient(180deg, #080b12 0%, #0a0e17 100%);
+  background: #050505;
 }
 
 button,
@@ -64,11 +58,12 @@ a {
 
 .brand {
   gap: 14px;
+  white-space: nowrap;
 }
 
 .brand-mark {
   border-radius: 12px;
-  box-shadow: 0 10px 32px rgb(37 99 235 / 24%);
+  box-shadow: 0 10px 32px rgb(0 0 0 / 36%);
 }
 
 .header-actions {
@@ -116,9 +111,9 @@ p {
 .badge,
 .repo-label,
 .operation-badge {
-  border: 1px solid #273244;
+  border: 1px solid #2a2a2e;
   border-radius: 999px;
-  background: rgb(15 23 42 / 72%);
+  background: #111113;
   color: #cbd5e1;
   font-size: 0.75rem;
   font-weight: 700;
@@ -131,10 +126,10 @@ p {
 .auth-panel,
 .panel,
 .summary-card {
-  border: 1px solid #1e293b;
+  border: 1px solid #242428;
   border-radius: 16px;
-  background: rgb(13 18 29 / 88%);
-  box-shadow: 0 18px 60px rgb(0 0 0 / 16%);
+  background: #0b0b0d;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 24%);
 }
 
 .auth-panel {
@@ -175,13 +170,17 @@ legend {
   gap: 10px;
 }
 
+.auth-controls input {
+  flex: 1 1 auto;
+}
+
 input[type='password'],
 textarea {
   width: 100%;
-  border: 1px solid #2a374b;
+  border: 1px solid #303036;
   border-radius: 10px;
   outline: none;
-  background: #090e18;
+  background: #070709;
   color: #f8fafc;
   transition:
     border-color 120ms ease,
@@ -215,6 +214,7 @@ textarea:focus {
   border-radius: 9px;
   cursor: pointer;
   font-weight: 750;
+  white-space: nowrap;
   transition:
     background 120ms ease,
     border-color 120ms ease,
@@ -249,8 +249,8 @@ textarea:focus-visible {
 }
 
 .button-quiet {
-  border-color: #2a374b;
-  background: #111827;
+  border-color: #303036;
+  background: #141416;
   color: #cbd5e1;
 }
 
@@ -277,11 +277,19 @@ textarea:focus-visible {
   font-size: 0.82rem;
 }
 
-.summary-grid {
+.summary-grid,
+.workspace-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+}
+
+.summary-grid {
   margin-bottom: 14px;
+}
+
+.operations-panel {
+  grid-column: span 2;
 }
 
 .summary-card {
@@ -333,12 +341,6 @@ textarea:focus-visible {
   text-decoration: none;
 }
 
-.workspace-grid {
-  display: grid;
-  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.5fr);
-  gap: 14px;
-}
-
 .panel {
   padding: 22px;
 }
@@ -351,7 +353,7 @@ textarea:focus-visible {
 
 .panel-heading {
   padding-bottom: 20px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #242428;
   margin-bottom: 20px;
 }
 
@@ -388,10 +390,10 @@ legend {
   align-items: flex-start;
   min-height: 92px;
   padding: 12px;
-  border: 1px solid #273244;
+  border: 1px solid #303036;
   border-radius: 10px;
   cursor: pointer;
-  background: #0b111d;
+  background: #0d0d0f;
 }
 
 .target-option:has(input:checked) {
@@ -426,7 +428,7 @@ legend {
   padding: 14px;
   border: 1px solid #254576;
   border-radius: 12px;
-  background: rgb(37 99 235 / 8%);
+  background: #0d1119;
 }
 
 .preview-list {
@@ -437,7 +439,7 @@ legend {
 
 .preview-list li {
   padding: 10px 0;
-  border-top: 1px solid #21344f;
+  border-top: 1px solid #292d35;
 }
 
 .preview-list a,
@@ -467,9 +469,9 @@ code {
 
 .operation-card {
   padding: 15px;
-  border: 1px solid #243044;
+  border: 1px solid #2a2a2f;
   border-radius: 12px;
-  background: #0b111d;
+  background: #0d0d0f;
 }
 
 .operation-card[data-state='success'] {
@@ -519,8 +521,8 @@ code {
   gap: 8px;
   padding: 12px 0;
   margin: 12px 0;
-  border-top: 1px solid #1e293b;
-  border-bottom: 1px solid #1e293b;
+  border-top: 1px solid #242428;
+  border-bottom: 1px solid #242428;
 }
 
 .request-row {
@@ -571,9 +573,14 @@ footer {
 }
 
 @media (max-width: 900px) {
+  .summary-grid,
   .workspace-grid,
   .auth-panel {
     grid-template-columns: 1fr;
+  }
+
+  .operations-panel {
+    grid-column: 1;
   }
 
   .auth-panel {
@@ -590,6 +597,7 @@ footer {
 
   .header {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .header-actions {
@@ -597,7 +605,6 @@ footer {
     flex-direction: column;
   }
 
-  .summary-grid,
   .target-options {
     grid-template-columns: 1fr;
   }
