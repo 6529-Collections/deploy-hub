@@ -97,7 +97,7 @@ export function formatDisplayState(value) {
     cancelled: 'Cancelled',
     failure: 'Failed',
     in_progress: 'In progress',
-    queued: 'Queued',
+    queued: 'Waiting to start',
     skipped: 'Skipped',
     success: 'Successful',
     timed_out: 'Timed out',

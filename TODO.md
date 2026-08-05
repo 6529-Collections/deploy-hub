@@ -176,8 +176,9 @@ Evidence:
   author; selection order remains deployment order.
 - Signed-out access is a compact single-column form with a full-width token
   field and button. The redundant marketing copy and source footer are gone.
-- Field focus uses a subtle one-pixel highlight, and GitHub's machine state
-  names are converted to concise user-facing labels.
+- Field focus uses a subtle one-pixel highlight, and GitHub's machine states
+  are converted to concise user-facing labels such as `In progress`, `Failed`,
+  and `Waiting to start`.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

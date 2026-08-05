@@ -2,6 +2,7 @@
 
 ## 2026-08-05
 
+- Replaced the unhelpful `Queued` display label with `Waiting to start`.
 - Replaced the doubled, oversized field-focus glow with a subtle one-pixel
   highlight and converted GitHub machine states such as `in_progress` into
   readable UI labels such as `In progress`.
