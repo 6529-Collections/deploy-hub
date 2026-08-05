@@ -2,6 +2,10 @@
 
 ## 2026-08-05
 
+- Fixed missing Production history by reading the latest staging and production
+  executions from their exact workflow endpoints instead of relying only on the
+  repository's newest 100 Actions runs. Aligned `View workflow` to each card's
+  right edge while retaining the latest-run link on the left.
 - Removed horizontal scrolling from the PR picker. Titles now wrap to at most
   two lines, while branch and author metadata wrap safely when needed.
 - Disabled `Review selected PRs` while the selection is empty and made the

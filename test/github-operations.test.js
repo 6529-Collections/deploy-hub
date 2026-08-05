@@ -11,6 +11,7 @@ import {
   freezePullRequests,
   listOpenPullRequests,
   parsePrNumbers,
+  readDashboard,
   requestStop
 } from '../ui/github-operations.js';
 
@@ -408,6 +409,48 @@ test('derives operations, waiting work, and environment runs from GitHub truth',
   assert.equal(model.operations[0].target, 'staging');
   assert.equal(model.operations[0].terminal, false);
   assert.equal(model.operations[0].requests[0].canRemove, true);
+});
+
+test('reads latest environment runs from their exact workflow endpoints', async () => {
+  const requestedUrls = [];
+  const productionRun = {
+    conclusion: 'success',
+    created_at: '2026-08-04T11:50:00.000Z',
+    html_url: `${RUN_URL}9`,
+    id: 129,
+    path: '.github/workflows/build-upload-deploy-prod.yml',
+    status: 'completed'
+  };
+  const model = await readDashboard(
+    TOKEN,
+    async (url) => {
+      requestedUrls.push(url);
+      if (url.endsWith('/graphql')) {
+        return jsonResponse(200, {
+          data: { repository: { pullRequests: { nodes: [] } } }
+        });
+      }
+      if (url.includes('/build-upload-deploy-prod.yml/runs')) {
+        return jsonResponse(200, { workflow_runs: [productionRun] });
+      }
+      return jsonResponse(200, { workflow_runs: [] });
+    },
+    () => Date.parse('2026-08-04T12:00:05.000Z')
+  );
+
+  assert.ok(
+    requestedUrls.some((url) =>
+      url.endsWith('/actions/workflows/deploy-staging.yml/runs?per_page=1')
+    )
+  );
+  assert.ok(
+    requestedUrls.some((url) =>
+      url.endsWith(
+        '/actions/workflows/build-upload-deploy-prod.yml/runs?per_page=1'
+      )
+    )
+  );
+  assert.equal(model.environments.production.id, 129);
 });
 
 test('recovers the operation id from a correlated canonical workflow run', () => {

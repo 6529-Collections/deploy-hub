@@ -180,6 +180,10 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /:focus-visible/);
   assert.match(css, /\.target-option:focus-within/);
   assert.match(css, /\.summary-loading::before/);
+  assert.match(
+    css,
+    /\.summary-links \.inline-link:last-child\s*{[\s\S]*?margin-left: auto;/
+  );
   assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
   assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);

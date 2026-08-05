@@ -67,6 +67,9 @@ checks and exact-head repository CI pass for completion commit
 Environment cards now remain in an explicit loading state until that GitHub
 truth arrives; they no longer flash a false `No recent run` placeholder. Each
 environment card also links directly to its canonical frontend workflow page.
+The two links sit at opposite edges, and environment runs are read directly
+from their canonical workflows rather than inferred from only the repository's
+newest 100 Actions runs.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling.

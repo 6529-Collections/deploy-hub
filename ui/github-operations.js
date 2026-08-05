@@ -579,14 +579,38 @@ export async function readDashboard(
   fetchImpl = globalThis.fetch,
   now = Date.now
 ) {
-  const [repository, runs] = await Promise.all([
+  const [repository, runs, stagingRuns, productionRuns] = await Promise.all([
     githubGraphql(token, fetchImpl),
     githubRequest(
       `/repos/${FRONTEND_REPOSITORY}/actions/runs?per_page=100`,
       token,
       {},
       fetchImpl
+    ),
+    githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/workflows/deploy-staging.yml/runs?per_page=1`,
+      token,
+      {},
+      fetchImpl
+    ),
+    githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/workflows/build-upload-deploy-prod.yml/runs?per_page=1`,
+      token,
+      {},
+      fetchImpl
     )
   ]);
-  return buildDashboardModel(repository, runs, new Date(now()).toISOString());
+  const runsById = new Map();
+  for (const run of [
+    ...(runs.workflow_runs ?? []),
+    ...(stagingRuns.workflow_runs ?? []),
+    ...(productionRuns.workflow_runs ?? [])
+  ]) {
+    runsById.set(String(run.id ?? run.html_url), run);
+  }
+  return buildDashboardModel(
+    repository,
+    { workflow_runs: [...runsById.values()] },
+    new Date(now()).toISOString()
+  );
 }
