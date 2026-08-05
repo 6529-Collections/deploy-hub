@@ -2,6 +2,11 @@
 
 ## 2026-08-05
 
+- Synchronized frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  with current frontend `main` at exact head
+  `11c84cc6be0b33312d4d3ea26e986bbce500ec14`. The merge was conflict-free;
+  newly triggered CI was not polled.
 - Followed up frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   again at exact head `be52c0ea98433f8001a494de2cd05fb34f510611`.

@@ -15,7 +15,7 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `be52c0ea98433f8001a494de2cd05fb34f510611`.
+is open at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14`.
 It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
