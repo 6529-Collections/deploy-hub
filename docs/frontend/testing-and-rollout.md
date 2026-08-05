@@ -17,6 +17,8 @@ throughout rollout.
   cancel, and retry projection.
 - Five-second polling replacement and recovery after a failed poll.
 - Token canary proving credentials never enter visible or durable output.
+- One-shot agent submit, status, stop, retry, and staging-removal commands using
+  the same exact operation contract, including moved-SHA retry rejection.
 
 ## 2. Base FE shadow workflow
 

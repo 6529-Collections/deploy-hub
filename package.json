@@ -7,8 +7,12 @@
   "engines": {
     "node": ">=22.17.1"
   },
+  "bin": {
+    "deploy-hub": "./deploy-hub.mjs"
+  },
   "scripts": {
     "check": "npm run format:check && npm run lint && npm test",
+    "deploy-hub": "node deploy-hub.mjs",
     "format": "prettier --write \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"test/**/*.js\" \"ui/**/*.{html,js,css}\"",
     "format:check": "prettier --check \".github/**/*.yml\" \"*.json\" \"*.mjs\" \"test/**/*.js\" \"ui/**/*.{html,js,css}\"",
     "lint": "eslint . --max-warnings=0",

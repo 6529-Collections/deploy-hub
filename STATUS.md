@@ -20,8 +20,8 @@ It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
 production preflight, frozen-SHA ancestry and rollback protection, and
-forward-only removal with automatic restore on failure. It also contains
-lower-level primitives needed by Task 5. The PR
+forward-only removal with automatic restore on failure. It also contains the
+lower-level primitives used by Task 5. The PR
 remains open, and no Deploy Hub operation was dispatched.
 
 The latest review follow-up syncs current frontend `main`, verifies each
@@ -31,9 +31,8 @@ or redirected credentialed GitHub API requests. All CodeRabbit threads are
 resolved. Focused tests, test type-checks, Knip, and changed-code quality checks
 pass locally.
 
-Task 2 is **DONE**. Tasks 3 and 4 are **DONE — PENDING** frontend PR
+Task 2 is **DONE**. Tasks 3, 4, and 5 are **DONE — PENDING** frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
-Task 5 is **NOT STARTED**.
 
 - Task 3 has all 16 criteria implemented. One fixed commit-status context holds
   pending requests until the surviving controller claims them; later cohorts
@@ -44,6 +43,11 @@ Task 5 is **NOT STARTED**.
   mergeability, check runs, and external statuses immediately before that PR's
   merge. The canonical deploy keeps its frozen SHA valid if `main` advances,
   while blocking removed-history candidates and unintended rollbacks.
+- Task 5 has all 8 criteria implemented. One dependency-free command uses the
+  caller's existing GitHub authentication to submit, read one current status
+  snapshot, stop, retry, or remove through the same fixed UI contract. It
+  preserves exact SHA/target identity, rejects moved-head retries, prints exact
+  GitHub run identity, and exits without becoming an execution dependency.
 
 The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
 live workflow contract, refreshes GitHub truth every five seconds, shows
@@ -104,7 +108,7 @@ inactive while the PR is open; this follow-up did not dispatch them.
 
 ## Next work
 
-Start Task 5, the small agent-facing submit/status/stop/retry surface that uses
-the same GitHub contract. Keep PR #3586 open until its frontend changes are
-actually needed. Any real staging operation still requires a separate explicit
-owner instruction.
+Task 6 is next. Keep frontend PR #3586 open until its frontend changes are
+actually needed, then merge it immediately before controlled canary testing.
+Any merge or real staging operation still requires a separate explicit owner
+instruction.

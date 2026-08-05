@@ -30,7 +30,7 @@ separate project.
 |    2 | Live frontend UI                      | DONE        | 1          |
 |    3 | Real frontend staging                 | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 1, 2       |
 |    4 | Real frontend production              | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3          |
-|    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
+|    5 | Agent operations and recovery         | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
 
@@ -42,8 +42,8 @@ separate project.
   is open at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
-  forward-only removal from staging. It also provides lower-level primitives
-  needed by future Task 5. It is intentionally pending merge. No Deploy Hub
+  forward-only removal from staging. It also provides the lower-level
+  primitives used by Task 5. It is intentionally pending merge. No Deploy Hub
   operation was dispatched.
 
 ## Task details
@@ -284,33 +284,43 @@ Evidence:
   ordinary `main` advancement while preventing removed-history candidates and
   unintended rollback.
 
-### [ ] Task 5 — Agent operations and recovery
+### [x] Task 5 — Agent operations and recovery
 
-Status: `NOT STARTED`
+Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
 
 Outcome: Codex operates the same frontend contract without the browser or a
 Deploy Hub credential.
 
 Acceptance criteria:
 
-- [ ] One small command or skill supports submit, status, stop, and retry.
-- [ ] The same command or UI contract can remove one tracked, unmerged PR from
+- [x] One small command or skill supports submit, status, stop, and retry.
+- [x] The same command or UI contract can remove one tracked, unmerged PR from
       staging without an agent polling loop.
-- [ ] It uses existing GitHub authentication and the same fixed repositories,
+- [x] It uses existing GitHub authentication and the same fixed repositories,
       workflows, refs, exact-SHA checks, and production-intent rules as the UI.
-- [ ] It retains exact run identity and can resume from GitHub/runtime truth.
-- [ ] Stop targets the exact operation and uses the same immediate-cancel or
+- [x] It retains exact run identity and can resume from GitHub/runtime truth.
+- [x] Stop targets the exact operation and uses the same immediate-cancel or
       post-mutation safe-stop contract as the UI; it requires no agent polling.
-- [ ] Retry preserves the same exact SHA and target.
-- [ ] A closed agent task is not required for operation execution or recovery.
-- [ ] Direct canonical workflows remain documented fallback paths.
+- [x] Retry preserves the same exact SHA and target.
+- [x] A closed agent task is not required for operation execution or recovery.
+- [x] Direct canonical workflows remain documented fallback paths.
 
 Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   provides the in-repository Stop and forward-only removal/recovery primitives.
-  The agent command remains unimplemented; the Task 2 UI entry points exist.
+- `deploy-hub.mjs` provides one dependency-free submit, status, stop, retry,
+  and remove command. It uses `GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`,
+  then applies the same operator verification and shared UI operation module.
+- Status is a single GitHub snapshot containing exact operation, PR SHA, and
+  run ID/link evidence. Stop and removal submit once and exit. Retry re-freezes
+  current PR heads and fails closed if any exact original SHA moved.
+- Seven focused agent-command tests cover parsing, authentication, submission,
+  status identity, Stop projection, exact-SHA retry, and tracked removal. All
+  32 repository tests, formatting, and lint pass.
+- The README documents every command and direct canonical staging/production
+  fallback. No Deploy Hub operation was dispatched.
 
 ### [ ] Task 6 — Canary, burn-in, and establishment
 
@@ -364,4 +374,6 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 5 — Agent operations and recovery.
+Task 6 — Canary, burn-in, and establishment. Frontend PR #3586 remains open
+until the owner deliberately merges it immediately before controlled canary
+testing.

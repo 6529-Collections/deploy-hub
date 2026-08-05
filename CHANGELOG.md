@@ -2,6 +2,12 @@
 
 ## 2026-08-05
 
+- Completed Task 5 as **DONE — PENDING** frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
+  Added one dependency-free agent command for submit, one-shot status, exact
+  Stop, same-SHA retry, and tracked staging removal using existing GitHub
+  authentication and the UI's fixed operation contract. All 32 repository
+  tests, formatting, and lint pass; no operation or deployment was dispatched.
 - Synchronized frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   with current frontend `main` at exact head

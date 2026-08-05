@@ -47,6 +47,9 @@ real staging while preserving the existing manual path.
 - The static UI and direct GitHub-token authentication are implemented. The UI
   freezes exact PR heads, submits the fixed operation contract, refreshes
   GitHub truth every five seconds, and exposes Stop and tracked staging removal.
+- The one-shot agent command supports submit, status, Stop, exact-SHA retry,
+  and tracked staging removal through the same fixed GitHub contract and the
+  caller's existing GitHub authentication.
 - The supplied Deploy Hub mark and deterministic icon/favicon sizes are saved
   under `ui/assets/brand/` and integrated into the static UI.
 - The FE-only requirements, architecture, flows, and rollout strategy are the
@@ -91,3 +94,35 @@ During the current private bootstrap, audited changes are pushed directly to
 `main` after fetching and checking `origin/main`. Protected main must be
 reconsidered before adding deployment mutation capability or another write
 actor.
+
+## Agent command
+
+Codex and other operators use the same fixed GitHub contract as the static UI:
+
+```bash
+npm run deploy-hub -- submit staging 123
+npm run deploy-hub -- submit production 123 456
+npm run deploy-hub -- status [operation-id]
+npm run deploy-hub -- stop <operation-id>
+npm run deploy-hub -- retry <operation-id>
+npm run deploy-hub -- remove <pr-number>
+```
+
+The command uses `GH_TOKEN`, `GITHUB_TOKEN`, or the caller's existing
+`gh auth token`. It verifies the same operator membership as the UI, prints a
+single JSON result, and exits after one bounded action or status snapshot.
+GitHub retains the exact operation and run identity and continues execution
+without an open agent task. `status` is one current snapshot, not a polling
+loop. `retry` rejects a moved PR rather than changing the original exact SHA or
+target, and `remove` accepts only a tracked, open exact PR currently shown in
+staging.
+
+Until frontend PR
+[#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+is merged, mutation commands fail closed because the live workflow is not on
+frontend `main`.
+
+The canonical frontend workflows remain the direct break-glass paths:
+
+- [Staging deployment](https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-staging.yml)
+- [Production deployment](https://github.com/6529-Collections/6529seize-frontend/actions/workflows/build-upload-deploy-prod.yml)
