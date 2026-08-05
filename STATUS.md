@@ -60,9 +60,9 @@ state, and operators select from a searchable, ordered list of current open
 frontend PRs instead of entering numbers manually. Signed-out access is a
 compact vertical token form; redundant login copy and the source footer have
 been removed. Field focus is deliberately subtle, and machine states such as
-`in_progress` and `queued` render as `In progress` and `Waiting to start`. All
-22 original completion checks and exact-head repository CI pass for completion
-commit
+`in_progress` and `action_required` render as `In Progress` and
+`Action Required` without changing their meaning. All 22 original completion
+checks and exact-head repository CI pass for completion commit
 [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854).
 The current UI regressions and all 35 repository tests also pass.
 

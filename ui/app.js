@@ -91,22 +91,11 @@ function formatElapsed(value) {
 }
 
 export function formatDisplayState(value) {
-  const state = String(value ?? 'unknown').toLowerCase();
-  const labels = {
-    action_required: 'Action required',
-    cancelled: 'Cancelled',
-    failure: 'Failed',
-    in_progress: 'In progress',
-    queued: 'Waiting to start',
-    skipped: 'Skipped',
-    success: 'Successful',
-    timed_out: 'Timed out',
-    unknown: 'Unknown'
-  };
-  return (
-    labels[state] ??
-    `${state.charAt(0).toUpperCase()}${state.slice(1).replaceAll('_', ' ')}`
-  );
+  return String(value ?? 'unknown')
+    .toLowerCase()
+    .split('_')
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
 }
 
 function clearRefreshTimer() {

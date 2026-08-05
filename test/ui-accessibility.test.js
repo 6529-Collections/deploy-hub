@@ -76,9 +76,10 @@ test('browser entry module initializes the signed-out UI without a server', asyn
     assert.equal(elements.get('#dashboard').hidden, true);
     assert.equal(elements.get('#forget-github').hidden, true);
     assert.equal(elements.get('#github-token').focused, true);
-    assert.equal(app.formatDisplayState('in_progress'), 'In progress');
-    assert.equal(app.formatDisplayState('failure'), 'Failed');
-    assert.equal(app.formatDisplayState('queued'), 'Waiting to start');
+    assert.equal(app.formatDisplayState('queued'), 'Queued');
+    assert.equal(app.formatDisplayState('in_progress'), 'In Progress');
+    assert.equal(app.formatDisplayState('action_required'), 'Action Required');
+    assert.equal(app.formatDisplayState('failure'), 'Failure');
   } finally {
     if (documentDescriptor) {
       Object.defineProperty(globalThis, 'document', documentDescriptor);

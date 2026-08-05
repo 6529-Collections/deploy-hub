@@ -177,8 +177,8 @@ Evidence:
 - Signed-out access is a compact single-column form with a full-width token
   field and button. The redundant marketing copy and source footer are gone.
 - Field focus uses a subtle one-pixel highlight, and GitHub's machine states
-  are converted to concise user-facing labels such as `In progress`, `Failed`,
-  and `Waiting to start`.
+  are displayed without semantic changes: underscores become spaces and each
+  word is capitalized.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository
