@@ -453,6 +453,7 @@ a:focus-visible {
 .pr-options {
   display: grid;
   max-height: 280px;
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
@@ -460,6 +461,7 @@ a:focus-visible {
   display: flex;
   gap: 10px;
   align-items: flex-start;
+  min-width: 0;
   padding: 11px 12px;
   border-bottom: 1px solid #1f1f22;
   cursor: pointer;
@@ -489,6 +491,7 @@ a:focus-visible {
 
 .pr-option span {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .pr-option strong,
@@ -497,21 +500,20 @@ a:focus-visible {
 }
 
 .pr-option strong {
+  display: -webkit-box;
   overflow: hidden;
   color: #f4f4f5;
   font-size: 0.78rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .pr-option small {
-  overflow: hidden;
   margin-top: 3px;
   color: #a1a1aa;
   font-size: 0.68rem;
   font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .selected-prs {

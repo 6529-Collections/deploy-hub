@@ -201,8 +201,9 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
 });
 
 test('PR picker searches open work and keeps the bounded multi-select contract', async () => {
-  const [app, html] = await Promise.all([
+  const [app, css, html] = await Promise.all([
     readUiFile('app.js'),
+    readUiFile('styles.css'),
     readUiFile('index.html')
   ]);
 
@@ -211,6 +212,12 @@ test('PR picker searches open work and keeps the bounded multi-select contract',
   assert.match(html, /Selection order is deployment order/);
   assert.match(app, /listOpenPullRequests/);
   assert.match(app, /MAX_SELECTED_PULL_REQUESTS = 20/);
+  assert.match(
+    css,
+    /\.pr-options\s*{[\s\S]*?overflow-x: hidden;[\s\S]*?overflow-y: auto;/
+  );
+  assert.match(css, /\.pr-option strong\s*{[\s\S]*?-webkit-line-clamp: 2;/);
+  assert.match(css, /\.pr-option span\s*{[\s\S]*?overflow-wrap: anywhere;/);
 });
 
 test('declared icons exist at their exact expected dimensions', async () => {

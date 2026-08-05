@@ -68,7 +68,8 @@ Environment cards now remain in an explicit loading state until that GitHub
 truth arrives; they no longer flash a false `No recent run` placeholder. Each
 environment card also links directly to its canonical frontend workflow page.
 The review action remains disabled with a visible prompt until an open PR is
-selected.
+selected. The PR picker uses two-line titles, wrapping metadata, and
+vertical-only scrolling.
 The current UI regressions and all 35 repository tests also pass.
 
 ## Retained foundation

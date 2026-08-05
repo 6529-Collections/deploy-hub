@@ -185,6 +185,8 @@ Evidence:
   canonical frontend workflow pages.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
+- PR titles wrap to at most two lines, metadata and long branch names wrap
+  safely, and the picker scrolls vertically without horizontal overflow.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

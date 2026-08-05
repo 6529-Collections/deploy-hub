@@ -2,6 +2,8 @@
 
 ## 2026-08-05
 
+- Removed horizontal scrolling from the PR picker. Titles now wrap to at most
+  two lines, while branch and author metadata wrap safely when needed.
 - Disabled `Review selected PRs` while the selection is empty and made the
   selection requirement visible before submission instead of only after an
   invalid click.
