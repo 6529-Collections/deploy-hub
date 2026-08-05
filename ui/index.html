@@ -266,6 +266,7 @@
                 class="button button-primary button-wide"
                 id="review-operation"
                 type="submit"
+                disabled
               >
                 Review selected PRs
               </button>
@@ -295,7 +296,9 @@
                 Start operation
               </button>
             </div>
-            <p class="form-message" id="operation-message" role="status"></p>
+            <p class="form-message" id="operation-message" role="status">
+              Select at least one open pull request.
+            </p>
           </section>
 
           <section

@@ -183,6 +183,8 @@ Evidence:
   `No recent run` appears only after a successful read finds no matching run.
 - Staging and Production cards link both to the latest matching run and their
   canonical frontend workflow pages.
+- The review action is disabled with a visible selection prompt until at least
+  one open frontend PR is selected.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

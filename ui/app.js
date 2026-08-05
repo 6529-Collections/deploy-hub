@@ -61,6 +61,7 @@ let frozenPreview = null;
 let refreshInFlight = false;
 let pullRequests = [];
 let pullRequestsInFlight = false;
+let reviewInFlight = false;
 let selectedPrNumbers = [];
 
 function safeMessage(error, fallback) {
@@ -181,10 +182,20 @@ async function connect(token) {
 }
 
 function updateSelectedPrs() {
-  elements.selectedPrs.textContent =
-    selectedPrNumbers.length === 0
-      ? 'None selected'
-      : `Deployment order: ${selectedPrNumbers.map((pr) => `#${pr}`).join(' → ')}`;
+  const noSelection = selectedPrNumbers.length === 0;
+  elements.selectedPrs.textContent = noSelection
+    ? 'None selected'
+    : `Deployment order: ${selectedPrNumbers.map((pr) => `#${pr}`).join(' → ')}`;
+  elements.reviewButton.disabled = noSelection || reviewInFlight;
+  if (noSelection) {
+    elements.operationMessage.textContent =
+      'Select at least one open pull request.';
+  } else if (
+    elements.operationMessage.textContent ===
+    'Select at least one open pull request.'
+  ) {
+    elements.operationMessage.textContent = '';
+  }
 }
 
 function renderPullRequests() {
@@ -553,7 +564,8 @@ elements.operationForm.addEventListener('submit', async (event) => {
     elements.prSearch.focus();
     return;
   }
-  elements.reviewButton.disabled = true;
+  reviewInFlight = true;
+  updateSelectedPrs();
   elements.operationMessage.textContent = 'Freezing exact PR heads…';
   try {
     const target = new globalThis.FormData(elements.operationForm).get(
@@ -575,7 +587,8 @@ elements.operationForm.addEventListener('submit', async (event) => {
       'Unable to freeze these PRs.'
     );
   } finally {
-    elements.reviewButton.disabled = false;
+    reviewInFlight = false;
+    updateSelectedPrs();
   }
 });
 

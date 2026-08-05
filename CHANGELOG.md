@@ -2,6 +2,9 @@
 
 ## 2026-08-05
 
+- Disabled `Review selected PRs` while the selection is empty and made the
+  selection requirement visible before submission instead of only after an
+  invalid click.
 - Added permanent `View workflow` links for the canonical frontend staging and
   production deployment workflows alongside each environment's latest run.
 - Replaced the false initial `No recent run` environment placeholders with

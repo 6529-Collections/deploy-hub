@@ -111,7 +111,10 @@ test('browser entry module references elements that exist exactly once', async (
 });
 
 test('forms and live interaction surfaces expose accessible relationships', async () => {
-  const html = await readUiFile('index.html');
+  const [app, html] = await Promise.all([
+    readUiFile('app.js'),
+    readUiFile('index.html')
+  ]);
 
   assert.match(html, /<html lang="en">/);
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
@@ -123,7 +126,18 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
   assert.match(html, /id="auth-message" role="status"/);
-  assert.match(html, /id="operation-message" role="status"/);
+  assert.match(
+    html,
+    /id="operation-message" role="status">[\s\S]*?Select at least one open pull request\./
+  );
+  assert.match(
+    html.match(/<button(?=[^>]*id="review-operation")[^>]*>/)?.[0] ?? '',
+    /disabled/
+  );
+  assert.match(
+    app,
+    /elements\.reviewButton\.disabled = noSelection \|\| reviewInFlight/
+  );
   assert.match(html, /id="staging-state"[\s\S]*?Loading…/);
   assert.match(html, /id="production-state"[\s\S]*?Loading…/);
   assert.doesNotMatch(html, /id="(?:staging|production)-state">No recent run/);

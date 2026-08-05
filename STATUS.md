@@ -67,6 +67,8 @@ checks and exact-head repository CI pass for completion commit
 Environment cards now remain in an explicit loading state until that GitHub
 truth arrives; they no longer flash a false `No recent run` placeholder. Each
 environment card also links directly to its canonical frontend workflow page.
+The review action remains disabled with a visible prompt until an open PR is
+selected.
 The current UI regressions and all 35 repository tests also pass.
 
 ## Retained foundation
