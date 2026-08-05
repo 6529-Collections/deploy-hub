@@ -15,7 +15,7 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14`.
+is open at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b`.
 It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
@@ -24,12 +24,12 @@ forward-only removal with automatic restore on failure. It also contains the
 lower-level primitives used by Task 5. The PR
 remains open, and no Deploy Hub operation was dispatched.
 
-The latest review follow-up syncs current frontend `main`, verifies each
-production merge against the exact authorized main parent, publishes terminal
-Deploy Hub status even when staging E2E packs are skipped, and rejects insecure
-or redirected credentialed GitHub API requests. All CodeRabbit threads are
-resolved. Focused tests, test type-checks, Knip, and changed-code quality checks
-pass locally.
+The latest action was a conflict-free sync with current frontend `main`; newly
+triggered CI was not polled. Before that sync, the review follow-up verified
+each production merge against the exact authorized main parent, published
+terminal Deploy Hub status even when staging E2E packs are skipped, and
+rejected insecure or redirected credentialed GitHub API requests. All then-open
+CodeRabbit threads were resolved, and focused local validation passed.
 
 Task 2 is **DONE**. Tasks 3, 4, and 5 are **DONE — PENDING** frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
@@ -108,7 +108,8 @@ inactive while the PR is open; this follow-up did not dispatch them.
 
 ## Next work
 
-Task 6 is next. Keep frontend PR #3586 open until its frontend changes are
-actually needed, then merge it immediately before controlled canary testing.
-Any merge or real staging operation still requires a separate explicit owner
-instruction.
+Task 6 begins with shadow-only validation through the already-merged dormant
+shadow workflow. Keep frontend PR #3586 open and do not mutate staging or
+production during this phase. Merge #3586 only after shadow evidence passes and
+the owner separately authorizes a controlled real canary. Any merge or real
+staging operation still requires an explicit owner instruction.

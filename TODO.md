@@ -39,7 +39,7 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14`.
+  is open at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides the lower-level
@@ -219,7 +219,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14` contains the
+  at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
@@ -275,7 +275,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `11c84cc6be0b33312d4d3ea26e986bbce500ec14` contains the
+  at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App
@@ -374,6 +374,8 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 6 — Canary, burn-in, and establishment. Frontend PR #3586 remains open
-until the owner deliberately merges it immediately before controlled canary
-testing.
+Task 6 — Canary, burn-in, and establishment. Begin with shadow-only validation
+through the already-merged dormant shadow workflow. Keep frontend PR #3586
+open and do not mutate staging or production during this phase. Merge #3586
+only after shadow evidence passes and the owner separately authorizes a
+controlled real canary.
