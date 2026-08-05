@@ -4,6 +4,13 @@
 
 - Followed up frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  again at exact head `be52c0ea98433f8001a494de2cd05fb34f510611`.
+  Synced current frontend `main`, bound production continuation to exact merge
+  parents, made skipped staging E2E paths publish terminal Deploy Hub status,
+  and rejected insecure or redirected credentialed GitHub API requests. All
+  review threads are resolved; newly triggered CI was not polled.
+- Followed up frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd`. Synced current
   frontend `main`, fixed the failing Knip export and Sonar predicate finding,
   bound canonical deploys to their exact controller operation and commit, and
