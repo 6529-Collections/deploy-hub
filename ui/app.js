@@ -118,6 +118,23 @@ function showSignedOut(message = '') {
   elements.tokenInput.focus();
 }
 
+function showDashboardLoading() {
+  for (const [stateElement, linkElement] of [
+    [elements.stagingState, elements.stagingLink],
+    [elements.productionState, elements.productionLink]
+  ]) {
+    stateElement.className = 'summary-value summary-loading';
+    stateElement.textContent = 'Loading…';
+    stateElement.setAttribute('aria-busy', 'true');
+    linkElement.hidden = true;
+  }
+  elements.waitingCount.textContent = '…';
+  elements.refreshState.textContent = 'Loading GitHub…';
+  elements.operationsList.replaceChildren();
+  elements.operationsEmpty.textContent = 'Loading…';
+  elements.operationsEmpty.hidden = false;
+}
+
 function showSignedIn(identity, token) {
   activeToken = token;
   currentIdentity = identity;
@@ -125,6 +142,7 @@ function showSignedIn(identity, token) {
   elements.authBadge.textContent = `@${identity.login}`;
   elements.authMessage.textContent = '';
   elements.authPanel.hidden = true;
+  showDashboardLoading();
   elements.dashboard.hidden = false;
   elements.forgetButton.hidden = false;
   elements.connectButton.disabled = false;
@@ -248,6 +266,8 @@ async function refreshPullRequests({ announce = false } = {}) {
 }
 
 function setEnvironment(run, stateElement, linkElement) {
+  stateElement.className = 'summary-value';
+  stateElement.setAttribute('aria-busy', 'false');
   if (!run) {
     stateElement.textContent = 'No recent run';
     linkElement.hidden = true;
@@ -455,6 +475,7 @@ function renderDashboard(model) {
   elements.operationsList.replaceChildren(
     ...model.operations.map(renderOperation)
   );
+  elements.operationsEmpty.textContent = 'No Deploy Hub operations found yet.';
   elements.operationsEmpty.hidden = model.operations.length > 0;
 }
 

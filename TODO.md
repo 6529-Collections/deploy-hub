@@ -179,6 +179,10 @@ Evidence:
 - Field focus uses a subtle one-pixel highlight, and GitHub's machine states
   are displayed without semantic changes: underscores become spaces and each
   word is capitalized.
+- Environment cards show a loader until the first complete GitHub snapshot;
+  `No recent run` appears only after a successful read finds no matching run.
+- Staging and Production cards link both to the latest matching run and their
+  canonical frontend workflow pages.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

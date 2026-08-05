@@ -124,6 +124,17 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
   assert.match(html, /id="auth-message" role="status"/);
   assert.match(html, /id="operation-message" role="status"/);
+  assert.match(html, /id="staging-state"[\s\S]*?Loading…/);
+  assert.match(html, /id="production-state"[\s\S]*?Loading…/);
+  assert.doesNotMatch(html, /id="(?:staging|production)-state">No recent run/);
+  assert.match(
+    html,
+    /actions\/workflows\/deploy-staging\.yml[\s\S]*?View workflow/
+  );
+  assert.match(
+    html,
+    /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View workflow/
+  );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
   assert.match(html, /id="operations-list"[\s\S]*role="list"/);
   assert.doesNotMatch(html, /tabindex="[1-9]/);
@@ -154,6 +165,7 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
 
   assert.match(css, /:focus-visible/);
   assert.match(css, /\.target-option:focus-within/);
+  assert.match(css, /\.summary-loading::before/);
   assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
   assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);

@@ -108,17 +108,34 @@
               ></span>
               <h2>Staging</h2>
             </div>
-            <p class="summary-value" id="staging-state">No recent run</p>
-            <a
-              class="inline-link"
-              id="staging-link"
-              href="#"
-              target="_blank"
-              rel="noreferrer"
-              hidden
+            <p
+              class="summary-value summary-loading"
+              id="staging-state"
+              aria-busy="true"
+              aria-live="polite"
             >
-              Open latest run
-            </a>
+              Loading…
+            </p>
+            <div class="summary-links">
+              <a
+                class="inline-link"
+                id="staging-link"
+                href="#"
+                target="_blank"
+                rel="noreferrer"
+                hidden
+              >
+                Open latest run
+              </a>
+              <a
+                class="inline-link"
+                href="https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-staging.yml"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View workflow
+              </a>
+            </div>
           </article>
           <article class="summary-card">
             <div class="summary-heading">
@@ -128,17 +145,34 @@
               ></span>
               <h2>Production</h2>
             </div>
-            <p class="summary-value" id="production-state">No recent run</p>
-            <a
-              class="inline-link"
-              id="production-link"
-              href="#"
-              target="_blank"
-              rel="noreferrer"
-              hidden
+            <p
+              class="summary-value summary-loading"
+              id="production-state"
+              aria-busy="true"
+              aria-live="polite"
             >
-              Open latest run
-            </a>
+              Loading…
+            </p>
+            <div class="summary-links">
+              <a
+                class="inline-link"
+                id="production-link"
+                href="#"
+                target="_blank"
+                rel="noreferrer"
+                hidden
+              >
+                Open latest run
+              </a>
+              <a
+                class="inline-link"
+                href="https://github.com/6529-Collections/6529seize-frontend/actions/workflows/build-upload-deploy-prod.yml"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View workflow
+              </a>
+            </div>
           </article>
           <article class="summary-card">
             <div class="summary-heading">
@@ -149,7 +183,7 @@
               <h2>Waiting</h2>
             </div>
             <p class="summary-value">
-              <span id="waiting-count">0</span> operations
+              <span id="waiting-count">…</span> operations
             </p>
             <p class="summary-detail" id="refresh-state">
               Connecting to GitHub…
@@ -287,9 +321,7 @@
               Refresh failed. Showing the last complete GitHub snapshot.
             </p>
             <div class="operations-list" id="operations-list" role="list"></div>
-            <p class="empty-state" id="operations-empty">
-              No Deploy Hub operations found yet.
-            </p>
+            <p class="empty-state" id="operations-empty">Loading…</p>
           </section>
         </div>
       </div>
