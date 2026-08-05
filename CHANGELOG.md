@@ -1,5 +1,16 @@
 # Planning Changelog
 
+## 2026-08-05
+
+- Followed up frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd`. Synced current
+  frontend `main`, fixed the failing Knip export and Sonar predicate finding,
+  bound canonical deploys to their exact controller operation and commit, and
+  adopted `main`'s automatic E2E dispatch without duplicate runs. All review
+  threads, including outdated CodeRabbit threads, are resolved. No workflow
+  was dispatched and newly triggered CI was not polled.
+
 ## 2026-08-04
 
 - Followed up frontend PR

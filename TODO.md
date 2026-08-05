@@ -1,6 +1,6 @@
 # Deploy Hub FE Implementation Tracker
 
-Last updated: 2026-08-04
+Last updated: 2026-08-05
 
 This is the only active top-level implementation tracker. It intentionally
 contains eight frontend tasks rather than decomposing every concern into a
@@ -39,7 +39,7 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958`.
+  is open at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides lower-level primitives
@@ -219,7 +219,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958` contains the
+  at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
@@ -275,7 +275,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958` contains the
+  at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App

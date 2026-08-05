@@ -1,6 +1,6 @@
 # Deploy Hub Status
 
-Last updated: 2026-08-04
+Last updated: 2026-08-05
 
 ## Current position
 
@@ -15,7 +15,7 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `eb1cb9fa22f38bace28028cd8a808bd1c6836958`.
+is open at exact head `11ca7e8faada64bd224597d7bb5302801814fdfd`.
 It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
@@ -24,12 +24,12 @@ forward-only removal with automatic restore on failure. It also contains
 lower-level primitives needed by Task 5. The PR
 remains open, and no Deploy Hub operation was dispatched.
 
-The latest review follow-up fixes the task-owned Jest typecheck failure and
-addresses current workflow-orchestration review findings: GitHub request
-timeouts/retries, nested refs, current mergeability polling, workflow-origin
-verification, newest-status selection, bounded final polling, reconciliation
-race protection, base-ref propagation, and failure reporting that preserves
-the original error. Focused tests and changed-code quality checks pass locally.
+The latest review follow-up syncs current frontend `main`, fixes the failing
+Knip export and Sonar predicate finding, binds each canonical deploy to its
+exact Deploy Hub controller operation and commit, and integrates with `main`'s
+automatic E2E dispatch without creating duplicate E2E runs. All CodeRabbit
+threads, including outdated threads, are resolved. Focused tests, test
+type-checks, Knip, and changed-code quality checks pass locally.
 
 Task 2 is **DONE**. Tasks 3 and 4 are **DONE — PENDING** frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
