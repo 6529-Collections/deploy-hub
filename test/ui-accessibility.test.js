@@ -157,6 +157,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.doesNotMatch(html, /Reading GitHub truth|Loading GitHub/);
   assert.doesNotMatch(html, /GitHub truth/i);
   assert.match(html, /<p class="eyebrow">Deployment activity<\/p>/);
+  assert.match(html, /<h2 id="operations-title">Recent Operations<\/h2>/);
   assert.match(
     html,
     /id="refresh-dashboard"[\s\S]*?aria-label="Refresh operations"[\s\S]*?<svg[\s\S]*?aria-hidden="true"/
