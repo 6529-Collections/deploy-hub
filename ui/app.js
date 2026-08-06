@@ -181,9 +181,7 @@ async function connect(token) {
     ) {
       forgetToken(localStorage);
     }
-    showSignedOut(
-      safeMessage(error, 'GitHub authentication is temporarily unavailable.')
-    );
+    showSignedOut(safeMessage(error, 'Could not reach GitHub. Try again.'));
   }
 }
 

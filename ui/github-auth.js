@@ -42,7 +42,7 @@ export async function authenticateGitHubToken(
   if (!viewerResponse.ok) {
     throw new GitHubAuthError(
       'github_unavailable',
-      'GitHub authentication is temporarily unavailable.'
+      'Could not reach GitHub. Try again.'
     );
   }
 

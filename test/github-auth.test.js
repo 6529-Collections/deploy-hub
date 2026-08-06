@@ -95,6 +95,18 @@ test('rejects invalid tokens without exposing GitHub response text', async () =>
   );
 });
 
+test('reports an actionable error when GitHub cannot authenticate', async () => {
+  const fetchImpl = sequenceFetch([jsonResponse(500, {})], []);
+
+  await assert.rejects(
+    authenticateGitHubToken(TOKEN, fetchImpl),
+    (error) =>
+      error instanceof GitHubAuthError &&
+      error.code === 'github_unavailable' &&
+      error.message === 'Could not reach GitHub. Try again.'
+  );
+});
+
 test('rejects users outside the operator team', async () => {
   const fetchImpl = sequenceFetch(
     [
