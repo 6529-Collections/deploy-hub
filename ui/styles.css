@@ -358,12 +358,16 @@ a:focus-visible {
 .summary-grid,
 .workspace-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
 .summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 14px;
+}
+
+.workspace-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .operations-panel {
@@ -382,9 +386,30 @@ a:focus-visible {
 
 .summary-icon {
   width: 1rem;
+  flex: 0 0 auto;
   font-size: 1rem;
   line-height: 1;
   text-align: center;
+}
+
+.operations-title-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.queue-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid #2a2a2e;
+  border-radius: 999px;
+  background: #111113;
+  color: #a1a1aa;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .summary-value {
@@ -446,6 +471,10 @@ a:focus-visible {
   padding-bottom: 20px;
   border-bottom: 1px solid #242428;
   margin-bottom: 20px;
+}
+
+.operations-panel[aria-busy='true'] .button-icon svg {
+  animation: session-spin 700ms linear infinite;
 }
 
 .repo-label,
@@ -809,7 +838,9 @@ code {
     transition-duration: 0.01ms !important;
   }
 
-  .session-spinner {
+  .session-spinner,
+  .summary-loading::before,
+  .operations-panel[aria-busy='true'] .button-icon svg {
     animation: none;
   }
 }

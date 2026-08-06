@@ -41,9 +41,9 @@ const elements = {
   previewTarget: document.querySelector('#preview-target'),
   productionLink: document.querySelector('#production-link'),
   productionState: document.querySelector('#production-state'),
+  queueBadge: document.querySelector('#waiting-state'),
   refreshButton: document.querySelector('#refresh-dashboard'),
   refreshPrs: document.querySelector('#refresh-prs'),
-  refreshState: document.querySelector('#refresh-state'),
   reviewButton: document.querySelector('#review-operation'),
   selectedPrs: document.querySelector('#selected-prs'),
   sessionPanel: document.querySelector('#session-panel'),
@@ -51,8 +51,7 @@ const elements = {
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
   startOperation: document.querySelector('#start-operation'),
-  tokenInput: document.querySelector('#github-token'),
-  waitingState: document.querySelector('#waiting-state')
+  tokenInput: document.querySelector('#github-token')
 };
 
 let activeToken = '';
@@ -70,14 +69,6 @@ function safeMessage(error, fallback) {
     error instanceof GitHubAuthError
     ? error.message
     : fallback;
-}
-
-function formatDate(value) {
-  if (!value) return 'Time unavailable';
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  }).format(new Date(value));
 }
 
 function formatElapsed(value) {
@@ -131,11 +122,10 @@ function showDashboardLoading() {
     stateElement.setAttribute('aria-busy', 'true');
     linkElement.hidden = true;
   }
-  elements.waitingState.className = 'summary-value summary-loading';
-  elements.waitingState.textContent = 'Loading…';
-  elements.waitingState.setAttribute('aria-busy', 'true');
-  elements.refreshState.textContent = '';
-  elements.refreshState.hidden = true;
+  elements.queueBadge.textContent = 'Loading…';
+  elements.queueBadge.setAttribute('aria-busy', 'true');
+  elements.refreshButton.disabled = true;
+  elements.operationsPanel.setAttribute('aria-busy', 'true');
   elements.operationsList.replaceChildren();
   elements.operationsEmpty.textContent = 'Loading…';
   elements.operationsEmpty.hidden = false;
@@ -485,13 +475,8 @@ function renderDashboard(model) {
     elements.productionState,
     elements.productionLink
   );
-  elements.waitingState.className = 'summary-value';
-  elements.waitingState.textContent = `${model.waiting} ${
-    model.waiting === 1 ? 'operation' : 'operations'
-  }`;
-  elements.waitingState.setAttribute('aria-busy', 'false');
-  elements.refreshState.textContent = `Updated ${formatDate(model.refreshedAt)}`;
-  elements.refreshState.hidden = false;
+  elements.queueBadge.textContent = `${model.waiting} queued`;
+  elements.queueBadge.setAttribute('aria-busy', 'false');
   elements.staleWarning.hidden = true;
   elements.operationsList.replaceChildren(
     ...model.operations.map(renderOperation)
@@ -509,8 +494,6 @@ async function refreshDashboard() {
     renderDashboard(await readDashboard(activeToken));
   } catch (error) {
     elements.staleWarning.hidden = false;
-    elements.refreshState.textContent = 'Snapshot stale';
-    elements.refreshState.hidden = false;
     if (error instanceof GitHubOperationError && error.status === 401) {
       forgetToken(localStorage);
       showSignedOut('GitHub rejected the stored token. Connect again.');

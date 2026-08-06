@@ -145,7 +145,6 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(html, /id="staging-state"[\s\S]*?Loading…/);
   assert.match(html, /id="production-state"[\s\S]*?Loading…/);
-  assert.match(html, /<h2>Queued Operations<\/h2>/);
   assert.match(html, /aria-hidden="true">🚧<\/span>/);
   assert.match(html, /aria-hidden="true">🚀<\/span>/);
   assert.match(html, /aria-hidden="true">📥<\/span>/);
@@ -157,7 +156,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.doesNotMatch(html, /Reading GitHub truth|Loading GitHub/);
   assert.doesNotMatch(html, /GitHub truth/i);
   assert.match(html, /<p class="eyebrow">Deployment activity<\/p>/);
-  assert.match(html, /<h2 id="operations-title">Recent Operations<\/h2>/);
+  assert.match(html, /<h2 id="operations-title">Operations<\/h2>/);
   assert.match(
     html,
     /id="refresh-dashboard"[\s\S]*?aria-label="Refresh operations"[\s\S]*?<svg[\s\S]*?aria-hidden="true"/
@@ -208,6 +207,10 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
   assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(
+    css,
+    /\.operations-panel\[aria-busy='true'\] \.button-icon svg\s*{[\s\S]*?animation: session-spin/
+  );
   assert.match(css, /\.field-hint\s*{[\s\S]*?color: #94a3b8;/);
   assert.doesNotMatch(css, /footer\s*{/);
 });
@@ -217,7 +220,11 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
 
   assert.match(
     css,
-    /\.summary-grid,[\s\S]*?\.workspace-grid\s*{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
+    /\.summary-grid\s*{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/
+  );
+  assert.match(
+    css,
+    /\.workspace-grid\s*{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
   );
   assert.match(css, /\.operations-panel\s*{[\s\S]*?grid-column: span 2;/);
   assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);

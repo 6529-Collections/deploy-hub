@@ -193,21 +193,6 @@
               </a>
             </div>
           </article>
-          <article class="summary-card">
-            <div class="summary-heading">
-              <span class="summary-icon" aria-hidden="true">📥</span>
-              <h2>Queued Operations</h2>
-            </div>
-            <p
-              class="summary-value summary-loading"
-              id="waiting-state"
-              aria-busy="true"
-              aria-live="polite"
-            >
-              Loading…
-            </p>
-            <p class="summary-detail" id="refresh-state" hidden></p>
-          </article>
         </section>
 
         <div class="workspace-grid">
@@ -329,7 +314,18 @@
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Deployment activity</p>
-                <h2 id="operations-title">Recent Operations</h2>
+                <div class="operations-title-row">
+                  <span class="summary-icon" aria-hidden="true">📥</span>
+                  <h2 id="operations-title">Operations</h2>
+                  <span
+                    class="queue-badge"
+                    id="waiting-state"
+                    aria-busy="true"
+                    aria-live="polite"
+                  >
+                    Loading…
+                  </span>
+                </div>
               </div>
               <button
                 class="button button-quiet button-icon"
