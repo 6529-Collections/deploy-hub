@@ -397,7 +397,7 @@ a:focus-visible {
 
 .summary-heading {
   gap: 8px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .summary-icon {
@@ -429,10 +429,19 @@ a:focus-visible {
 }
 
 .summary-value {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   color: #f8fafc;
   font-size: 1rem;
   font-weight: 750;
+}
+
+.summary-label {
+  margin-bottom: 3px;
+  color: #71717a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .summary-loading {
@@ -459,13 +468,20 @@ a:focus-visible {
 
 .summary-links {
   display: flex;
-  gap: 12px;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.summary-links .inline-link:last-child {
-  margin-left: auto;
+.summary-links .inline-link + .inline-link {
+  padding-left: 10px;
+  margin-left: 10px;
+  border-left: 1px solid #303036;
+}
+
+.inline-link-disabled {
+  color: #52525b;
+  cursor: default;
+  pointer-events: none;
 }
 
 .inline-link {

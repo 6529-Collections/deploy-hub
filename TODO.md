@@ -194,7 +194,10 @@ Evidence:
 - Environment truth reads each canonical workflow directly, so an infrequent
   production run cannot disappear behind the repository's newest 100 runs.
 - Environment links keep the latest run on the left and the canonical workflow
-  on the right edge.
+  together on the left: the workflow is always available and the latest-run
+  link remains visibly disabled until GitHub returns a run.
+- Each environment card labels its status as the latest run and shows the
+  GitHub state without an unexplained commit SHA.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap

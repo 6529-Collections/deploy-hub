@@ -138,6 +138,7 @@
               <span class="summary-icon" aria-hidden="true">🚧</span>
               <h2>Staging</h2>
             </div>
+            <p class="summary-label">Latest run</p>
             <p
               class="summary-value summary-loading"
               id="staging-state"
@@ -149,21 +150,21 @@
             <div class="summary-links">
               <a
                 class="inline-link"
-                id="staging-link"
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                hidden
-              >
-                Open latest run
-              </a>
-              <a
-                class="inline-link"
                 href="https://github.com/6529-Collections/6529seize-frontend/actions/workflows/deploy-staging.yml"
                 target="_blank"
                 rel="noreferrer"
               >
                 View workflow
+              </a>
+              <a
+                class="inline-link inline-link-disabled"
+                id="staging-link"
+                target="_blank"
+                rel="noreferrer"
+                aria-disabled="true"
+                tabindex="-1"
+              >
+                Open latest run
               </a>
             </div>
           </article>
@@ -172,6 +173,7 @@
               <span class="summary-icon" aria-hidden="true">🚀</span>
               <h2>Production</h2>
             </div>
+            <p class="summary-label">Latest run</p>
             <p
               class="summary-value summary-loading"
               id="production-state"
@@ -183,21 +185,21 @@
             <div class="summary-links">
               <a
                 class="inline-link"
-                id="production-link"
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                hidden
-              >
-                Open latest run
-              </a>
-              <a
-                class="inline-link"
                 href="https://github.com/6529-Collections/6529seize-frontend/actions/workflows/build-upload-deploy-prod.yml"
                 target="_blank"
                 rel="noreferrer"
               >
                 View workflow
+              </a>
+              <a
+                class="inline-link inline-link-disabled"
+                id="production-link"
+                target="_blank"
+                rel="noreferrer"
+                aria-disabled="true"
+                tabindex="-1"
+              >
+                Open latest run
               </a>
             </div>
           </article>

@@ -2,6 +2,11 @@
 
 ## 2026-08-06
 
+- Simplified the Staging and Production cards: each now presents a labelled
+  latest-run state without an unexplained commit SHA, followed by one
+  left-aligned `View workflow | Open latest run` action row. The workflow link
+  is always available; the latest-run link is visibly disabled until GitHub
+  returns a matching run.
 - Opened dedicated frontend dry-run PR
   [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
   at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`. It replaces the

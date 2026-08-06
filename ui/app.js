@@ -154,7 +154,10 @@ function showDashboardLoading() {
     stateElement.className = 'summary-value summary-loading';
     stateElement.textContent = 'Loading…';
     stateElement.setAttribute('aria-busy', 'true');
-    linkElement.hidden = true;
+    linkElement.removeAttribute('href');
+    linkElement.setAttribute('aria-disabled', 'true');
+    linkElement.setAttribute('tabindex', '-1');
+    linkElement.classList.add('inline-link-disabled');
   }
   if (dashboardMode === 'operator') {
     elements.queueBadge.hidden = false;
@@ -334,14 +337,19 @@ function setEnvironment(run, stateElement, linkElement) {
   stateElement.className = 'summary-value';
   stateElement.setAttribute('aria-busy', 'false');
   if (!run) {
-    stateElement.textContent = 'No recent run';
-    linkElement.hidden = true;
+    stateElement.textContent = 'No runs found';
+    linkElement.removeAttribute('href');
+    linkElement.setAttribute('aria-disabled', 'true');
+    linkElement.setAttribute('tabindex', '-1');
+    linkElement.classList.add('inline-link-disabled');
     return;
   }
   const state = run.status === 'completed' ? run.conclusion : run.status;
-  stateElement.textContent = `${formatDisplayState(state)} · ${run.head_sha?.slice(0, 12) ?? 'SHA pending'}`;
+  stateElement.textContent = formatDisplayState(state);
   linkElement.href = run.html_url;
-  linkElement.hidden = false;
+  linkElement.removeAttribute('aria-disabled');
+  linkElement.removeAttribute('tabindex');
+  linkElement.classList.remove('inline-link-disabled');
 }
 
 function makeButton(label, className, handler) {

@@ -12,6 +12,12 @@ async function readUiFile(path) {
 class UiElement {
   constructor() {
     this.attributes = new Map();
+    const classes = new Set();
+    this.classList = {
+      add: (...names) => names.forEach((name) => classes.add(name)),
+      contains: (name) => classes.has(name),
+      remove: (...names) => names.forEach((name) => classes.delete(name))
+    };
     this.dataset = {};
     this.disabled = false;
     this.focused = false;
@@ -42,6 +48,10 @@ class UiElement {
 
   getAttribute(name) {
     return this.attributes.get(name) ?? null;
+  }
+
+  removeAttribute(name) {
+    this.attributes.delete(name);
   }
 
   setAttribute(name, value) {
@@ -207,11 +217,15 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(
     html,
-    /actions\/workflows\/deploy-staging\.yml[\s\S]*?View workflow/
+    /actions\/workflows\/deploy-staging\.yml[\s\S]*?View workflow[\s\S]*?id="staging-link"[\s\S]*?aria-disabled="true"[\s\S]*?Open latest run/
   );
   assert.match(
     html,
-    /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View workflow/
+    /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View workflow[\s\S]*?id="production-link"[\s\S]*?aria-disabled="true"[\s\S]*?Open latest run/
+  );
+  assert.equal(
+    (html.match(/<p class="summary-label">Latest run<\/p>/g) ?? []).length,
+    2
   );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
   assert.match(html, /id="refresh-state" hidden/);
@@ -247,8 +261,9 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /\.summary-loading::before/);
   assert.match(
     css,
-    /\.summary-links \.inline-link:last-child\s*{[\s\S]*?margin-left: auto;/
+    /\.summary-links \.inline-link \+ \.inline-link\s*{[\s\S]*?border-left: 1px solid #303036;/
   );
+  assert.match(css, /\.inline-link-disabled\s*{[\s\S]*?pointer-events: none;/);
   assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
   assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
