@@ -2,6 +2,11 @@
 
 ## 2026-08-06
 
+- Added a small self-deployment indicator below the header. It links queued,
+  active, or failed GitHub Pages runs and offers Reload when the browser is
+  still serving an older successful version. The check uses the public GitHub
+  API, polls slowly when idle and once per minute while active, and fails
+  silently without affecting the dashboard.
 - Simplified the Staging and Production cards: each now presents a labelled
   latest-run state without an unexplained commit SHA, followed by one
   left-aligned `View workflow | Open latest run` action row. The workflow link

@@ -198,6 +198,10 @@ Evidence:
   link remains visibly disabled until GitHub returns a run.
 - Each environment card labels its status as the latest run and shows the
   GitHub state without an unexplained commit SHA.
+- The page checks its own public Pages workflow without authentication. It
+  links an active or failed UI deployment and offers Reload when a newer
+  successful version is available; GitHub API failure leaves the page
+  unchanged.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap

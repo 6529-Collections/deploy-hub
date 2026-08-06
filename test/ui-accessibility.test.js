@@ -28,6 +28,8 @@ class UiElement {
     this.value = '';
   }
 
+  append() {}
+
   addEventListener(name, listener) {
     this.listeners.set(name, listener);
   }
@@ -74,10 +76,17 @@ test('browser entry module initializes the public read-only UI without a server'
     globalThis,
     'setInterval'
   );
+  const setTimeoutDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'setTimeout'
+  );
 
   Object.defineProperty(globalThis, 'document', {
     configurable: true,
     value: {
+      createElement() {
+        return new UiElement();
+      },
       querySelector(selector) {
         if (!elements.has(selector)) elements.set(selector, new UiElement());
         return elements.get(selector);
@@ -97,6 +106,10 @@ test('browser entry module initializes the public read-only UI without a server'
     value: () => new Promise(() => {})
   });
   Object.defineProperty(globalThis, 'setInterval', {
+    configurable: true,
+    value: () => 1
+  });
+  Object.defineProperty(globalThis, 'setTimeout', {
     configurable: true,
     value: () => 1
   });
@@ -122,6 +135,34 @@ test('browser entry module initializes the public read-only UI without a server'
     assert.equal(app.formatDisplayState('in_progress'), 'In Progress');
     assert.equal(app.formatDisplayState('action_required'), 'Action Required');
     assert.equal(app.formatDisplayState('failure'), 'Failure');
+    assert.deepEqual(
+      app.siteDeploymentPresentation({ id: 123, status: 'in_progress' }),
+      {
+        action: 'View deployment',
+        active: true,
+        kind: 'active',
+        message: 'Update deploying',
+        url: 'https://github.com/6529-Collections/deploy-hub/actions/runs/123'
+      }
+    );
+    assert.deepEqual(
+      app.siteDeploymentPresentation(
+        {
+          conclusion: 'success',
+          head_sha: 'b'.repeat(40),
+          id: 124,
+          status: 'completed'
+        },
+        'a'.repeat(40)
+      ),
+      {
+        action: 'Reload',
+        active: false,
+        kind: 'ready',
+        message: 'Update available',
+        url: ''
+      }
+    );
   } finally {
     if (documentDescriptor) {
       Object.defineProperty(globalThis, 'document', documentDescriptor);
@@ -142,6 +183,11 @@ test('browser entry module initializes the public read-only UI without a server'
       Object.defineProperty(globalThis, 'setInterval', setIntervalDescriptor);
     } else {
       delete globalThis.setInterval;
+    }
+    if (setTimeoutDescriptor) {
+      Object.defineProperty(globalThis, 'setTimeout', setTimeoutDescriptor);
+    } else {
+      delete globalThis.setTimeout;
     }
   }
 });
@@ -171,6 +217,10 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<html lang="en">/);
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
   assert.match(html, /<h1>6529 Deploy Hub<\/h1>/);
+  assert.match(
+    html,
+    /id="site-deployment-status"[\s\S]*?aria-live="polite"[\s\S]*?hidden/
+  );
   assert.doesNotMatch(html, /6529 engineering/i);
   assert.match(html, /for="github-token"/);
   assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);
@@ -259,6 +309,7 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /:focus-visible/);
   assert.match(css, /\.target-option:focus-within/);
   assert.match(css, /\.summary-loading::before/);
+  assert.match(css, /\.site-deployment-active::before/);
   assert.match(
     css,
     /\.summary-links \.inline-link \+ \.inline-link\s*{[\s\S]*?border-left: 1px solid #303036;/

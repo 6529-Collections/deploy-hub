@@ -56,6 +56,63 @@ a {
   margin-bottom: 28px;
 }
 
+.site-deployment-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 42px;
+  padding: 9px 12px;
+  margin: -12px 0 16px;
+  border: 1px solid #303036;
+  border-radius: 10px;
+  background: #0b0b0d;
+  color: #d4d4d8;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.site-deployment-status a,
+.site-deployment-status button {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: #93c5fd;
+  font: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-deployment-status a:hover,
+.site-deployment-status button:hover {
+  color: #bfdbfe;
+  text-decoration: underline;
+}
+
+.site-deployment-active::before {
+  width: 11px;
+  height: 11px;
+  border: 2px solid #3f3f46;
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: session-spin 700ms linear infinite;
+  content: '';
+}
+
+.site-deployment-active span {
+  margin-right: auto;
+}
+
+.site-deployment-failed {
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.site-deployment-ready {
+  border-color: #1e40af;
+}
+
 .brand {
   gap: 14px;
   white-space: nowrap;
@@ -871,6 +928,7 @@ code {
   }
 
   .summary-loading::before,
+  .site-deployment-active::before,
   .operations-panel[aria-busy='true'] .button-icon svg {
     animation: none;
   }

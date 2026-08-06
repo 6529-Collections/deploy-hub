@@ -87,6 +87,10 @@ returns a run. Each card labels the value as `Latest run` and shows the GitHub
 state without an unexplained commit SHA. Environment runs are read directly
 from their canonical workflows rather than inferred from only the repository's
 newest 100 Actions runs.
+The header area also checks the public Deploy Hub Pages workflow: an active or
+failed UI deployment gets a direct Actions link, while an already completed
+newer version offers Reload. This self-status check requires no authentication
+and disappears harmlessly if GitHub cannot be reached.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

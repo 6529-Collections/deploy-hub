@@ -18,7 +18,13 @@ import {
 
 const OPERATOR_REFRESH_INTERVAL_MS = 5_000;
 const PUBLIC_REFRESH_INTERVAL_MS = 5 * 60_000;
+const SITE_DEPLOYMENT_ACTIVE_INTERVAL_MS = 60_000;
+const SITE_DEPLOYMENT_IDLE_INTERVAL_MS = 5 * 60_000;
 const MAX_SELECTED_PULL_REQUESTS = 20;
+const SITE_VERSION = (() => {
+  const value = new globalThis.URL(import.meta.url).searchParams.get('v') ?? '';
+  return /^[a-f0-9]{40}$/i.test(value) ? value.toLowerCase() : '';
+})();
 
 const elements = {
   accountControl: document.querySelector('#account-control'),
@@ -50,6 +56,7 @@ const elements = {
   refreshPrs: document.querySelector('#refresh-prs'),
   reviewButton: document.querySelector('#review-operation'),
   selectedPrs: document.querySelector('#selected-prs'),
+  siteDeploymentStatus: document.querySelector('#site-deployment-status'),
   stagingLink: document.querySelector('#staging-link'),
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
@@ -68,6 +75,112 @@ let pullRequests = [];
 let pullRequestsInFlight = false;
 let reviewInFlight = false;
 let selectedPrNumbers = [];
+let siteDeploymentTimer = null;
+
+export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
+  const runId = Number(run?.id);
+  const runUrl =
+    Number.isSafeInteger(runId) && runId > 0
+      ? `https://github.com/6529-Collections/deploy-hub/actions/runs/${runId}`
+      : '';
+  if (!runUrl) return null;
+  if (run.status === 'queued' || run.status === 'in_progress') {
+    return {
+      action: 'View deployment',
+      active: true,
+      kind: 'active',
+      message: 'Update deploying',
+      url: runUrl
+    };
+  }
+  if (run.status !== 'completed') return null;
+  if (run.conclusion !== 'success') {
+    return {
+      action: 'View deployment',
+      active: false,
+      kind: 'failed',
+      message: 'Latest UI deployment failed',
+      url: runUrl
+    };
+  }
+  if (
+    currentVersion &&
+    /^[a-f0-9]{40}$/i.test(run.head_sha ?? '') &&
+    run.head_sha.toLowerCase() !== currentVersion.toLowerCase()
+  ) {
+    return {
+      action: 'Reload',
+      active: false,
+      kind: 'ready',
+      message: 'Update available',
+      url: ''
+    };
+  }
+  return null;
+}
+
+function renderSiteDeploymentStatus(presentation) {
+  elements.siteDeploymentStatus.replaceChildren();
+  if (!presentation) {
+    elements.siteDeploymentStatus.hidden = true;
+    elements.siteDeploymentStatus.removeAttribute('aria-busy');
+    return;
+  }
+  elements.siteDeploymentStatus.className = `site-deployment-status site-deployment-${presentation.kind}`;
+  elements.siteDeploymentStatus.setAttribute(
+    'aria-busy',
+    String(presentation.active)
+  );
+  const message = document.createElement('span');
+  message.textContent = presentation.message;
+  let action;
+  if (presentation.kind === 'ready') {
+    action = document.createElement('button');
+    action.type = 'button';
+    action.addEventListener('click', () => globalThis.location.reload());
+  } else {
+    action = document.createElement('a');
+    action.href = presentation.url;
+    action.target = '_blank';
+    action.rel = 'noreferrer';
+  }
+  action.textContent = presentation.action;
+  elements.siteDeploymentStatus.append(message, action);
+  elements.siteDeploymentStatus.hidden = false;
+}
+
+function scheduleSiteDeploymentRefresh(active) {
+  if (siteDeploymentTimer) globalThis.clearTimeout(siteDeploymentTimer);
+  siteDeploymentTimer = globalThis.setTimeout(
+    () => void refreshSiteDeploymentStatus(),
+    active
+      ? SITE_DEPLOYMENT_ACTIVE_INTERVAL_MS
+      : SITE_DEPLOYMENT_IDLE_INTERVAL_MS
+  );
+}
+
+async function refreshSiteDeploymentStatus() {
+  try {
+    const response = await globalThis.fetch(
+      'https://api.github.com/repos/6529-Collections/deploy-hub/actions/workflows/deploy-pages.yml/runs?branch=main&per_page=1',
+      {
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      }
+    );
+    if (!response.ok) throw new Error('Pages status unavailable.');
+    const payload = await response.json();
+    const presentation = siteDeploymentPresentation(payload.workflow_runs?.[0]);
+    renderSiteDeploymentStatus(presentation);
+    scheduleSiteDeploymentRefresh(presentation?.active === true);
+  } catch {
+    renderSiteDeploymentStatus(null);
+    scheduleSiteDeploymentRefresh(false);
+  }
+}
 
 function safeMessage(error, fallback) {
   return error instanceof GitHubOperationError ||
@@ -726,6 +839,7 @@ elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
 showPublicMode();
+void refreshSiteDeploymentStatus();
 if (storedToken) {
   void connect(storedToken, { silent: true });
 }
