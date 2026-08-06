@@ -52,7 +52,7 @@ const elements = {
   staleWarning: document.querySelector('#stale-warning'),
   startOperation: document.querySelector('#start-operation'),
   tokenInput: document.querySelector('#github-token'),
-  waitingCount: document.querySelector('#waiting-count')
+  waitingState: document.querySelector('#waiting-state')
 };
 
 let activeToken = '';
@@ -131,7 +131,9 @@ function showDashboardLoading() {
     stateElement.setAttribute('aria-busy', 'true');
     linkElement.hidden = true;
   }
-  elements.waitingCount.textContent = '…';
+  elements.waitingState.className = 'summary-value summary-loading';
+  elements.waitingState.textContent = 'Loading…';
+  elements.waitingState.setAttribute('aria-busy', 'true');
   elements.refreshState.textContent = 'Loading GitHub…';
   elements.operationsList.replaceChildren();
   elements.operationsEmpty.textContent = 'Loading…';
@@ -484,7 +486,11 @@ function renderDashboard(model) {
     elements.productionState,
     elements.productionLink
   );
-  elements.waitingCount.textContent = String(model.waiting);
+  elements.waitingState.className = 'summary-value';
+  elements.waitingState.textContent = `${model.waiting} ${
+    model.waiting === 1 ? 'operation' : 'operations'
+  }`;
+  elements.waitingState.setAttribute('aria-busy', 'false');
   elements.refreshState.textContent = `Updated ${formatDate(model.refreshedAt)}`;
   elements.staleWarning.hidden = true;
   elements.operationsList.replaceChildren(

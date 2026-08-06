@@ -145,6 +145,11 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(html, /id="staging-state"[\s\S]*?Loading…/);
   assert.match(html, /id="production-state"[\s\S]*?Loading…/);
+  assert.match(html, /<h2>Queued operations<\/h2>/);
+  assert.match(
+    html,
+    /id="waiting-state"[\s\S]*?aria-busy="true"[\s\S]*?Loading…/
+  );
   assert.doesNotMatch(html, /id="(?:staging|production)-state">No recent run/);
   assert.match(
     html,

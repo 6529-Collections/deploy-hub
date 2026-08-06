@@ -205,10 +205,15 @@
                 class="environment-dot environment-waiting"
                 aria-hidden="true"
               ></span>
-              <h2>Waiting</h2>
+              <h2>Queued operations</h2>
             </div>
-            <p class="summary-value">
-              <span id="waiting-count">…</span> operations
+            <p
+              class="summary-value summary-loading"
+              id="waiting-state"
+              aria-busy="true"
+              aria-live="polite"
+            >
+              Loading…
             </p>
             <p class="summary-detail" id="refresh-state">
               Connecting to GitHub…
