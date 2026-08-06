@@ -100,9 +100,16 @@ to receive status updates on its original exact head after it is merged.
 ## UI
 
 - Plain static files hosted anywhere.
-- Existing direct GitHub-token authentication and operator verification.
-- Fixed frontend repository, workflows, refs, targets, and inputs.
-- Submit one or more frontend PRs with an explicit final target.
+- Public read-only mode uses unauthenticated REST calls for the public frontend
+  repository, shows environment and recent workflow activity, and polls every
+  five minutes.
+- Public mode has no deployment form, exact queued-PR projection, Stop, retry,
+  removal, or other mutation controls.
+- Login opens a modal. Existing direct GitHub-token authentication and operator
+  verification unlock the fixed frontend repository, workflows, refs, targets,
+  and inputs.
+- Authenticated operators can submit one or more frontend PRs with an explicit
+  final target and receive the exact queued-PR projection.
 - Poll GitHub at least every five seconds after authentication.
 - Show new operations and updates without browser refresh.
 - Show environments, active and waiting cohorts, PRs, exact SHAs, phase,

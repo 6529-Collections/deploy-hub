@@ -12,6 +12,7 @@ import {
   listOpenPullRequests,
   parsePrNumbers,
   readDashboard,
+  readPublicDashboard,
   requestStop
 } from '../ui/github-operations.js';
 
@@ -451,6 +452,54 @@ test('reads latest environment runs from their exact workflow endpoints', async 
     )
   );
   assert.equal(model.environments.production.id, 129);
+});
+
+test('reads the public dashboard through unauthenticated REST only', async () => {
+  const calls = [];
+  const operationRun = {
+    conclusion: null,
+    created_at: '2026-08-04T12:00:00.000Z',
+    display_title: 'Deploy Hub public-operation',
+    html_url: RUN_URL,
+    id: 123,
+    path: '.github/workflows/deploy-hub.yml',
+    status: 'in_progress'
+  };
+  const productionRun = {
+    conclusion: 'success',
+    created_at: '2026-08-04T11:50:00.000Z',
+    head_sha: SHA_B,
+    html_url: `${RUN_URL}9`,
+    id: 129,
+    path: '.github/workflows/build-upload-deploy-prod.yml',
+    status: 'completed'
+  };
+
+  const model = await readPublicDashboard(
+    async (url, options) => {
+      calls.push({ options, url });
+      if (url.includes('/build-upload-deploy-prod.yml/runs')) {
+        return jsonResponse(200, { workflow_runs: [productionRun] });
+      }
+      if (url.endsWith('/actions/runs?per_page=100')) {
+        return jsonResponse(200, { workflow_runs: [operationRun] });
+      }
+      return jsonResponse(200, { workflow_runs: [] });
+    },
+    () => Date.parse('2026-08-04T12:00:05.000Z')
+  );
+
+  assert.equal(calls.length, 3);
+  assert.equal(
+    calls.some(({ url }) => url.endsWith('/graphql')),
+    false
+  );
+  assert.equal(
+    calls.every(({ options }) => !('authorization' in options.headers)),
+    true
+  );
+  assert.equal(model.environments.production.id, 129);
+  assert.equal(model.operations[0].id, 'public-operation');
 });
 
 test('recovers the operation id from a correlated canonical workflow run', () => {

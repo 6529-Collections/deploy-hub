@@ -2,6 +2,12 @@
 
 ## 2026-08-06
 
+- Added a public read-only UI mode for the public frontend repository. It uses
+  three unauthenticated REST reads on a five-minute interval, keeps Staging and
+  Production visible, expands Operations to full width, and exposes no exact
+  queue claim or mutation control. Login now opens the token form in a modal;
+  verified operators retain the exact five-second dashboard and all existing
+  operation controls.
 - Fixed intermittent post-deployment sign-in failures caused by GitHub Pages
   caching HTML and JavaScript independently for ten minutes. The Pages artifact
   now versions coupled CSS and JavaScript URLs with the deployment SHA, retains

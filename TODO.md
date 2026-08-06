@@ -136,6 +136,11 @@ Acceptance criteria:
 
 - [x] Existing GitHub-token authentication and operator verification remain
       intact.
+- [x] Signed-out users receive a public REST-only, read-only dashboard with
+      five-minute polling, full-width Operations, and no deployment or recovery
+      controls.
+- [x] Login opens a modal and switches successful operators to exact
+      five-second polling, queued-PR state, and mutation controls.
 - [x] The UI accepts one or more frontend PRs and an explicit Staging or
       Production final target.
 - [x] Submission freezes and displays exact PR heads before dispatch.
@@ -164,18 +169,21 @@ Evidence:
   exact Stop requests without storing separate operation state.
 - `ui/index.html`, `ui/app.js`, and `ui/styles.css` provide the submission,
   five-second refresh, environment, operation, Stop, and removal surfaces.
-- Twenty-two authentication, contract, projection, token-canary, browser-entry,
-  accessibility, branding, and refresh tests pass with formatting and lint.
+- Thirty-nine authentication, contract, projection, token-canary,
+  browser-entry, accessibility, branding, and refresh tests pass with
+  formatting and lint.
 - The desktop UI now uses one shared three-column grid: summary cards each span
   one column, while the request and operations panels span exactly one and two.
   The header is one `6529 Deploy Hub` line, action labels do not wrap, and
   neutral near-black surfaces replace the prior blue-tinted gradient.
-- Initial load shows a dedicated session-checking state instead of flashing the
-  login form. The deployment form lists current open frontend PRs and supports
-  bounded multi-selection with search across PR number, branch, title, and
-  author; selection order remains deployment order.
-- Signed-out access is a compact single-column form with a full-width token
-  field and button. The redundant marketing copy and source footer are gone.
+- Initial load shows the public Staging, Production, and full-width Operations
+  view immediately. It reads three public REST endpoints every five minutes,
+  exposes no deployment or recovery controls, and omits the exact queue badge
+  rather than approximating authenticated commit-status data.
+- A top-right Login button opens the compact token form in a modal. Successful
+  operator verification restores the deployment form, exact queued-PR state,
+  mutation controls, and five-second polling. The deployment form lists current
+  open frontend PRs and supports bounded ordered multi-selection and search.
 - Field focus uses a subtle one-pixel highlight, and GitHub's machine states
   are displayed without semantic changes: underscores become spaces and each
   word is capitalized.

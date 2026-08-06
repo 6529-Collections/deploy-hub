@@ -163,8 +163,7 @@ p {
   outline-offset: -3px;
 }
 
-.session-panel,
-.auth-panel,
+.auth-dialog,
 .panel,
 .summary-card {
   border: 1px solid #242428;
@@ -173,48 +172,57 @@ p {
   box-shadow: 0 18px 60px rgb(0 0 0 / 24%);
 }
 
-.session-panel {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  max-width: 420px;
-  padding: 24px;
-  margin: 96px auto;
-}
-
-.session-panel p {
-  margin: 0;
-  color: #d4d4d8;
-  font-weight: 700;
-}
-
-.session-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #3f3f46;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: session-spin 700ms linear infinite;
-}
-
 @keyframes session-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-.auth-panel {
-  display: block;
-  max-width: 560px;
+.auth-dialog {
+  width: min(560px, calc(100% - 32px));
   padding: 32px;
-  margin: 72px auto;
+  border-color: #303036;
+  color: #f8fafc;
 }
 
-.auth-panel h2 {
+.auth-dialog::backdrop {
+  background: rgb(0 0 0 / 72%);
+}
+
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
+}
+
+.auth-dialog h2 {
   font-size: 1.5rem;
   letter-spacing: -0.025em;
+}
+
+.dialog-close {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: #a1a1aa;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.dialog-close:hover {
+  background: #18181b;
+  color: #f8fafc;
+}
+
+.dialog-close:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 label,
@@ -372,6 +380,14 @@ a:focus-visible {
 
 .operations-panel {
   grid-column: span 2;
+}
+
+#dashboard[data-mode='public'] .request-panel {
+  display: none;
+}
+
+#dashboard[data-mode='public'] .operations-panel {
+  grid-column: 1 / -1;
 }
 
 .summary-card {
@@ -838,7 +854,6 @@ code {
     transition-duration: 0.01ms !important;
   }
 
-  .session-spinner,
   .summary-loading::before,
   .operations-panel[aria-busy='true'] .button-icon svg {
     animation: none;

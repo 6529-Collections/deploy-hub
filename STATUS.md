@@ -51,17 +51,20 @@ Task 2 is **DONE**. Tasks 3, 4, and 5 are **DONE — PENDING** frontend PR
   preserves exact SHA/target identity, rejects moved-head retries, prints exact
   GitHub run identity, and exits without becoming an execution dependency.
 
-The completed Task 2 UI freezes and previews exact PR heads, submits the fixed
-live workflow contract, refreshes GitHub truth every five seconds, shows
-environment and operation evidence, and exposes exact Stop and tracked
-staging-removal actions. It remains static and stores no Deploy Hub operation
-state outside GitHub. The desktop UI now uses exact one-third/two-thirds panel
+The completed Task 2 UI now opens as a public read-only dashboard. Signed-out
+users see current environment and recent workflow activity through three public
+REST reads every five minutes, with a full-width Operations panel and no
+deployment, queue, Stop, or removal controls. Login opens a modal; a verified
+operator receives the exact queued-PR projection, five-second refresh,
+deployment form, Stop, and tracked staging-removal controls. The UI freezes and
+previews exact PR heads and submits the fixed live workflow contract only in
+that authenticated mode. It remains static and stores no Deploy Hub operation
+state outside GitHub. The operator UI uses exact one-third/two-thirds panel
 alignment, a single-line `6529 Deploy Hub` header, non-wrapping actions, and
-neutral near-black surfaces. Initial load uses an explicit session-checking
-state, and operators select from a searchable, ordered list of current open
-frontend PRs instead of entering numbers manually. Signed-out access is a
-compact vertical token form; redundant login copy and the source footer have
-been removed. Field focus is deliberately subtle, and machine states such as
+neutral near-black surfaces. A stored operator session is checked without
+hiding the public dashboard, and operators select from a searchable, ordered
+list of current open frontend PRs instead of entering numbers manually. Field
+focus is deliberately subtle, and machine states such as
 `in_progress` and `action_required` render as `In Progress` and
 `Action Required` without changing their meaning. All 22 original completion
 checks and exact-head repository CI pass for completion commit

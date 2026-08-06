@@ -24,8 +24,10 @@ environment, or OIDC authority. Task 3 separately adds real staging behavior.
 
 ```mermaid
 flowchart LR
-    U["Developer"] --> UI["Deploy Hub static UI"]
+    V["Public viewer"] --> UI["Deploy Hub static UI"]
+    U["Operator"] --> UI
     C["Codex"] --> CMD["Small Deploy Hub command"]
+    UI -->|"Unauthenticated REST reads"| GH["GitHub API"]
     UI -->|"User GitHub token"| GH["GitHub API"]
     CMD -->|"Existing GitHub auth"| GH
 
@@ -103,11 +105,17 @@ same SHA or separately authorized known-good deployment may proceed.
 
 ## UI projection
 
-The static page polls GitHub at least every five seconds after authentication.
-Each complete read derives the current environments, active operation, pending
-statuses, run phases, runtime proof, E2E, and recent history. A failed poll
-leaves the last visible snapshot marked stale; the next complete read replaces
-it without event replay.
+Signed-out access is a public read-only projection of the public frontend
+repository. It uses only unauthenticated GitHub REST endpoints, polls every five
+minutes, shows the two environments and recent workflow activity, and exposes
+no mutation controls. It deliberately omits the exact queued-PR count because
+that durable status projection requires authenticated GitHub reads.
+
+After operator authentication, the static page polls GitHub at least every five
+seconds. Each complete read derives the current environments, active operation,
+pending statuses, run phases, runtime proof, E2E, and recent history. A failed
+poll leaves the last visible snapshot marked stale; the next complete read
+replaces it without event replay.
 
 The UI is not an authorization boundary. GitHub repository permissions,
 protected refs, workflow permissions, environments, and explicit production

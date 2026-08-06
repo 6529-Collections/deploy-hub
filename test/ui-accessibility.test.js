@@ -17,6 +17,7 @@ class UiElement {
     this.focused = false;
     this.hidden = false;
     this.listeners = new Map();
+    this.open = false;
     this.textContent = '';
     this.value = '';
   }
@@ -29,6 +30,16 @@ class UiElement {
     this.focused = true;
   }
 
+  close() {
+    this.open = false;
+  }
+
+  replaceChildren() {}
+
+  showModal() {
+    this.open = true;
+  }
+
   getAttribute(name) {
     return this.attributes.get(name) ?? null;
   }
@@ -38,7 +49,7 @@ class UiElement {
   }
 }
 
-test('browser entry module initializes the signed-out UI without a server', async () => {
+test('browser entry module initializes the public read-only UI without a server', async () => {
   const elements = new Map();
   const documentDescriptor = Object.getOwnPropertyDescriptor(
     globalThis,
@@ -47,6 +58,11 @@ test('browser entry module initializes the signed-out UI without a server', asyn
   const localStorageDescriptor = Object.getOwnPropertyDescriptor(
     globalThis,
     'localStorage'
+  );
+  const fetchDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  const setIntervalDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'setInterval'
   );
 
   Object.defineProperty(globalThis, 'document', {
@@ -66,17 +82,32 @@ test('browser entry module initializes the signed-out UI without a server', asyn
       setItem() {}
     }
   });
+  Object.defineProperty(globalThis, 'fetch', {
+    configurable: true,
+    value: () => new Promise(() => {})
+  });
+  Object.defineProperty(globalThis, 'setInterval', {
+    configurable: true,
+    value: () => 1
+  });
 
   try {
     const app = await import(new URL(`app.js?test=${Date.now()}`, UI_ROOT));
 
-    assert.equal(elements.get('#auth-state').textContent, 'Not connected');
+    assert.equal(elements.get('#auth-state').textContent, '');
     assert.equal(elements.get('#account-control').hidden, true);
-    assert.equal(elements.get('#auth-panel').hidden, false);
-    assert.equal(elements.get('#session-panel').hidden, true);
-    assert.equal(elements.get('#dashboard').hidden, true);
+    assert.equal(elements.get('#auth-dialog').open, false);
+    assert.equal(elements.get('#dashboard').hidden, false);
+    assert.equal(elements.get('#dashboard').dataset.mode, 'public');
     assert.equal(elements.get('#disconnect-github').hidden, true);
+    assert.equal(elements.get('#login-github').hidden, false);
+    assert.equal(elements.get('#waiting-state').hidden, true);
+    assert.equal(elements.get('#github-token').focused, false);
+    elements.get('#login-github').listeners.get('click')();
+    assert.equal(elements.get('#auth-dialog').open, true);
     assert.equal(elements.get('#github-token').focused, true);
+    elements.get('#close-auth').listeners.get('click')();
+    assert.equal(elements.get('#auth-dialog').open, false);
     assert.equal(app.formatDisplayState('queued'), 'Queued');
     assert.equal(app.formatDisplayState('in_progress'), 'In Progress');
     assert.equal(app.formatDisplayState('action_required'), 'Action Required');
@@ -91,6 +122,16 @@ test('browser entry module initializes the signed-out UI without a server', asyn
       Object.defineProperty(globalThis, 'localStorage', localStorageDescriptor);
     } else {
       delete globalThis.localStorage;
+    }
+    if (fetchDescriptor) {
+      Object.defineProperty(globalThis, 'fetch', fetchDescriptor);
+    } else {
+      delete globalThis.fetch;
+    }
+    if (setIntervalDescriptor) {
+      Object.defineProperty(globalThis, 'setInterval', setIntervalDescriptor);
+    } else {
+      delete globalThis.setInterval;
     }
   }
 });
@@ -123,6 +164,9 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.doesNotMatch(html, /6529 engineering/i);
   assert.match(html, /for="github-token"/);
   assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);
+  assert.match(html, /<dialog[^>]+id="auth-dialog"/);
+  assert.match(html, /id="login-github"[\s\S]*?>[\s\S]*?Login/);
+  assert.match(html, /id="close-auth"[\s\S]*?aria-label="Close login"/);
   assert.match(html, /for="pr-search"/);
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);
   assert.match(html, /<fieldset>[\s\S]*<legend>Final target<\/legend>/);
@@ -228,6 +272,10 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
     /\.workspace-grid\s*{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
   );
   assert.match(css, /\.operations-panel\s*{[\s\S]*?grid-column: span 2;/);
+  assert.match(
+    css,
+    /#dashboard\[data-mode='public'\] \.operations-panel\s*{[\s\S]*?grid-column: 1 \/ -1;/
+  );
   assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);
   assert.match(css, /body\s*{[\s\S]*?background: #050505;/);
   assert.doesNotMatch(css, /radial-gradient|linear-gradient/);

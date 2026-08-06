@@ -64,12 +64,13 @@ export class GitHubOperationError extends Error {
 }
 
 function requestHeaders(token) {
-  return {
+  const headers = {
     accept: 'application/vnd.github+json',
-    authorization: `Bearer ${token}`,
     'content-type': 'application/json',
     'x-github-api-version': '2022-11-28'
   };
+  if (token) headers.authorization = `Bearer ${token}`;
+  return headers;
 }
 
 async function githubRequest(
@@ -610,6 +611,45 @@ export async function readDashboard(
   }
   return buildDashboardModel(
     repository,
+    { workflow_runs: [...runsById.values()] },
+    new Date(now()).toISOString()
+  );
+}
+
+export async function readPublicDashboard(
+  fetchImpl = globalThis.fetch,
+  now = Date.now
+) {
+  const [runs, stagingRuns, productionRuns] = await Promise.all([
+    githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/runs?per_page=100`,
+      '',
+      {},
+      fetchImpl
+    ),
+    githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/workflows/deploy-staging.yml/runs?per_page=1`,
+      '',
+      {},
+      fetchImpl
+    ),
+    githubRequest(
+      `/repos/${FRONTEND_REPOSITORY}/actions/workflows/build-upload-deploy-prod.yml/runs?per_page=1`,
+      '',
+      {},
+      fetchImpl
+    )
+  ]);
+  const runsById = new Map();
+  for (const run of [
+    ...(runs.workflow_runs ?? []),
+    ...(stagingRuns.workflow_runs ?? []),
+    ...(productionRuns.workflow_runs ?? [])
+  ]) {
+    runsById.set(String(run.id ?? run.html_url), run);
+  }
+  return buildDashboardModel(
+    { pullRequests: { nodes: [] } },
     { workflow_runs: [...runsById.values()] },
     new Date(now()).toISOString()
   );

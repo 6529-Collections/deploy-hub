@@ -25,8 +25,10 @@ production before considering backend support.
 
 ## Product boundary
 
-Deploy Hub is a portable static app in this repository. Humans use their
-existing GitHub token directly in the browser. Codex uses its existing GitHub
+Deploy Hub is a portable static app in this repository. Anyone can view the
+public repository's environment and workflow activity without signing in.
+Operators use their existing GitHub token directly in the browser to see exact
+queued PR state and use deployment controls. Codex uses its existing GitHub
 authentication through one small command or skill.
 
 GitHub and the frontend repository remain the mutation and execution
@@ -44,9 +46,11 @@ real staging while preserving the existing manual path.
 
 ## Current state
 
-- The static UI and direct GitHub-token authentication are implemented. The UI
-  freezes exact PR heads, submits the fixed operation contract, refreshes
-  GitHub truth every five seconds, and exposes Stop and tracked staging removal.
+- The static UI has a public REST-only read view that refreshes every five
+  minutes and an authenticated operator view that refreshes every five seconds.
+  Operators can freeze exact PR heads, submit the fixed operation contract, and
+  use Stop and tracked staging removal. Public mode exposes no mutation controls
+  and does not claim the authenticated exact queued-PR projection.
 - The one-shot agent command supports submit, status, Stop, exact-SHA retry,
   and tracked staging removal through the same fixed GitHub contract and the
   caller's existing GitHub authentication.

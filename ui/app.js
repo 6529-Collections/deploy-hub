@@ -5,6 +5,7 @@ import {
   freezePullRequests,
   listOpenPullRequests,
   readDashboard,
+  readPublicDashboard,
   requestStop
 } from './github-operations.js';
 import {
@@ -15,19 +16,22 @@ import {
   storeToken
 } from './github-auth.js';
 
-const REFRESH_INTERVAL_MS = 5_000;
+const OPERATOR_REFRESH_INTERVAL_MS = 5_000;
+const PUBLIC_REFRESH_INTERVAL_MS = 5 * 60_000;
 const MAX_SELECTED_PULL_REQUESTS = 20;
 
 const elements = {
   accountControl: document.querySelector('#account-control'),
+  authDialog: document.querySelector('#auth-dialog'),
   authForm: document.querySelector('#auth-form'),
   authMessage: document.querySelector('#auth-message'),
-  authPanel: document.querySelector('#auth-panel'),
   authProfile: document.querySelector('#auth-state'),
+  closeAuth: document.querySelector('#close-auth'),
   connectButton: document.querySelector('#connect-github'),
   dashboard: document.querySelector('#dashboard'),
   disconnectButton: document.querySelector('#disconnect-github'),
   editOperation: document.querySelector('#edit-operation'),
+  loginButton: document.querySelector('#login-github'),
   operationForm: document.querySelector('#operation-form'),
   operationMessage: document.querySelector('#operation-message'),
   operationsEmpty: document.querySelector('#operations-empty'),
@@ -46,7 +50,6 @@ const elements = {
   refreshPrs: document.querySelector('#refresh-prs'),
   reviewButton: document.querySelector('#review-operation'),
   selectedPrs: document.querySelector('#selected-prs'),
-  sessionPanel: document.querySelector('#session-panel'),
   stagingLink: document.querySelector('#staging-link'),
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
@@ -57,6 +60,8 @@ const elements = {
 let activeToken = '';
 let currentIdentity = null;
 let refreshTimer = null;
+let dashboardMode = 'public';
+let refreshGeneration = 0;
 let frozenPreview = null;
 let refreshInFlight = false;
 let pullRequests = [];
@@ -96,20 +101,49 @@ function clearRefreshTimer() {
   refreshTimer = null;
 }
 
-function showSignedOut(message = '') {
+function startRefreshTimer(interval) {
   clearRefreshTimer();
+  refreshTimer = globalThis.setInterval(() => {
+    void refreshDashboard();
+  }, interval);
+}
+
+function beginDashboardMode(mode) {
+  dashboardMode = mode;
+  refreshGeneration += 1;
+  refreshInFlight = false;
+  elements.dashboard.dataset.mode = mode;
+}
+
+function openAuthDialog(message = '') {
+  elements.authMessage.textContent = message;
+  if (!elements.authDialog.open) elements.authDialog.showModal();
+  elements.tokenInput.focus();
+}
+
+function closeAuthDialog() {
+  if (elements.authDialog.open) elements.authDialog.close();
+}
+
+function showPublicMode({ refresh = true } = {}) {
+  clearRefreshTimer();
+  beginDashboardMode('public');
   activeToken = '';
   currentIdentity = null;
   frozenPreview = null;
-  elements.sessionPanel.hidden = true;
-  elements.authProfile.textContent = 'Not connected';
-  elements.authMessage.textContent = message;
-  elements.authPanel.hidden = false;
+  elements.authProfile.textContent = '';
   elements.accountControl.hidden = true;
-  elements.dashboard.hidden = true;
+  elements.loginButton.hidden = false;
+  elements.loginButton.disabled = false;
+  elements.loginButton.textContent = 'Login';
+  elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = true;
   elements.connectButton.disabled = false;
-  elements.tokenInput.focus();
+  elements.queueBadge.hidden = true;
+  closeAuthDialog();
+  showDashboardLoading();
+  startRefreshTimer(PUBLIC_REFRESH_INTERVAL_MS);
+  if (refresh) void refreshDashboard();
 }
 
 function showDashboardLoading() {
@@ -122,8 +156,13 @@ function showDashboardLoading() {
     stateElement.setAttribute('aria-busy', 'true');
     linkElement.hidden = true;
   }
-  elements.queueBadge.textContent = 'Loading…';
-  elements.queueBadge.setAttribute('aria-busy', 'true');
+  if (dashboardMode === 'operator') {
+    elements.queueBadge.hidden = false;
+    elements.queueBadge.textContent = 'Loading…';
+    elements.queueBadge.setAttribute('aria-busy', 'true');
+  } else {
+    elements.queueBadge.hidden = true;
+  }
   elements.refreshButton.disabled = true;
   elements.operationsPanel.setAttribute('aria-busy', 'true');
   elements.operationsList.replaceChildren();
@@ -132,32 +171,31 @@ function showDashboardLoading() {
 }
 
 function showSignedIn(identity, token) {
+  beginDashboardMode('operator');
   activeToken = token;
   currentIdentity = identity;
-  elements.sessionPanel.hidden = true;
   elements.authProfile.textContent = `@${identity.login}`;
   elements.authProfile.href = `https://github.com/${encodeURIComponent(identity.login)}`;
   elements.authMessage.textContent = '';
-  elements.authPanel.hidden = true;
+  closeAuthDialog();
   elements.accountControl.hidden = false;
+  elements.loginButton.hidden = true;
   showDashboardLoading();
   elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = false;
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
   elements.prSearch.focus();
-  clearRefreshTimer();
-  refreshTimer = globalThis.setInterval(() => {
-    void refreshDashboard();
-  }, REFRESH_INTERVAL_MS);
+  startRefreshTimer(OPERATOR_REFRESH_INTERVAL_MS);
   void refreshPullRequests({ announce: true });
   void refreshDashboard();
 }
 
-async function connect(token) {
+async function connect(token, { silent = false } = {}) {
   elements.connectButton.disabled = true;
-  elements.authProfile.textContent = 'Checking';
-  elements.authMessage.textContent = 'Verifying with GitHub…';
+  elements.loginButton.disabled = true;
+  elements.loginButton.textContent = 'Checking…';
+  if (!silent) elements.authMessage.textContent = 'Verifying with GitHub…';
 
   let identity;
   try {
@@ -171,7 +209,15 @@ async function connect(token) {
     ) {
       forgetToken(localStorage);
     }
-    showSignedOut(safeMessage(error, 'Could not reach GitHub. Try again.'));
+    elements.connectButton.disabled = false;
+    elements.loginButton.disabled = false;
+    elements.loginButton.textContent = 'Login';
+    if (!silent) {
+      elements.authMessage.textContent = safeMessage(
+        error,
+        'Could not reach GitHub. Try again.'
+      );
+    }
     return;
   }
 
@@ -179,7 +225,13 @@ async function connect(token) {
     storeToken(localStorage, token);
     showSignedIn(identity, token.trim());
   } catch {
-    showSignedOut('Deploy Hub could not start. Reload the page.');
+    elements.connectButton.disabled = false;
+    elements.loginButton.disabled = false;
+    elements.loginButton.textContent = 'Login';
+    if (!silent) {
+      elements.authMessage.textContent =
+        'Deploy Hub could not start. Reload the page.';
+    }
   }
 }
 
@@ -384,7 +436,7 @@ async function removeRequest(request, button) {
   }
 }
 
-function renderOperation(operation) {
+function renderOperation(operation, authenticated) {
   const card = document.createElement('article');
   const state = operation.status?.state ?? operation.run?.status ?? 'pending';
   card.className = 'operation-card';
@@ -401,7 +453,7 @@ function renderOperation(operation) {
     : 'Deploy Hub operation';
   const meta = document.createElement('p');
   meta.className = 'operation-meta';
-  meta.textContent = `${operation.shadow ? 'Shadow · ' : ''}${operation.target || 'Target pending'} · ${formatElapsed(operation.createdAt)}`;
+  meta.textContent = `${operation.shadow ? 'Shadow · ' : ''}${operation.target || (authenticated ? 'Target pending' : 'Workflow activity')} · ${formatElapsed(operation.createdAt)}`;
   heading.append(title, meta);
   const badge = document.createElement('span');
   badge.className = 'operation-badge';
@@ -415,7 +467,13 @@ function renderOperation(operation) {
     operation.status?.description ||
     (operation.run?.status === 'queued'
       ? 'Queued in GitHub Actions'
-      : 'Waiting for PR status projection');
+      : operation.run
+        ? `GitHub Actions: ${formatDisplayState(
+            operation.run.status === 'completed'
+              ? operation.run.conclusion
+              : operation.run.status
+          )}`
+        : 'Waiting for PR status projection');
   card.append(status);
 
   if (operation.requests.length > 0) {
@@ -437,7 +495,7 @@ function renderOperation(operation) {
       sha.textContent = request.sha.slice(0, 12);
       copy.append(link, sha);
       row.append(copy);
-      if (request.canRemove && operation.terminal) {
+      if (authenticated && request.canRemove && operation.terminal) {
         const removeButton = makeButton(
           'Remove from staging',
           'button button-danger button-small',
@@ -454,6 +512,7 @@ function renderOperation(operation) {
   actions.className = 'operation-actions';
   appendRunLink(actions, operation);
   if (
+    authenticated &&
     !operation.shadow &&
     !operation.terminal &&
     operation.id &&
@@ -472,6 +531,7 @@ function renderOperation(operation) {
 }
 
 function renderDashboard(model) {
+  const authenticated = dashboardMode === 'operator';
   setEnvironment(
     model.environments.staging,
     elements.stagingState,
@@ -482,33 +542,53 @@ function renderDashboard(model) {
     elements.productionState,
     elements.productionLink
   );
-  elements.queueBadge.textContent = `${model.waiting} queued`;
-  elements.queueBadge.setAttribute('aria-busy', 'false');
+  elements.queueBadge.hidden = !authenticated;
+  if (authenticated) {
+    elements.queueBadge.textContent = `${model.waiting} queued`;
+    elements.queueBadge.setAttribute('aria-busy', 'false');
+  }
   elements.staleWarning.hidden = true;
   elements.operationsList.replaceChildren(
-    ...model.operations.map(renderOperation)
+    ...model.operations.map((operation) =>
+      renderOperation(operation, authenticated)
+    )
   );
   elements.operationsEmpty.textContent = 'No Deploy Hub operations found yet.';
   elements.operationsEmpty.hidden = model.operations.length > 0;
 }
 
 async function refreshDashboard() {
-  if (!activeToken || refreshInFlight) return;
+  if (refreshInFlight) return;
+  const generation = refreshGeneration;
+  const token = activeToken;
+  const mode = dashboardMode;
   refreshInFlight = true;
   elements.refreshButton.disabled = true;
   elements.operationsPanel.setAttribute('aria-busy', 'true');
   try {
-    renderDashboard(await readDashboard(activeToken));
+    const model =
+      mode === 'operator'
+        ? await readDashboard(token)
+        : await readPublicDashboard();
+    if (generation === refreshGeneration) renderDashboard(model);
   } catch (error) {
+    if (generation !== refreshGeneration) return;
     elements.staleWarning.hidden = false;
-    if (error instanceof GitHubOperationError && error.status === 401) {
+    if (
+      mode === 'operator' &&
+      error instanceof GitHubOperationError &&
+      error.status === 401
+    ) {
       forgetToken(localStorage);
-      showSignedOut('GitHub rejected the stored token. Connect again.');
+      showPublicMode();
+      openAuthDialog('GitHub rejected the stored token. Connect again.');
     }
   } finally {
-    refreshInFlight = false;
-    elements.refreshButton.disabled = false;
-    elements.operationsPanel.setAttribute('aria-busy', 'false');
+    if (generation === refreshGeneration) {
+      refreshInFlight = false;
+      elements.refreshButton.disabled = false;
+      elements.operationsPanel.setAttribute('aria-busy', 'false');
+    }
   }
 }
 
@@ -551,9 +631,15 @@ elements.authForm.addEventListener('submit', (event) => {
   void connect(elements.tokenInput.value);
 });
 
+elements.loginButton.addEventListener('click', () => {
+  openAuthDialog();
+});
+
+elements.closeAuth.addEventListener('click', closeAuthDialog);
+
 elements.disconnectButton.addEventListener('click', () => {
   forgetToken(localStorage);
-  showSignedOut('Disconnected from GitHub.');
+  showPublicMode();
 });
 
 elements.operationForm.addEventListener('submit', async (event) => {
@@ -631,8 +717,7 @@ elements.refreshPrs.addEventListener('click', () => {
 elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
+showPublicMode();
 if (storedToken) {
-  void connect(storedToken);
-} else {
-  showSignedOut();
+  void connect(storedToken, { silent: true });
 }
