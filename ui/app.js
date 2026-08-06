@@ -84,7 +84,7 @@ export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
   if (!runUrl) return null;
   if (run.status === 'queued' || run.status === 'in_progress') {
     return {
-      action: 'View deployment',
+      action: 'View Deployment',
       active: true,
       kind: 'active',
       message: 'Update deploying',
@@ -94,7 +94,7 @@ export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
   if (run.status !== 'completed') return null;
   if (run.conclusion !== 'success') {
     return {
-      action: 'View deployment',
+      action: 'View Deployment',
       active: false,
       kind: 'failed',
       message: 'Latest UI deployment failed',
@@ -447,11 +447,9 @@ async function refreshPullRequests({ announce = false } = {}) {
 function setEnvironment(run, stateElement) {
   stateElement.className = 'summary-value';
   stateElement.setAttribute('aria-busy', 'false');
+  stateElement.replaceChildren();
   if (!run) {
     stateElement.textContent = 'No runs found';
-    stateElement.removeAttribute('href');
-    stateElement.setAttribute('aria-disabled', 'true');
-    stateElement.setAttribute('tabindex', '-1');
     stateElement.classList.add('summary-value-disabled');
     return;
   }
@@ -462,12 +460,15 @@ function setEnvironment(run, stateElement) {
   const sha = /^[a-f0-9]{40}$/i.test(run.head_sha ?? '')
     ? run.head_sha.slice(0, 12)
     : '';
-  stateElement.textContent = [formatDisplayState(state), runNumber, sha]
-    .filter(Boolean)
-    .join(' · ');
-  stateElement.href = run.html_url;
-  stateElement.removeAttribute('aria-disabled');
-  stateElement.removeAttribute('tabindex');
+  const status = document.createElement('span');
+  status.textContent = formatDisplayState(state);
+  const runLink = document.createElement('a');
+  runLink.className = 'summary-run-link';
+  runLink.href = run.html_url;
+  runLink.target = '_blank';
+  runLink.rel = 'noreferrer';
+  runLink.textContent = [runNumber, sha].filter(Boolean).join(' · ');
+  stateElement.append(status, ' · ', runLink);
 }
 
 function makeButton(label, className, handler) {

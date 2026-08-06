@@ -82,8 +82,8 @@ Environment cards now remain in an explicit loading state until that GitHub
 truth arrives; they no longer flash a false `No recent run` placeholder. Each
 environment card also links directly to its canonical frontend workflow page.
 Each environment card now places `View Workflow` at its top-right edge. The
-latest-run value shows state, GitHub run number, and short SHA and links
-directly to that run, eliminating the separate bottom action row and its
+latest-run value keeps the state as plain text and links only the GitHub run
+number and short SHA, eliminating the separate bottom action row and its
 reserved empty height. Environment runs are read directly from their canonical
 workflows rather than inferred from only the repository's newest 100 Actions
 runs.
@@ -91,7 +91,9 @@ The header also checks the public Deploy Hub Pages workflow: a compact status
 control immediately before Login/account links an active or failed UI
 deployment, while an already completed newer version offers Reload. This
 self-status check requires no authentication and disappears harmlessly if
-GitHub cannot be reached.
+GitHub cannot be reached. Failed UI deployments use a neutral control with a
+small red marker, and the Pages job allows 15 minutes for GitHub's hosted
+deployment queue.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

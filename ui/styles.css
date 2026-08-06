@@ -103,8 +103,15 @@ a {
 }
 
 .site-deployment-failed {
-  border-color: #7f1d1d;
-  color: #fca5a5;
+  color: #d4d4d8;
+}
+
+.site-deployment-failed::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  content: '';
 }
 
 .site-deployment-ready {
@@ -495,7 +502,12 @@ a:focus-visible {
   text-decoration: none;
 }
 
-.summary-value[href]:hover {
+.summary-run-link {
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+.summary-run-link:hover {
   color: #bfdbfe;
   text-decoration: underline;
 }

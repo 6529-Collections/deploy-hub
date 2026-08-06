@@ -2,6 +2,10 @@
 
 ## 2026-08-06
 
+- Refined failure presentation: the Pages failure control is neutral with a
+  small red marker and uses `View Deployment`; environment cards keep the
+  result as plain text and link only `Run #… · SHA`. Increased the Pages job
+  timeout from 10 to 15 minutes for GitHub's hosted deployment queue.
 - Added a compact Pages self-deployment indicator in the header immediately
   before Login/account. It links queued, active, or failed GitHub Pages runs,
   offers Reload when the browser is still serving an older successful version,

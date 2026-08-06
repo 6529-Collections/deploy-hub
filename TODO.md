@@ -194,13 +194,14 @@ Evidence:
 - Environment truth reads each canonical workflow directly, so an infrequent
   production run cannot disappear behind the repository's newest 100 runs.
 - Each environment card places `View Workflow` at its top-right edge. Its
-  latest-run value shows the GitHub state, run number, and short SHA and is
-  itself the run link, so no separate action row or reserved empty card height
+  latest-run value keeps the GitHub state as plain text and links only the run
+  number and short SHA, so no separate action row or reserved empty card height
   is needed.
 - The page checks its own public Pages workflow without authentication. A
   compact header control immediately before Login/account links an active or
   failed UI deployment and offers Reload when a newer successful version is
-  available; GitHub API failure leaves the page unchanged.
+  available; failed deployments use a neutral control with a small red marker,
+  and GitHub API failure leaves the page unchanged.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap

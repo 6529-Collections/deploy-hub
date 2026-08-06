@@ -138,7 +138,7 @@ test('browser entry module initializes the public read-only UI without a server'
     assert.deepEqual(
       app.siteDeploymentPresentation({ id: 123, status: 'in_progress' }),
       {
-        action: 'View deployment',
+        action: 'View Deployment',
         active: true,
         kind: 'active',
         message: 'Update deploying',
@@ -324,7 +324,8 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /\.summary-loading::before/);
   assert.match(css, /\.site-deployment-active::before/);
   assert.match(css, /\.summary-workflow-link\s*{[\s\S]*?margin-left: auto;/);
-  assert.match(css, /\.summary-value\[href\]:hover/);
+  assert.match(css, /\.summary-run-link\s*{[\s\S]*?color: #93c5fd;/);
+  assert.match(css, /\.summary-run-link:hover/);
   assert.match(css, /\.summary-card\s*{[\s\S]*?padding: 16px 20px;/);
   assert.doesNotMatch(css, /\.summary-card\s*{[^}]*min-height:/);
   assert.match(
