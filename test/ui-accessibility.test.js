@@ -238,6 +238,10 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);
   assert.match(html, /<dialog[^>]+id="auth-dialog"/);
   assert.match(html, /id="login-github"[\s\S]*?>[\s\S]*?Login/);
+  assert.match(
+    html.match(/<button(?=[^>]*id="login-github")[^>]*>/)?.[0] ?? '',
+    /hidden/
+  );
   assert.match(html, /class="button button-quiet header-login"/);
   assert.match(
     app,
@@ -336,8 +340,13 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /\.target-option:focus-within/);
   assert.match(css, /\.summary-loading::before/);
   assert.match(css, /\.site-deployment-active::before/);
+  assert.match(
+    css,
+    /\.site-deployment-status > span\s*{[\s\S]*?margin-right: auto;[\s\S]*?text-align: left;/
+  );
   assert.match(css, /\.summary-workflow-link\s*{[\s\S]*?margin-left: auto;/);
   assert.match(css, /\.summary-run-link\s*{[\s\S]*?color: #93c5fd;/);
+  assert.match(css, /\.summary-value\s*{[\s\S]*?column-gap: 0\.3em;/);
   assert.match(css, /\.summary-run-link:hover/);
   assert.match(css, /\.summary-card\s*{[\s\S]*?padding: 16px 20px;/);
   assert.doesNotMatch(css, /\.summary-card\s*{[^}]*min-height:/);
@@ -382,6 +391,10 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
   assert.match(
     css,
     /@media \(max-width: 900px\)[\s\S]*?\.site-deployment-status\s*{[\s\S]*?grid-column: 1 \/ -1;[\s\S]*?grid-row: 2;/
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 900px\)[\s\S]*?\.site-deployment-status\s*{[\s\S]*?justify-content: flex-start;/
   );
 });
 

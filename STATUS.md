@@ -100,7 +100,10 @@ GitHub cannot be reached. Failed UI deployments use a neutral control with a
 small red marker. The Pages deployment action now allows 15 minutes for
 GitHub's hosted deployment queue inside a 16-minute job envelope. The public
 Login control now matches the height and styling of the joined authenticated
-account control.
+account control. Header authentication controls remain hidden until stored
+session detection resolves. Compact deployment notices keep their marker and
+message left-aligned together, and environment runs render as
+`Status · Run #… - SHA` with clear spacing and baseline alignment.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

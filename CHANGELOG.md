@@ -2,6 +2,10 @@
 
 ## 2026-08-06
 
+- Removed the initial Login flash while a stored GitHub session is being
+  verified. Compact Pages deployment notices now keep the status marker and
+  message left-aligned together, and environment runs now render as
+  `Status · Run #… - SHA` with explicit spacing and baseline alignment.
 - Made the header deployment indicator responsive: it stays between the brand
   and account on desktop, then becomes a full-width second header row on compact
   screens while the brand and account remain together above it. Added minimal

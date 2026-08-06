@@ -68,10 +68,18 @@ a {
   color: #d4d4d8;
   font-size: 0.76rem;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.site-deployment-status > span {
+  margin-right: auto;
+  text-align: left;
 }
 
 .site-deployment-status a,
 .site-deployment-status button {
+  display: inline-flex;
+  align-items: center;
   padding: 0;
   border: 0;
   cursor: pointer;
@@ -89,6 +97,7 @@ a {
 }
 
 .site-deployment-active::before {
+  flex: 0 0 auto;
   width: 11px;
   height: 11px;
   border: 2px solid #3f3f46;
@@ -107,6 +116,7 @@ a {
 }
 
 .site-deployment-failed::before {
+  flex: 0 0 auto;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -502,6 +512,8 @@ a:focus-visible {
 
 .summary-value {
   display: inline-flex;
+  align-items: baseline;
+  column-gap: 0.3em;
   margin-bottom: 0;
   color: #f8fafc;
   font-size: 1rem;
@@ -908,7 +920,7 @@ code {
   .site-deployment-status {
     grid-column: 1 / -1;
     grid-row: 2;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
   }
 

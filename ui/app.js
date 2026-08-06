@@ -239,7 +239,7 @@ function closeAuthDialog() {
   if (elements.authDialog.open) elements.authDialog.close();
 }
 
-function showPublicMode({ refresh = true } = {}) {
+function showPublicMode({ refresh = true, revealLogin = true } = {}) {
   clearRefreshTimer();
   beginDashboardMode('public');
   activeToken = '';
@@ -247,7 +247,7 @@ function showPublicMode({ refresh = true } = {}) {
   frozenPreview = null;
   elements.authProfile.textContent = '';
   elements.accountControl.hidden = true;
-  elements.loginButton.hidden = false;
+  elements.loginButton.hidden = !revealLogin;
   elements.loginButton.disabled = false;
   elements.loginButton.textContent = 'Login';
   renderSiteDeploymentStatus(null);
@@ -330,6 +330,7 @@ async function connect(token, { silent = false } = {}) {
     }
     elements.connectButton.disabled = false;
     elements.loginButton.disabled = false;
+    elements.loginButton.hidden = false;
     elements.loginButton.textContent = 'Login';
     if (!silent) {
       elements.authMessage.textContent = safeMessage(
@@ -346,6 +347,7 @@ async function connect(token, { silent = false } = {}) {
   } catch {
     elements.connectButton.disabled = false;
     elements.loginButton.disabled = false;
+    elements.loginButton.hidden = false;
     elements.loginButton.textContent = 'Login';
     if (!silent) {
       elements.authMessage.textContent =
@@ -467,13 +469,17 @@ function setEnvironment(run, stateElement) {
     : '';
   const status = document.createElement('span');
   status.textContent = formatDisplayState(state);
+  const separator = document.createElement('span');
+  separator.className = 'summary-run-separator';
+  separator.textContent = '·';
+  separator.setAttribute('aria-hidden', 'true');
   const runLink = document.createElement('a');
   runLink.className = 'summary-run-link';
   runLink.href = run.html_url;
   runLink.target = '_blank';
   runLink.rel = 'noreferrer';
-  runLink.textContent = [runNumber, sha].filter(Boolean).join(' · ');
-  stateElement.append(status, ' · ', runLink);
+  runLink.textContent = [runNumber, sha].filter(Boolean).join(' - ');
+  stateElement.append(status, separator, runLink);
 }
 
 function makeButton(label, className, handler) {
@@ -841,7 +847,7 @@ elements.refreshPrs.addEventListener('click', () => {
 elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
-showPublicMode();
+showPublicMode({ revealLogin: !storedToken });
 void refreshSiteDeploymentStatus();
 if (storedToken) {
   void connect(storedToken, { silent: true });

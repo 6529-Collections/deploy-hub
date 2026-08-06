@@ -210,6 +210,10 @@ Evidence:
   and Apple touch icons.
 - The public Login control matches the height, border, radius, typography, and
   visual weight of the joined authenticated account control.
+- Header authentication controls remain hidden until stored-session detection
+  resolves. Compact deployment notices group the marker with their left-aligned
+  message, and environment runs render as `Status · Run #… - SHA` with explicit
+  spacing.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap
