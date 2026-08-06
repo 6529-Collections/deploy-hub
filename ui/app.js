@@ -159,10 +159,9 @@ async function connect(token) {
   elements.authProfile.textContent = 'Checking';
   elements.authMessage.textContent = 'Verifying with GitHub…';
 
+  let identity;
   try {
-    const identity = await authenticateGitHubToken(token);
-    storeToken(localStorage, token);
-    showSignedIn(identity, token.trim());
+    identity = await authenticateGitHubToken(token);
   } catch (error) {
     if (
       error instanceof GitHubAuthError &&
@@ -173,6 +172,14 @@ async function connect(token) {
       forgetToken(localStorage);
     }
     showSignedOut(safeMessage(error, 'Could not reach GitHub. Try again.'));
+    return;
+  }
+
+  try {
+    storeToken(localStorage, token);
+    showSignedIn(identity, token.trim());
+  } catch {
+    showSignedOut('Deploy Hub could not start. Reload the page.');
   }
 }
 

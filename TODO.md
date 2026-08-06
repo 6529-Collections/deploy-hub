@@ -193,9 +193,11 @@ Evidence:
   safely, and the picker scrolls vertically without horizontal overflow.
 - Signed-in identity and disconnect are one joined control; the username links
   to the operator's GitHub profile and disconnect is an icon-only action.
-- GitHub Pages publishes `ui/` unchanged at
+- GitHub Pages publishes `ui/` at
   <https://6529-collections.github.io/deploy-hub/> and automatically redeploys
-  after UI changes reach `main`; no backend or build system was added.
+  after UI changes reach `main`. Its dependency-free packaging step versions
+  coupled CSS and JavaScript URLs with the deployment SHA; no backend or
+  application build system was added.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository

@@ -2,6 +2,11 @@
 
 ## 2026-08-06
 
+- Fixed intermittent post-deployment sign-in failures caused by GitHub Pages
+  caching HTML and JavaScript independently for ten minutes. The Pages artifact
+  now versions coupled CSS and JavaScript URLs with the deployment SHA, retains
+  one hidden compatibility element for already-cached clients, and keeps UI
+  startup errors outside the GitHub authentication error boundary.
 - Added a minimal GitHub Actions deployment that publishes `ui/` unchanged to
   <https://6529-collections.github.io/deploy-hub/>. The workflow redeploys
   after UI or workflow changes reach `main`, uses immutable official Action

@@ -76,11 +76,12 @@ The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined
 control, with the username linking to the operator's GitHub profile.
-The current UI regressions and all 36 repository tests also pass.
+The current UI regressions and repository tests also pass.
 The static UI is published directly from `ui/` through GitHub Pages at
 <https://6529-collections.github.io/deploy-hub/>. The Pages workflow runs after
-changes to `ui/**` or its own workflow file reach `main`; it uploads the UI
-directory unchanged and introduces no build system or application server.
+changes to `ui/**` or its own workflow file reach `main`; it versions coupled
+CSS and JavaScript URLs with the deployment SHA to prevent mixed-cache startup
+failures and introduces no application build system or server.
 
 ## Retained foundation
 

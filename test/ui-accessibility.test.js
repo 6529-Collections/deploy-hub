@@ -170,6 +170,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View workflow/
   );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
+  assert.match(html, /id="refresh-state" hidden/);
   assert.match(html, /id="operations-list"[\s\S]*role="list"/);
   assert.doesNotMatch(html, /tabindex="[1-9]/);
 });

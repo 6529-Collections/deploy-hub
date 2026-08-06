@@ -62,7 +62,7 @@ KISS: Keep It Simple, Silly.
 
 ## Repository workflow
 
-- During the owner-approved private static-app bootstrap, commit and push
+- During the owner-approved public static-app bootstrap, commit and push
   audited changes directly to `main`.
 - Fetch `origin/main` immediately before every push and stop on divergence or
   unexpected worktree changes.
