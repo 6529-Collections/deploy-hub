@@ -888,6 +888,30 @@ code {
 }
 
 @media (max-width: 900px) {
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .header-actions {
+    display: contents;
+  }
+
+  .header-login,
+  .account-control {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .site-deployment-status {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: space-between;
+    width: 100%;
+  }
+
   .summary-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -902,17 +926,6 @@ code {
   .shell {
     width: min(100% - 24px, 1280px);
     padding-top: 20px;
-  }
-
-  .header {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .header-actions {
-    align-items: center;
-    flex-direction: row;
-    flex-wrap: wrap;
   }
 
   .target-options {
@@ -931,6 +944,29 @@ code {
 
   .panel {
     padding: 17px;
+  }
+}
+
+@media (max-width: 440px) {
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  .account-profile {
+    max-width: 104px;
+    overflow: hidden;
+    padding-inline: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

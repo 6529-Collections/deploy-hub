@@ -91,11 +91,16 @@ The header also checks the public Deploy Hub Pages workflow: authenticated
 operators receive a compact status control immediately before their account
 that links an active or failed UI deployment, while an already completed newer
 version offers Reload. Public read-only mode hides this operator-only control.
+On compact screens that status occupies a second header row while the brand and
+account remain together above it. The static UI also includes standalone web
+app and iPhone home-screen metadata under the `6529 Deploy Hub` name using the
+existing blue icon assets.
 The self-status check requires no authentication and disappears harmlessly if
 GitHub cannot be reached. Failed UI deployments use a neutral control with a
-small red marker, and the Pages job allows 15 minutes for GitHub's hosted
-deployment queue. The public Login control now matches the height and styling
-of the joined authenticated account control.
+small red marker. The Pages deployment action now allows 15 minutes for
+GitHub's hosted deployment queue inside a 16-minute job envelope. The public
+Login control now matches the height and styling of the joined authenticated
+account control.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

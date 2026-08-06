@@ -26,9 +26,10 @@ test('Pages publication versions coupled static assets with the deployment SHA',
       version
     ]);
 
-    const [index, app] = await Promise.all([
+    const [index, app, manifest] = await Promise.all([
       readFile(join(outputDirectory, 'index.html'), 'utf8'),
-      readFile(join(outputDirectory, 'app.js'), 'utf8')
+      readFile(join(outputDirectory, 'app.js'), 'utf8'),
+      readFile(join(outputDirectory, 'manifest.webmanifest'), 'utf8')
     ]);
 
     assert.match(index, new RegExp(`href="\\./styles\\.css\\?v=${version}"`));
@@ -46,6 +47,7 @@ test('Pages publication versions coupled static assets with the deployment SHA',
         await stat(join(outputDirectory, 'assets/brand/favicon-32.png'))
       ).isFile()
     );
+    assert.equal(JSON.parse(manifest).name, '6529 Deploy Hub');
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }

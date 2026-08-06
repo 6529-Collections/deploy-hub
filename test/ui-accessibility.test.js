@@ -216,6 +216,12 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   ]);
 
   assert.match(html, /<html lang="en">/);
+  assert.match(html, /<title>6529 Deploy Hub<\/title>/);
+  assert.match(html, /<link rel="manifest" href="\.\/manifest\.webmanifest"/);
+  assert.match(
+    html,
+    /name="apple-mobile-web-app-title" content="6529 Deploy Hub"/
+  );
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
   assert.match(html, /<h1>6529 Deploy Hub<\/h1>/);
   assert.match(
@@ -368,6 +374,31 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
   assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);
   assert.match(css, /body\s*{[\s\S]*?background: #050505;/);
   assert.doesNotMatch(css, /radial-gradient|linear-gradient/);
+  assert.match(
+    css,
+    /@media \(max-width: 900px\)[\s\S]*?\.header\s*{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 900px\)[\s\S]*?\.site-deployment-status\s*{[\s\S]*?grid-column: 1 \/ -1;[\s\S]*?grid-row: 2;/
+  );
+});
+
+test('web app manifest uses the Deploy Hub identity and existing blue icons', async () => {
+  const manifest = JSON.parse(await readUiFile('manifest.webmanifest'));
+
+  assert.equal(manifest.name, '6529 Deploy Hub');
+  assert.equal(manifest.short_name, 'Deploy Hub');
+  assert.equal(manifest.start_url, './');
+  assert.equal(manifest.scope, './');
+  assert.equal(manifest.display, 'standalone');
+  assert.deepEqual(
+    manifest.icons.map(({ sizes, src }) => [sizes, src]),
+    [
+      ['192x192', './assets/brand/deploy-hub-icon-192.png'],
+      ['512x512', './assets/brand/deploy-hub-icon-512.png']
+    ]
+  );
 });
 
 test('PR picker searches open work and keeps the bounded multi-select contract', async () => {

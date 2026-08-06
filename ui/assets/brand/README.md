@@ -1,7 +1,7 @@
 # Deploy Hub brand assets
 
-These files are saved for the live UI task and are not wired into the current
-static shell yet.
+These files provide the live UI mark, favicons, Apple touch icon, and installable
+web-app icons.
 
 ## Source
 
@@ -20,6 +20,6 @@ No generated or redrawn variant is used.
 | `favicon-32.png`             |     32×32 | Standard favicon     |
 | `favicon-16.png`             |     16×16 | Small favicon        |
 
-All derivatives are deterministic resizes of the preserved source. The current
-shell should adopt them during Task 2 together with accessible branding and
-favicon markup.
+All derivatives are deterministic resizes of the preserved source. The live
+shell uses them for accessible branding, favicons, iPhone home-screen metadata,
+and the web app manifest.

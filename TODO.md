@@ -202,6 +202,12 @@ Evidence:
   account links an active or failed UI deployment and offers Reload when a
   newer successful version is available. Public read-only mode hides this
   operator-only update control; GitHub API failure leaves the page unchanged.
+- Desktop keeps that deployment control between the brand and account. Compact
+  screens preserve the brand and account on the first row and place deployment
+  status on a full-width second row only when it is present.
+- The page includes a standalone web app manifest and iPhone home-screen
+  metadata named `6529 Deploy Hub`, backed by the existing blue 192 px, 512 px,
+  and Apple touch icons.
 - The public Login control matches the height, border, radius, typography, and
   visual weight of the joined authenticated account control.
 - The review action is disabled with a visible selection prompt until at least
