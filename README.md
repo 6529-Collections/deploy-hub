@@ -52,6 +52,9 @@ real staging while preserving the existing manual path.
   caller's existing GitHub authentication.
 - The supplied Deploy Hub mark and deterministic icon/favicon sizes are saved
   under `ui/assets/brand/` and integrated into the static UI.
+- The UI is published from `ui/` through GitHub Pages at
+  <https://6529-collections.github.io/deploy-hub/>. Changes to `ui/**` on
+  `main` redeploy it automatically.
 - The FE-only requirements, architecture, flows, and rollout strategy are the
   active design.
 - The static page contains no repository or environment authority of its own.
@@ -88,9 +91,10 @@ npm run check
 ```
 
 The project uses plain HTML, CSS, JavaScript, Node unit tests, and read-only
-credentialless CI. There is no local or hosted Deploy Hub server.
+credentialless CI. GitHub Pages serves the static `ui/` files directly; there
+is no Deploy Hub application server.
 
-During the current private bootstrap, audited changes are pushed directly to
+During the current bootstrap, audited changes are pushed directly to
 `main` after fetching and checking `origin/main`. Protected main must be
 reconsidered before adding deployment mutation capability or another write
 actor.

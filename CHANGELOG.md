@@ -1,5 +1,20 @@
 # Planning Changelog
 
+## 2026-08-06
+
+- Added a minimal GitHub Actions deployment that publishes `ui/` unchanged to
+  <https://6529-collections.github.io/deploy-hub/>. The workflow redeploys
+  after UI or workflow changes reach `main`, uses immutable official Action
+  pins, exposes the Pages deployment URL, and adds no build system, backend, or
+  Jekyll behavior. Audited all UI asset, module, image, favicon, navigation,
+  and request paths; no `/deploy-hub/` compatibility changes were required.
+- Synchronized frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  with current frontend `main` at exact head
+  `5be84590dc6488387e42ac4446130fd267ac09bc`. Resolved the two E2E workflow
+  conflicts by preserving both Deploy Hub and upstream behavior; focused
+  workflow tests passed and newly triggered CI was not polled.
+
 ## 2026-08-05
 
 - Replaced the mismatched username badge and `Forget GitHub` button with one

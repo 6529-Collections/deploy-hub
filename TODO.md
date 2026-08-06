@@ -1,6 +1,6 @@
 # Deploy Hub FE Implementation Tracker
 
-Last updated: 2026-08-05
+Last updated: 2026-08-06
 
 This is the only active top-level implementation tracker. It intentionally
 contains eight frontend tasks rather than decomposing every concern into a
@@ -39,7 +39,7 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant Task 1 shadow baseline.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b`.
+  is open at exact head `5be84590dc6488387e42ac4446130fd267ac09bc`.
   It completes Task 1, Task 3, and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides the lower-level
@@ -193,6 +193,9 @@ Evidence:
   safely, and the picker scrolls vertically without horizontal overflow.
 - Signed-in identity and disconnect are one joined control; the username links
   to the operator's GitHub profile and disconnect is an icon-only action.
+- GitHub Pages publishes `ui/` unchanged at
+  <https://6529-collections.github.io/deploy-hub/> and automatically redeploys
+  after UI changes reach `main`; no backend or build system was added.
 - UI completion commit
   [`efa3ace`](https://github.com/6529-Collections/deploy-hub/commit/efa3acea8310340d0b6d1b680cb4dbf2d29f1854)
   passed exact-head repository
@@ -246,7 +249,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b` contains the
+  at exact head `5be84590dc6488387e42ac4446130fd267ac09bc` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
@@ -302,7 +305,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b` contains the
+  at exact head `5be84590dc6488387e42ac4446130fd267ac09bc` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App

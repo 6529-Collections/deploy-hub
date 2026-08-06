@@ -1,6 +1,6 @@
 # Deploy Hub Status
 
-Last updated: 2026-08-05
+Last updated: 2026-08-06
 
 ## Current position
 
@@ -15,7 +15,7 @@ merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `71a20ee65082c83ea3eb43aecf3638189a42a36b`.
+is open at exact head `5be84590dc6488387e42ac4446130fd267ac09bc`.
 It completes Task 1, Task 3, and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
@@ -24,8 +24,10 @@ forward-only removal with automatic restore on failure. It also contains the
 lower-level primitives used by Task 5. The PR
 remains open, and no Deploy Hub operation was dispatched.
 
-The latest action was a conflict-free sync with current frontend `main`; newly
-triggered CI was not polled. Before that sync, the review follow-up verified
+The latest frontend action merged current `main`, preserving both Deploy Hub
+and new upstream E2E behavior across two workflow conflicts; focused workflow
+tests passed and newly triggered CI was not polled. Before that sync, the
+review follow-up verified
 each production merge against the exact authorized main parent, published
 terminal Deploy Hub status even when staging E2E packs are skipped, and
 rejected insecure or redirected credentialed GitHub API requests. All then-open
@@ -75,10 +77,14 @@ selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined
 control, with the username linking to the operator's GitHub profile.
 The current UI regressions and all 36 repository tests also pass.
+The static UI is published directly from `ui/` through GitHub Pages at
+<https://6529-collections.github.io/deploy-hub/>. The Pages workflow runs after
+changes to `ui/**` or its own workflow file reach `main`; it uploads the UI
+directory unchanged and introduces no build system or application server.
 
 ## Retained foundation
 
-- Private `deploy-hub` repository with read-only CI and direct-to-`main`
+- Public `deploy-hub` repository with read-only CI and direct-to-`main`
   bootstrap workflow.
 - Plain static UI shell with no server runtime.
 - Direct browser-to-GitHub authentication, operator membership verification,
