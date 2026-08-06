@@ -218,6 +218,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<html lang="en">/);
   assert.match(html, /<title>6529 Deploy Hub<\/title>/);
   assert.match(html, /<link rel="manifest" href="\.\/manifest\.webmanifest"/);
+  assert.match(html, /name="application-name" content="6529 Deploy Hub"/);
   assert.match(
     html,
     /name="apple-mobile-web-app-title" content="6529 Deploy Hub"/
@@ -388,7 +389,7 @@ test('web app manifest uses the Deploy Hub identity and existing blue icons', as
   const manifest = JSON.parse(await readUiFile('manifest.webmanifest'));
 
   assert.equal(manifest.name, '6529 Deploy Hub');
-  assert.equal(manifest.short_name, 'Deploy Hub');
+  assert.equal(manifest.short_name, '6529 Deploy Hub');
   assert.equal(manifest.start_url, './');
   assert.equal(manifest.scope, './');
   assert.equal(manifest.display, 'standalone');

@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "6529 Deploy Hub",
-  "short_name": "Deploy Hub",
+  "short_name": "6529 Deploy Hub",
   "description": "6529 frontend deployment control and observability.",
   "start_url": "./",
   "scope": "./",

@@ -1,6 +1,7 @@
-# Deploy Hub
+# 6529 Deploy Hub
 
-Deploy Hub is the frontend deployment control and observability UI for 6529.
+6529 Deploy Hub is the frontend deployment control and observability UI for
+6529.
 
 The current project is deliberately frontend-only. The goal is to prove a
 small, reliable path from an exact frontend pull request to staging or

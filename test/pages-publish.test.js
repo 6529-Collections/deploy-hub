@@ -47,7 +47,12 @@ test('Pages publication versions coupled static assets with the deployment SHA',
         await stat(join(outputDirectory, 'assets/brand/favicon-32.png'))
       ).isFile()
     );
-    assert.equal(JSON.parse(manifest).name, '6529 Deploy Hub');
+    assert.deepEqual(
+      (({ name, short_name: shortName }) => ({ name, shortName }))(
+        JSON.parse(manifest)
+      ),
+      { name: '6529 Deploy Hub', shortName: '6529 Deploy Hub' }
+    );
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }

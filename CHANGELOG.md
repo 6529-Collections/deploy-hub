@@ -6,7 +6,8 @@
   and account on desktop, then becomes a full-width second header row on compact
   screens while the brand and account remain together above it. Added minimal
   standalone install metadata using the existing blue Deploy Hub icons and the
-  `6529 Deploy Hub` app name.
+  exact `6529 Deploy Hub` full name, short name, HTML title, application name,
+  and iPhone title.
 - Set the official Pages deployment action's own timeout to 15 minutes and kept
   a 16-minute outer job envelope. This corrects the earlier change that raised
   only the job timeout while the action still stopped after its 10-minute
