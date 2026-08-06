@@ -374,25 +374,11 @@ a:focus-visible {
   margin-bottom: 18px;
 }
 
-.environment-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.environment-staging {
-  background: #f59e0b;
-  box-shadow: 0 0 14px rgb(245 158 11 / 54%);
-}
-
-.environment-production {
-  background: #22c55e;
-  box-shadow: 0 0 14px rgb(34 197 94 / 54%);
-}
-
-.environment-waiting {
-  background: #3b82f6;
-  box-shadow: 0 0 14px rgb(59 130 246 / 54%);
+.summary-icon {
+  width: 1rem;
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
 }
 
 .summary-value {

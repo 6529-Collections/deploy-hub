@@ -127,10 +127,7 @@
         <section class="summary-grid" aria-label="Deployment environments">
           <article class="summary-card">
             <div class="summary-heading">
-              <span
-                class="environment-dot environment-staging"
-                aria-hidden="true"
-              ></span>
+              <span class="summary-icon" aria-hidden="true">🚧</span>
               <h2>Staging</h2>
             </div>
             <p
@@ -164,10 +161,7 @@
           </article>
           <article class="summary-card">
             <div class="summary-heading">
-              <span
-                class="environment-dot environment-production"
-                aria-hidden="true"
-              ></span>
+              <span class="summary-icon" aria-hidden="true">🚀</span>
               <h2>Production</h2>
             </div>
             <p
@@ -201,11 +195,8 @@
           </article>
           <article class="summary-card">
             <div class="summary-heading">
-              <span
-                class="environment-dot environment-waiting"
-                aria-hidden="true"
-              ></span>
-              <h2>Queued operations</h2>
+              <span class="summary-icon" aria-hidden="true">📥</span>
+              <h2>Queued Operations</h2>
             </div>
             <p
               class="summary-value summary-loading"
@@ -215,9 +206,7 @@
             >
               Loading…
             </p>
-            <p class="summary-detail" id="refresh-state">
-              Connecting to GitHub…
-            </p>
+            <p class="summary-detail" id="refresh-state" hidden></p>
           </article>
         </section>
 

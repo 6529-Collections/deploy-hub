@@ -134,7 +134,8 @@ function showDashboardLoading() {
   elements.waitingState.className = 'summary-value summary-loading';
   elements.waitingState.textContent = 'Loading…';
   elements.waitingState.setAttribute('aria-busy', 'true');
-  elements.refreshState.textContent = 'Loading GitHub…';
+  elements.refreshState.textContent = '';
+  elements.refreshState.hidden = true;
   elements.operationsList.replaceChildren();
   elements.operationsEmpty.textContent = 'Loading…';
   elements.operationsEmpty.hidden = false;
@@ -160,7 +161,7 @@ function showSignedIn(identity, token) {
     void refreshDashboard();
   }, REFRESH_INTERVAL_MS);
   void refreshPullRequests({ announce: true });
-  void refreshDashboard({ announce: true });
+  void refreshDashboard();
 }
 
 async function connect(token) {
@@ -490,6 +491,7 @@ function renderDashboard(model) {
   }`;
   elements.waitingState.setAttribute('aria-busy', 'false');
   elements.refreshState.textContent = `Updated ${formatDate(model.refreshedAt)}`;
+  elements.refreshState.hidden = false;
   elements.staleWarning.hidden = true;
   elements.operationsList.replaceChildren(
     ...model.operations.map(renderOperation)
@@ -498,17 +500,17 @@ function renderDashboard(model) {
   elements.operationsEmpty.hidden = model.operations.length > 0;
 }
 
-async function refreshDashboard({ announce = false } = {}) {
+async function refreshDashboard() {
   if (!activeToken || refreshInFlight) return;
   refreshInFlight = true;
   elements.refreshButton.disabled = true;
   elements.operationsPanel.setAttribute('aria-busy', 'true');
-  if (announce) elements.refreshState.textContent = 'Reading GitHub truth…';
   try {
     renderDashboard(await readDashboard(activeToken));
   } catch (error) {
     elements.staleWarning.hidden = false;
     elements.refreshState.textContent = 'Snapshot stale';
+    elements.refreshState.hidden = false;
     if (error instanceof GitHubOperationError && error.status === 401) {
       forgetToken(localStorage);
       showSignedOut('GitHub rejected the stored token. Connect again.');
@@ -629,7 +631,7 @@ elements.startOperation.addEventListener('click', async () => {
 });
 
 elements.refreshButton.addEventListener('click', () => {
-  void refreshDashboard({ announce: true });
+  void refreshDashboard();
 });
 
 elements.refreshPrs.addEventListener('click', () => {
