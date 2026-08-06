@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-04
+Last updated: 2026-08-06
 
 ## Product outcome
 
@@ -44,6 +44,12 @@ never silently follows a branch or upgrades staging intent to production.
 
 - Use `1a-staging` through non-force commits and the canonical frontend staging
   workflow.
+- Build each new candidate from a frozen current `main`, every still-active
+  tracked exact PR already accepted in staging, and the new cohort. Advancing
+  `main` must not silently remove an earlier staged PR.
+- If existing staging has no Deploy Hub composition metadata, accept it as the
+  initial baseline only when its content matches current `main`; otherwise fail
+  before mutation and require an explicit cutover decision.
 - Preserve the repository-owned build, deployment, health/runtime proof, E2E,
   CI notification, and manual fallback.
 - Success requires exact staging runtime proof and all 12 baseline staging E2E

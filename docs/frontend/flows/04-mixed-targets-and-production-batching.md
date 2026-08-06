@@ -9,7 +9,7 @@ cohorts, then the staging and production lanes overlap safely.
 ```mermaid
 flowchart TD
     A["Frozen pending manifest<br/>1. PR 2 target = Production<br/>2. PR 3 target = Staging"] --> B["Partition by adjacent final target"]
-    B --> C["Production cohort C2<br/>content = H + PR 2"]
+    B --> C["Production cohort C2<br/>content = current main + retained tracked PRs + PR 2"]
     B --> D["Staging cohort C3 waits<br/>until staging lane is free"]
     C --> E["C2 deploy, runtime proof,<br/>and full staging E2E pass"]
     E --> F["PR 2 status<br/>Target: Production / Staging validated"]
@@ -18,9 +18,9 @@ flowchart TD
     H --> I["PR 2 status<br/>Target: Production / Production complete"]
     E --> J["Release staging lane to C3<br/>while PR 2 continues independently"]
     D --> J
-    J --> K["C3 = verified H2 content + PR 3"]
+    J --> K["C3 = current main + retained tracked PRs + PR 3"]
     K --> L["C3 has a product failure"]
-    L --> M["Restore verified H2 content<br/>through a non-force recovery commit"]
+    L --> M["Restore current main + retained tracked PRs<br/>through a non-force recovery commit"]
     M --> N["PR 3 status<br/>Target: Staging / Not staged:<br/>product failure"]
 ```
 
@@ -33,7 +33,7 @@ the next staging cohort use independent concurrency lanes.
 ```mermaid
 flowchart TD
     A["Frozen pending manifest<br/>PR 2 target = Production<br/>PR 4 target = Production<br/>PR 5 target = Staging"] --> B["Adjacent production cohort C24<br/>separate staging cohort C5"]
-    B --> C["C24 = H + exact PR 2 + exact PR 4"]
+    B --> C["C24 = current main + retained tracked PRs<br/>+ exact PR 2 + exact PR 4"]
     C --> D["Shared staging deploy, runtime proof,<br/>and full staging E2E pass"]
     D --> E["Production candidate set<br/>exact PR 2 head + exact PR 4 head"]
     E --> F{"Preflight every candidate against<br/>the same current main and merge order"}

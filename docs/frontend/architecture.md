@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-04
+Last updated: 2026-08-06
 
 ## Boundary
 
@@ -16,11 +16,12 @@ workflow composes exact requests and calls the repository's existing canonical
 deployment and E2E implementations. Deploy Hub never receives AWS credentials
 or duplicates deployment logic.
 
-The first implementation is the Task 1 base FE shadow workflow. It is dormant
+The first implementation is the Task 1 FE dry-run workflow. It is dormant
 unless explicitly dispatched, uses the frontend repository's automatic
-`GITHUB_TOKEN`, and receives only repository/PR read access plus permission to
-write its dedicated shadow commit status. It has no ref, Actions-dispatch,
-environment, or OIDC authority. Task 3 separately adds real staging behavior.
+`GITHUB_TOKEN`, and receives only repository, PR, and check read access plus
+permission to write its clearly labelled dry-run commit status. It evaluates
+the real candidate plan but has no ref, Actions-dispatch, environment, or OIDC
+authority. Task 3 separately adds real staging behavior.
 
 ```mermaid
 flowchart LR
@@ -69,6 +70,20 @@ Examples:
 This permits useful same-target batching without mixing production evidence
 with staging-only work or recreating a release train.
 
+## Latest-main staging composition
+
+Each new staging candidate is rebuilt from one frozen current `main`, every
+still-active tracked exact PR already accepted in staging, and the new cohort.
+The controller does not merge `main` into a contributor's branch and does not
+use the previous `1a-staging` tree as an opaque base. This keeps current main
+content while preserving earlier staged PRs.
+
+Deploy Hub records the active exact PR composition in bounded commit metadata.
+If `1a-staging` has no such metadata, its tree is accepted as an initial
+baseline only when it matches current `main`; otherwise live mutation fails
+closed. The dry run reports this as `baselineRequired` without changing the
+branch or environment.
+
 ## Concurrency
 
 - One staging cohort owns the frontend staging mutation lane at a time.
@@ -96,8 +111,9 @@ point while retaining its ordinary manual/push path.
 Staging infrastructure failures retry the same snapshot within a bounded
 budget. Product failures enter the finite ordered replay documented in
 [the staging reconciliation flow](flows/03-staging-failure-reconciliation.md).
-Recovery creates new non-force commits whose content represents the selected
-known-good baseline plus candidate; it never resets shared branch history.
+Recovery creates new non-force commits whose content represents the frozen
+current `main`, retained tracked PRs, and the selected candidate; it never
+resets shared branch history.
 
 Production does not use automatic replay. After `main` mutation, every failure
 reports the exact merged SHA and runtime truth. Only an explicit retry of the

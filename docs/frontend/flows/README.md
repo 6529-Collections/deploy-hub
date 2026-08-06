@@ -39,6 +39,12 @@ that Tasks 1–6 must implement and prove.
   pushes to `1a-staging` retain their normal push-triggered path; the controller
   does not depend on its own `GITHUB_TOKEN` push creating another run, because
   GitHub suppresses that recursive trigger.
+- Every new candidate starts from a frozen current `main`, reapplies every
+  still-active tracked exact PR already accepted in staging, then adds the new
+  cohort. Earlier staged PRs are not lost when `main` advances.
+- If staging has no Deploy Hub composition metadata and differs from current
+  `main`, live operation fails before mutation and requires an explicit
+  baseline decision.
 
 ### Staging batching
 

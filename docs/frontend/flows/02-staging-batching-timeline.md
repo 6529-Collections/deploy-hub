@@ -33,7 +33,7 @@ sequenceDiagram
     DH->>P1: Target: Staging / Staging validated
     DH->>DH: Freeze manifest [PR 2 to Production, PR 3 to Staging]
     Note over DH: Different final targets become consecutive cohorts,<br/>not one mixed snapshot.
-    DH->>STG: Production cohort C2 = H + PR 2
+    DH->>STG: Production cohort C2 = current main + tracked PR 1 + PR 2
     DH->>P2: Target: Production / Deploying staging snapshot C2
     DH->>P3: Target: Staging / Queued behind active staging cohort
 
@@ -45,10 +45,10 @@ sequenceDiagram
         DH->>PROD: Merge exact PR 2, freeze M2, deploy and run production E2E
         PROD-->>P2: Target: Production / Production complete
     and PR 3 uses the now-free staging lane
-        DH->>STG: Staging cohort C3 = H2 + PR 3
+        DH->>STG: Staging cohort C3 = current main + tracked PRs 1 and 2 + PR 3
         DH->>P3: Target: Staging / Deploying staging snapshot C3
         STG-->>DH: C3 product failure
-        DH->>STG: Restore and verify known-good H2 content
+        DH->>STG: Restore current main + retained tracked PRs 1 and 2
         DH->>P3: Target: Staging / Not staged: product failure
     end
 ```

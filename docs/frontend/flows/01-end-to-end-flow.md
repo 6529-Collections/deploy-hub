@@ -11,7 +11,7 @@ flowchart TD
     C -- "No" --> C1["Fail before mutation<br/>PR status shows stale or policy blocker"]
     C -- "Yes" --> D["Write PR status<br/>Queued for staging batch"]
     D --> E["Frontend controller freezes valid pending requests<br/>and partitions adjacent requests by final target"]
-    E --> F["Compose one cumulative staging snapshot<br/>for the next same-target cohort"]
+    E --> F["Compose from frozen current main + retained tracked PRs<br/>+ the next same-target cohort"]
     F --> G["Non-force update of 1a-staging"]
     G --> H["Canonical deploy-staging.yml"]
     H --> I["Prove exact staging runtime SHA"]

@@ -26,7 +26,7 @@ separate project.
 | Task | Deliverable                           | Status      | Depends on |
 | ---: | ------------------------------------- | ----------- | ---------- |
 |    0 | FE-only repository baseline           | DONE        | —          |
-|    1 | Base FE shadow workflow               | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 0          |
+|    1 | Real FE dry-run workflow              | DONE — PENDING [FE PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653) | 0          |
 |    2 | Live frontend UI                      | DONE        | 1          |
 |    3 | Real frontend staging                 | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 1, 2       |
 |    4 | Real frontend production              | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3          |
@@ -37,10 +37,15 @@ separate project.
 ## Active frontend implementation PRs
 
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
-  is merged and owns the dormant Task 1 shadow baseline.
+  is merged and owns the dormant deterministic simulator being replaced.
+- [Frontend PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
+  is open at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`.
+  It replaces the simulator with the dedicated manual-only real dry run for
+  Task 1. It cannot deploy, dispatch another workflow, or mutate a ref or
+  environment. It is intentionally pending merge; no dry run was dispatched.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `5be84590dc6488387e42ac4446130fd267ac09bc`.
-  It completes Task 1, Task 3, and Task 4, including durable request intake,
+  is open at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8`.
+  It completes Task 3 and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides the lower-level
   primitives used by Task 5. It is intentionally pending merge. No Deploy Hub
@@ -77,32 +82,34 @@ Evidence:
 - `archive/original-cross-repo-plan/`
 - `ui/assets/brand/`
 
-### [x] Task 1 — Base FE shadow workflow
+### [x] Task 1 — Real FE dry-run workflow
 
-Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+Status: **DONE — PENDING** [FE PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
 
-Outcome: A dormant workflow in the frontend repository lets an exact frontend
-request exercise the full control and feedback shape without any
+Outcome: A manually dispatched workflow in the frontend repository evaluates
+the real pre-mutation plan for exact frontend requests without any
 shared-environment authority.
 
 Acceptance criteria:
 
-- [x] Inputs freeze repository, PR, exact head SHA, final target, requester, and
-      request time.
+- [x] Inputs freeze operation ID, ordered exact PR heads, final target,
+      requester, and request time.
 - [x] The workflow is explicitly dispatched, uses only the frontend
       repository's automatic `GITHUB_TOKEN`, and needs no stored credential.
-- [x] Permissions are limited to reading repository/PR data and writing the
-      dedicated shadow commit status.
+- [x] Permissions are limited to reading repository, PR, and check data and
+      writing clearly labelled dry-run commit statuses.
 - [x] Stale or moved PR heads fail closed.
-- [x] Deterministic fake phases cover queued, running, succeeded, product
-      failure, infrastructure failure, and stale outcomes.
-- [x] Shadow projection distinguishes immediate cancellation before mutation
-      from a safe-stop request after mutation has begun.
-- [x] The immutable manifest partitions adjacent requests by final target.
-- [x] Opted-in test PR feedback shows target, phase, exact SHA, conclusion, and
-      the authoritative shadow run link.
-- [x] Shadow permissions cannot update refs, dispatch canonical deploys, assume
-      environment roles, or publish CI/release-note communications.
+- [x] Operator authority and production check readiness use the same live
+      policy inputs.
+- [x] The candidate is composed locally from current `main`, retained tracked
+      exact staging PRs, and the requested PRs in order.
+- [x] Local merge conflicts fail before mutation.
+- [x] A divergent untracked staging baseline is reported as
+      `baselineRequired` rather than silently adopted.
+- [x] PR feedback is explicitly labelled `Deploy Hub Dry Run` and links to the
+      authoritative run without claiming deployment.
+- [x] Dry-run permissions cannot update refs, dispatch canonical deploys,
+      assume environment roles, or publish CI/release-note communications.
 - [x] No database, custom queue, callback, server, or agent polling is added.
 - [x] Focused tests and exact-head CI pass.
 
@@ -110,20 +117,13 @@ Evidence:
 
 - Frontend PR
   [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
-  merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
-  `main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`.
-- The focused shadow tests, changed-file checks, Jest diagnostic ratchet,
-  workflow-security validation, and secret scan pass locally.
-- Review follow-up ensures validation failures still produce a visible Action
-  summary and best-effort terminal error statuses replace partial pending
-  projections after a GitHub API interruption.
-- Latest review follow-up uses the repository's actual default branch and
-  rejects malformed request timestamps with the intended validation error.
+  merged the dormant deterministic simulator. It never received mutation
+  authority and is replaced by the real planning path in PR #3653.
 - Open frontend PR
-  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  distinguishes pre-mutation Stop from post-mutation safe Stop in the shadow
-  projection and completes the shadow status payload. Its merge remains
-  deliberately pending.
+  [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
+  at exact head `cf7d882c6432a744b6d3f2af1570756f11454175` contains the
+  complete manual-only dry run. Eleven focused tests and the frontend
+  changed-file check pass locally; newly triggered CI was not polled.
 
 ### [x] Task 2 — Live frontend UI
 
@@ -215,7 +215,7 @@ Evidence:
 
 Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
 
-Outcome: The proven base FE shadow workflow is extended so an exact frontend
+Outcome: The dry-run-proven frontend plan is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
 full E2E, and produces independently useful outcomes when a batch fails.
 
@@ -225,6 +225,9 @@ Acceptance criteria:
       `deploy-staging.yml` and staging E2E implementation.
 - [x] Exact PR heads integrate into `1a-staging` through new non-force commits;
       shared history is never rewritten.
+- [x] Every candidate is rebuilt from frozen current `main`, retained tracked
+      exact staged PRs, and the new cohort; an unsafe untracked baseline fails
+      before mutation.
 - [x] Adjacent same-target requests batch; different final targets remain
       separate ordered cohorts.
 - [x] One frontend staging cohort mutates the environment at a time through
@@ -259,7 +262,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `5be84590dc6488387e42ac4446130fd267ac09bc` contains the
+  at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
@@ -315,7 +318,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `5be84590dc6488387e42ac4446130fd267ac09bc` contains the
+  at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App
@@ -371,8 +374,9 @@ proven without blocking colleagues.
 
 Acceptance criteria:
 
-- [ ] Shadow success, failure, stale, cancel, retry, batching, polling, and PR
-      feedback cases pass with no mutation authority.
+- [ ] Dry-run exact-head, authority, checks, latest-main composition, retained
+      staging composition, conflict, baseline, and PR-feedback cases pass with
+      no mutation authority.
 - [ ] Controlled low-risk staging canaries prove runtime identity, all baseline
       E2E, failure recovery, and manual fallback.
 - [ ] Canary evidence proves both stop boundaries: pre-mutation leaves staging
@@ -414,8 +418,9 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 6 — Canary, burn-in, and establishment. Begin with shadow-only validation
-through the already-merged dormant shadow workflow. Keep frontend PR #3586
-open and do not mutate staging or production during this phase. Merge #3586
-only after shadow evidence passes and the owner separately authorizes a
+Task 6 — Canary, burn-in, and establishment. First merge frontend PR
+[#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653) only
+after its normal review gates and explicit owner authorization, then collect
+manual dry-run evidence with no staging or production mutation. Keep frontend
+PR #3586 open until that evidence passes and the owner separately authorizes a
 controlled real canary.

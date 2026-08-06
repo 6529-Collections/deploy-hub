@@ -2,6 +2,22 @@
 
 ## 2026-08-06
 
+- Opened dedicated frontend dry-run PR
+  [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
+  at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`. It replaces the
+  deterministic simulator with a real manual-only pre-mutation plan covering
+  exact heads, authority, checks, current-main composition, retained staged
+  PRs, baseline detection, and conflicts. It has no ref, workflow-dispatch,
+  environment, deployment, OIDC, AWS, or secret authority; no dry run was
+  dispatched and newly triggered CI was not polled.
+- Followed up frontend PR
+  [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+  at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8`. Synced current
+  `main`, preserved upstream isolated production-E2E evidence, tightened the
+  installed-App check and bounded GitHub retry handling, and rebuilt every
+  staging candidate from current `main`, retained tracked exact staged PRs,
+  and the new cohort. The remaining CodeRabbit thread was resolved; 85 focused
+  tests and the changed-file check pass, and newly triggered CI was not polled.
 - Added a public read-only UI mode for the public frontend repository. It uses
   three unauthenticated REST reads on a five-minute interval, keeps Staging and
   Production visible, expands Operations to full width, and exposes no exact

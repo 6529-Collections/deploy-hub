@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-04
+Last updated: 2026-08-06
 
 Release Bus remains OFF. Canonical manual frontend workflows remain available
 throughout rollout.
@@ -23,30 +23,35 @@ throughout rollout.
 - One-shot agent submit, status, stop, retry, and staging-removal commands using
   the same exact operation contract, including moved-SHA retry rejection.
 
-## 2. Base FE shadow workflow
+## 2. Real FE dry run
 
-Exercise the full request, cohort, status, UI, cancel, and retry shape with
-deterministic fake phases. The explicitly dispatched workflow lives in the
-frontend repository and uses only its automatic, permission-limited
-`GITHUB_TOKEN`; it needs no stored credential.
+Exercise the real pre-mutation planning rules without dispatching a canonical
+workflow or changing a ref or environment. The manually dispatched workflow
+lives in the frontend repository and uses only its automatic,
+permission-limited `GITHUB_TOKEN`; it needs no stored credential.
 
-The shadow identity must be physically unable to:
+The dry-run identity must be physically unable to:
 
 - update `1a-staging`, `main`, or another protected ref;
 - invoke canonical staging or production deployment;
 - assume staging or production environment roles;
 - publish real CI notifications or release notes; or
-- present shadow success as deployment evidence.
+- present dry-run success as deployment evidence.
 
-Required shadow scenarios:
+Required dry-run scenarios:
 
 - one staging request;
-- one production request through fake staging and production phases;
+- one production request with exact production-check preflight;
 - two adjacent same-target requests;
 - a mixed-target sequence;
-- stale source, pre-mutation cancellation, post-mutation safe stop, same-SHA
-  retry, infrastructure failure, and product failure/replay;
-- a page opened before the request that updates without refresh.
+- stale source, unauthorized requester, missing production checks, and local
+  merge conflict;
+- composition from current `main`, retained tracked exact staging PRs, and the
+  requested cohort;
+- an untracked staging baseline matching `main`, plus a divergent untracked
+  baseline reported as requiring explicit cutover;
+- clearly labelled dry-run commit statuses and an Action summary containing no
+  deployment claim.
 
 ## 3. Controlled staging canaries
 

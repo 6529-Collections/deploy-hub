@@ -37,12 +37,13 @@ callback service, SSE, or WebSocket.
 
 The frontend repository will own the thin operation workflow and continue to
 own the canonical deployment and E2E workflows. This repository owns the UI,
-frontend operation contract, agent entry point, documentation, and shadow
-fixtures.
+frontend operation contract, agent entry point, documentation, and dry-run
+tooling.
 
-Task 1 introduces that frontend operation workflow in dormant shadow-only form.
-It cannot deploy or mutate refs. Task 3 later extends the proven workflow to
-real staging while preserving the existing manual path.
+Task 1 introduces a manually dispatched frontend dry run. It validates the
+real exact-head, authority, check, composition, and conflict rules but cannot
+deploy or mutate refs. Task 3 separately adds real staging while preserving the
+existing manual path.
 
 ## Current state
 
@@ -66,6 +67,9 @@ real staging while preserving the existing manual path.
 - The static page contains no repository or environment authority of its own.
   Live workflow dispatch remains unavailable until the pending frontend PR is
   deliberately merged for controlled integration.
+- Frontend PR
+  [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
+  contains the dedicated manual-only real dry run. It is not merged or active.
 - Frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
   contains the open, in-review workflow implementation and staging removal

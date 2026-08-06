@@ -8,35 +8,44 @@ The repository has been reset around a frontend-only MVP. The previous broad
 frontend/backend plan is archived and no longer controls implementation.
 
 Task 0 is done. Task 1 is **DONE — PENDING** frontend PR
-[#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
+[#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653).
 Frontend PR [#3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
 merged exact head `abbabaff6f032daf448d6d9eb2433066fa19aabf` into frontend
-`main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`.
+`main` as `1e712d69a35980dab885057cc4c10ae6a8a7f0e2`; its dormant
+deterministic simulator has no mutation authority.
+
+Frontend PR
+[#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
+is open at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`.
+It replaces that simulator with the real manual-only dry run. The workflow
+checks exact heads, operator authority, production readiness, current-main
+composition, retained tracked staging PRs, and local conflicts. It can write
+only clearly labelled dry-run commit statuses; it cannot deploy, dispatch
+another workflow, or mutate a ref or environment. No dry run was dispatched.
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `5be84590dc6488387e42ac4446130fd267ac09bc`.
-It completes Task 1, Task 3, and Task 4: canonical staging and production
+is open at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8`.
+It completes Task 3 and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
 production preflight, frozen-SHA ancestry and rollback protection, and
-forward-only removal with automatic restore on failure. It also contains the
-lower-level primitives used by Task 5. The PR
-remains open, and no Deploy Hub operation was dispatched.
+forward-only removal with automatic restore on failure. Each staging candidate
+is rebuilt from frozen current `main`, retained tracked exact staged PRs, and
+the new cohort; an unsafe untracked baseline fails before mutation. It also
+contains the lower-level primitives used by Task 5. The PR remains open, and
+no Deploy Hub operation was dispatched.
 
-The latest frontend action merged current `main`, preserving both Deploy Hub
-and new upstream E2E behavior across two workflow conflicts; focused workflow
-tests passed and newly triggered CI was not polled. Before that sync, the
-review follow-up verified
-each production merge against the exact authorized main parent, published
-terminal Deploy Hub status even when staging E2E packs are skipped, and
-rejected insecure or redirected credentialed GitHub API requests. All then-open
-CodeRabbit threads were resolved, and focused local validation passed.
+The latest frontend follow-up merged current `main`, preserved the upstream
+isolated production-E2E evidence path, required the installed App check to
+complete successfully, honoured bounded `Retry-After`, resolved the remaining
+CodeRabbit thread, and passed 85 focused tests plus the changed-file check.
+Newly triggered CI was not polled.
 
 Task 2 is **DONE**. Tasks 3, 4, and 5 are **DONE — PENDING** frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586).
 
-- Task 3 has all 16 criteria implemented. One fixed commit-status context holds
+- Task 3 has all criteria implemented. One fixed commit-status context holds
   pending requests until the surviving controller claims them; later cohorts
   are terminalized if an earlier cohort stops or fails. Queued work remains
   visible and cancellable under its original Stop identity.
@@ -118,6 +127,9 @@ failures and introduces no application build system or server.
   tracked unmerged PR can be removed without a database. Removal uses another
   forward-only deploy and full E2E; failure restores and revalidates the prior
   snapshot.
+- Every new staging candidate starts from current `main`, reapplies all active
+  tracked exact staged PRs, and then adds the new cohort. A missing/divergent
+  initial composition baseline fails before live mutation.
 - The UI polls GitHub and repairs its view from the next complete read.
 - No Deploy Hub backend, database, custom queue, continuously running
   reconciler, callback receiver, or agent polling loop exists.
@@ -131,14 +143,16 @@ the current UI.
 ## Safety boundary
 
 No real deployment or repository mutation capability is present on frontend
-`main`. Task 1's merged shadow workflow remains unable to mutate refs or
-environments. PR #3586 proposes explicit mutation workflows, but they remain
-inactive while the PR is open; this follow-up did not dispatch them.
+`main`. Task 1's merged simulator remains unable to mutate refs or environments.
+PR #3653 is also read-only apart from clearly labelled dry-run statuses. PR
+#3586 proposes explicit mutation workflows, but they remain inactive while the
+PR is open; this follow-up did not dispatch either workflow.
 
 ## Next work
 
-Task 6 begins with shadow-only validation through the already-merged dormant
-shadow workflow. Keep frontend PR #3586 open and do not mutate staging or
-production during this phase. Merge #3586 only after shadow evidence passes and
-the owner separately authorizes a controlled real canary. Any merge or real
-staging operation still requires an explicit owner instruction.
+Task 6 begins by merging PR #3653 only after its normal review gates and an
+explicit owner instruction, then manually collecting real dry-run evidence.
+Keep PR #3586 open and do not mutate staging or production during that phase.
+Merge #3586 only after dry-run evidence passes and the owner separately
+authorizes a controlled real canary. Any merge or real staging operation still
+requires an explicit owner instruction.
