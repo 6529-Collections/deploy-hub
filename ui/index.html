@@ -49,6 +49,12 @@
           <h1>6529 Deploy Hub</h1>
         </div>
         <div class="header-actions">
+          <div
+            class="site-deployment-status"
+            id="site-deployment-status"
+            aria-live="polite"
+            hidden
+          ></div>
           <button
             class="button button-quiet button-small"
             id="login-github"
@@ -94,13 +100,6 @@
           </div>
         </div>
       </header>
-
-      <aside
-        class="site-deployment-status"
-        id="site-deployment-status"
-        aria-live="polite"
-        hidden
-      ></aside>
 
       <dialog class="auth-dialog" id="auth-dialog" aria-labelledby="auth-title">
         <div class="dialog-heading">

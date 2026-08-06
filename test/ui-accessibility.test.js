@@ -221,6 +221,10 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     html,
     /id="site-deployment-status"[\s\S]*?aria-live="polite"[\s\S]*?hidden/
   );
+  assert.match(
+    html,
+    /class="header-actions"[\s\S]*?id="site-deployment-status"[\s\S]*?id="login-github"/
+  );
   assert.doesNotMatch(html, /6529 engineering/i);
   assert.match(html, /for="github-token"/);
   assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);

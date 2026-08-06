@@ -39,12 +39,12 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant deterministic simulator being replaced.
 - [Frontend PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
-  is open at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`.
+  is open at exact head `1a34765b1f23d49481801b7ca4829dadfa205352`.
   It replaces the simulator with the dedicated manual-only real dry run for
   Task 1. It cannot deploy, dispatch another workflow, or mutate a ref or
   environment. It is intentionally pending merge; no dry run was dispatched.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8`.
+  is open at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c`.
   It completes Task 3 and Task 4, including durable request intake,
   truthful terminal cohort outcomes, current production preflight, and tracked
   forward-only removal from staging. It also provides the lower-level
@@ -121,7 +121,7 @@ Evidence:
   authority and is replaced by the real planning path in PR #3653.
 - Open frontend PR
   [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
-  at exact head `cf7d882c6432a744b6d3f2af1570756f11454175` contains the
+  at exact head `1a34765b1f23d49481801b7ca4829dadfa205352` contains the
   complete manual-only dry run. Eleven focused tests and the frontend
   changed-file check pass locally; newly triggered CI was not polled.
 
@@ -197,10 +197,10 @@ Evidence:
   latest-run value shows the GitHub state, run number, and short SHA and is
   itself the run link, so no separate action row or reserved empty card height
   is needed.
-- The page checks its own public Pages workflow without authentication. It
-  links an active or failed UI deployment and offers Reload when a newer
-  successful version is available; GitHub API failure leaves the page
-  unchanged.
+- The page checks its own public Pages workflow without authentication. A
+  compact header control immediately before Login/account links an active or
+  failed UI deployment and offers Reload when a newer successful version is
+  available; GitHub API failure leaves the page unchanged.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap
@@ -268,7 +268,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8` contains the
+  at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c` contains the
   complete in-review staging, bounded replay, Stop, exact composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
@@ -324,7 +324,7 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8` contains the
+  at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c` contains the
   complete in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App

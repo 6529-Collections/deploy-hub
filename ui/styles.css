@@ -57,13 +57,11 @@ a {
 }
 
 .site-deployment-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 42px;
-  padding: 9px 12px;
-  margin: -12px 0 16px;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 11px;
   border: 1px solid #303036;
   border-radius: 10px;
   background: #0b0b0d;
@@ -101,7 +99,7 @@ a {
 }
 
 .site-deployment-active span {
-  margin-right: auto;
+  white-space: nowrap;
 }
 
 .site-deployment-failed {
@@ -893,8 +891,9 @@ code {
   }
 
   .header-actions {
-    align-items: flex-end;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 
   .target-options {

@@ -16,7 +16,7 @@ deterministic simulator has no mutation authority.
 
 Frontend PR
 [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
-is open at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`.
+is open at exact head `1a34765b1f23d49481801b7ca4829dadfa205352`.
 It replaces that simulator with the real manual-only dry run. The workflow
 checks exact heads, operator authority, production readiness, current-main
 composition, retained tracked staging PRs, and local conflicts. It can write
@@ -25,7 +25,7 @@ another workflow, or mutate a ref or environment. No dry run was dispatched.
 
 Frontend PR
 [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is open at exact head `b8a7784ec3de37bafce5f509e69e8d5bda7d9ad8`.
+is open at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c`.
 It completes Task 3 and Task 4: canonical staging and production
 dispatch, durable GitHub-native request intake, bounded reconciliation,
 truthful terminal cohort outcomes, exact staging composition, current
@@ -87,10 +87,11 @@ directly to that run, eliminating the separate bottom action row and its
 reserved empty height. Environment runs are read directly from their canonical
 workflows rather than inferred from only the repository's newest 100 Actions
 runs.
-The header area also checks the public Deploy Hub Pages workflow: an active or
-failed UI deployment gets a direct Actions link, while an already completed
-newer version offers Reload. This self-status check requires no authentication
-and disappears harmlessly if GitHub cannot be reached.
+The header also checks the public Deploy Hub Pages workflow: a compact status
+control immediately before Login/account links an active or failed UI
+deployment, while an already completed newer version offers Reload. This
+self-status check requires no authentication and disappears harmlessly if
+GitHub cannot be reached.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined
