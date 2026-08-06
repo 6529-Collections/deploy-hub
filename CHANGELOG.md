@@ -10,7 +10,7 @@
 - Simplified the Staging and Production cards: `View Workflow` now sits at the
   top-right edge, while the latest-run value includes the state, GitHub run
   number, and short SHA and links directly to that run. The redundant bottom
-  action row is removed.
+  action row and its reserved empty card height are removed.
 - Opened dedicated frontend dry-run PR
   [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
   at exact head `cf7d882c6432a744b6d3f2af1570756f11454175`. It replaces the

@@ -83,9 +83,10 @@ truth arrives; they no longer flash a false `No recent run` placeholder. Each
 environment card also links directly to its canonical frontend workflow page.
 Each environment card now places `View Workflow` at its top-right edge. The
 latest-run value shows state, GitHub run number, and short SHA and links
-directly to that run, eliminating the separate bottom action row. Environment
-runs are read directly from their canonical workflows rather than inferred
-from only the repository's newest 100 Actions runs.
+directly to that run, eliminating the separate bottom action row and its
+reserved empty height. Environment runs are read directly from their canonical
+workflows rather than inferred from only the repository's newest 100 Actions
+runs.
 The header area also checks the public Deploy Hub Pages workflow: an active or
 failed UI deployment gets a direct Actions link, while an already completed
 newer version offers Reload. This self-status check requires no authentication

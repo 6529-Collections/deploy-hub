@@ -448,13 +448,12 @@ a:focus-visible {
 }
 
 .summary-card {
-  min-height: 124px;
-  padding: 18px 20px;
+  padding: 16px 20px;
 }
 
 .summary-heading {
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .summary-workflow-link {
@@ -491,7 +490,7 @@ a:focus-visible {
 
 .summary-value {
   display: inline-flex;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   color: #f8fafc;
   font-size: 1rem;
   font-weight: 750;
@@ -903,7 +902,7 @@ code {
   }
 
   .summary-card {
-    min-height: 106px;
+    padding-block: 15px;
   }
 
   .operation-top,

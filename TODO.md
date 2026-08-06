@@ -195,7 +195,8 @@ Evidence:
   production run cannot disappear behind the repository's newest 100 runs.
 - Each environment card places `View Workflow` at its top-right edge. Its
   latest-run value shows the GitHub state, run number, and short SHA and is
-  itself the run link, so no separate action row is needed.
+  itself the run link, so no separate action row or reserved empty card height
+  is needed.
 - The page checks its own public Pages workflow without authentication. It
   links an active or failed UI deployment and offers Reload when a newer
   successful version is available; GitHub API failure leaves the page
