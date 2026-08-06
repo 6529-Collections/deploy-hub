@@ -49,7 +49,6 @@ const elements = {
   preview: document.querySelector('#request-preview'),
   previewList: document.querySelector('#preview-list'),
   previewTarget: document.querySelector('#preview-target'),
-  productionLink: document.querySelector('#production-link'),
   productionState: document.querySelector('#production-state'),
   queueBadge: document.querySelector('#waiting-state'),
   refreshButton: document.querySelector('#refresh-dashboard'),
@@ -57,7 +56,6 @@ const elements = {
   reviewButton: document.querySelector('#review-operation'),
   selectedPrs: document.querySelector('#selected-prs'),
   siteDeploymentStatus: document.querySelector('#site-deployment-status'),
-  stagingLink: document.querySelector('#staging-link'),
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
   startOperation: document.querySelector('#start-operation'),
@@ -260,17 +258,17 @@ function showPublicMode({ refresh = true } = {}) {
 }
 
 function showDashboardLoading() {
-  for (const [stateElement, linkElement] of [
-    [elements.stagingState, elements.stagingLink],
-    [elements.productionState, elements.productionLink]
+  for (const stateElement of [
+    elements.stagingState,
+    elements.productionState
   ]) {
-    stateElement.className = 'summary-value summary-loading';
+    stateElement.className =
+      'summary-value summary-loading summary-value-disabled';
     stateElement.textContent = 'Loading…';
     stateElement.setAttribute('aria-busy', 'true');
-    linkElement.removeAttribute('href');
-    linkElement.setAttribute('aria-disabled', 'true');
-    linkElement.setAttribute('tabindex', '-1');
-    linkElement.classList.add('inline-link-disabled');
+    stateElement.removeAttribute('href');
+    stateElement.setAttribute('aria-disabled', 'true');
+    stateElement.setAttribute('tabindex', '-1');
   }
   if (dashboardMode === 'operator') {
     elements.queueBadge.hidden = false;
@@ -446,23 +444,30 @@ async function refreshPullRequests({ announce = false } = {}) {
   }
 }
 
-function setEnvironment(run, stateElement, linkElement) {
+function setEnvironment(run, stateElement) {
   stateElement.className = 'summary-value';
   stateElement.setAttribute('aria-busy', 'false');
   if (!run) {
     stateElement.textContent = 'No runs found';
-    linkElement.removeAttribute('href');
-    linkElement.setAttribute('aria-disabled', 'true');
-    linkElement.setAttribute('tabindex', '-1');
-    linkElement.classList.add('inline-link-disabled');
+    stateElement.removeAttribute('href');
+    stateElement.setAttribute('aria-disabled', 'true');
+    stateElement.setAttribute('tabindex', '-1');
+    stateElement.classList.add('summary-value-disabled');
     return;
   }
   const state = run.status === 'completed' ? run.conclusion : run.status;
-  stateElement.textContent = formatDisplayState(state);
-  linkElement.href = run.html_url;
-  linkElement.removeAttribute('aria-disabled');
-  linkElement.removeAttribute('tabindex');
-  linkElement.classList.remove('inline-link-disabled');
+  const runNumber = Number.isInteger(run.run_number)
+    ? `Run #${run.run_number}`
+    : '';
+  const sha = /^[a-f0-9]{40}$/i.test(run.head_sha ?? '')
+    ? run.head_sha.slice(0, 12)
+    : '';
+  stateElement.textContent = [formatDisplayState(state), runNumber, sha]
+    .filter(Boolean)
+    .join(' · ');
+  stateElement.href = run.html_url;
+  stateElement.removeAttribute('aria-disabled');
+  stateElement.removeAttribute('tabindex');
 }
 
 function makeButton(label, className, handler) {
@@ -653,16 +658,8 @@ function renderOperation(operation, authenticated) {
 
 function renderDashboard(model) {
   const authenticated = dashboardMode === 'operator';
-  setEnvironment(
-    model.environments.staging,
-    elements.stagingState,
-    elements.stagingLink
-  );
-  setEnvironment(
-    model.environments.production,
-    elements.productionState,
-    elements.productionLink
-  );
+  setEnvironment(model.environments.staging, elements.stagingState);
+  setEnvironment(model.environments.production, elements.productionState);
   elements.queueBadge.hidden = !authenticated;
   if (authenticated) {
     elements.queueBadge.textContent = `${model.waiting} queued`;

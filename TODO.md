@@ -193,11 +193,9 @@ Evidence:
   canonical frontend workflow pages.
 - Environment truth reads each canonical workflow directly, so an infrequent
   production run cannot disappear behind the repository's newest 100 runs.
-- Environment links keep the latest run on the left and the canonical workflow
-  together on the left: the workflow is always available and the latest-run
-  link remains visibly disabled until GitHub returns a run.
-- Each environment card labels its status as the latest run and shows the
-  GitHub state without an unexplained commit SHA.
+- Each environment card places `View Workflow` at its top-right edge. Its
+  latest-run value shows the GitHub state, run number, and short SHA and is
+  itself the run link, so no separate action row is needed.
 - The page checks its own public Pages workflow without authentication. It
   links an active or failed UI deployment and offers Reload when a newer
   successful version is available; GitHub API failure leaves the page

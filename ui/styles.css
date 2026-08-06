@@ -457,6 +457,10 @@ a:focus-visible {
   margin-bottom: 14px;
 }
 
+.summary-workflow-link {
+  margin-left: auto;
+}
+
 .summary-icon {
   width: 1rem;
   flex: 0 0 auto;
@@ -486,10 +490,17 @@ a:focus-visible {
 }
 
 .summary-value {
+  display: inline-flex;
   margin-bottom: 8px;
   color: #f8fafc;
   font-size: 1rem;
   font-weight: 750;
+  text-decoration: none;
+}
+
+.summary-value[href]:hover {
+  color: #bfdbfe;
+  text-decoration: underline;
 }
 
 .summary-label {
@@ -523,20 +534,7 @@ a:focus-visible {
   font-size: 0.74rem;
 }
 
-.summary-links {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.summary-links .inline-link + .inline-link {
-  padding-left: 10px;
-  margin-left: 10px;
-  border-left: 1px solid #303036;
-}
-
-.inline-link-disabled {
-  color: #52525b;
+.summary-value-disabled {
   cursor: default;
   pointer-events: none;
 }

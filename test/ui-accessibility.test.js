@@ -267,12 +267,21 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(
     html,
-    /actions\/workflows\/deploy-staging\.yml[\s\S]*?View workflow[\s\S]*?id="staging-link"[\s\S]*?aria-disabled="true"[\s\S]*?Open latest run/
+    /id="staging-state"[\s\S]*?aria-busy="true"[\s\S]*?Loading…/
   );
   assert.match(
     html,
-    /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View workflow[\s\S]*?id="production-link"[\s\S]*?aria-disabled="true"[\s\S]*?Open latest run/
+    /id="production-state"[\s\S]*?aria-busy="true"[\s\S]*?Loading…/
   );
+  assert.match(
+    html,
+    /actions\/workflows\/deploy-staging\.yml[\s\S]*?View Workflow/
+  );
+  assert.match(
+    html,
+    /actions\/workflows\/build-upload-deploy-prod\.yml[\s\S]*?View Workflow/
+  );
+  assert.doesNotMatch(html, /Open latest run|View workflow/);
   assert.equal(
     (html.match(/<p class="summary-label">Latest run<\/p>/g) ?? []).length,
     2
@@ -310,11 +319,12 @@ test('keyboard focus, reduced motion, and readable muted copy stay enforced', as
   assert.match(css, /\.target-option:focus-within/);
   assert.match(css, /\.summary-loading::before/);
   assert.match(css, /\.site-deployment-active::before/);
+  assert.match(css, /\.summary-workflow-link\s*{[\s\S]*?margin-left: auto;/);
+  assert.match(css, /\.summary-value\[href\]:hover/);
   assert.match(
     css,
-    /\.summary-links \.inline-link \+ \.inline-link\s*{[\s\S]*?border-left: 1px solid #303036;/
+    /\.summary-value-disabled\s*{[\s\S]*?pointer-events: none;/
   );
-  assert.match(css, /\.inline-link-disabled\s*{[\s\S]*?pointer-events: none;/);
   assert.match(css, /box-shadow: 0 0 0 1px rgb\(96 165 250 \/ 20%\);/);
   assert.doesNotMatch(css, /input:focus-visible|textarea:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
