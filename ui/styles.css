@@ -338,6 +338,12 @@ a:focus-visible {
   font-size: 0.74rem;
 }
 
+.button-icon {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+}
+
 .button-wide {
   width: 100%;
 }
