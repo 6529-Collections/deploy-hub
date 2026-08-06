@@ -124,6 +124,7 @@ test('browser entry module initializes the public read-only UI without a server'
     assert.equal(elements.get('#dashboard').dataset.mode, 'public');
     assert.equal(elements.get('#disconnect-github').hidden, true);
     assert.equal(elements.get('#login-github').hidden, false);
+    assert.equal(elements.get('#site-deployment-status').hidden, true);
     assert.equal(elements.get('#waiting-state').hidden, true);
     assert.equal(elements.get('#github-token').focused, false);
     elements.get('#login-github').listeners.get('click')();
@@ -230,6 +231,11 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /<h2 id="auth-title">Connect GitHub<\/h2>/);
   assert.match(html, /<dialog[^>]+id="auth-dialog"/);
   assert.match(html, /id="login-github"[\s\S]*?>[\s\S]*?Login/);
+  assert.match(html, /class="button button-quiet header-login"/);
+  assert.match(
+    app,
+    /renderSiteDeploymentStatus\(currentIdentity \? presentation : null\)/
+  );
   assert.match(html, /id="close-auth"[\s\S]*?aria-label="Close login"/);
   assert.match(html, /for="pr-search"/);
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);

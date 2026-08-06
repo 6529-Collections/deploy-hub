@@ -2,6 +2,9 @@
 
 ## 2026-08-06
 
+- Matched the public Login control to the authenticated account control and
+  hid the Pages self-deployment banner from public read-only mode. Operators
+  retain the update status and exact deployment link after authentication.
 - Refined failure presentation: the Pages failure control is neutral with a
   small red marker and uses `View Deployment`; environment cards keep the
   result as plain text and link only `Run #… · SHA`. Increased the Pages job

@@ -197,11 +197,13 @@ Evidence:
   latest-run value keeps the GitHub state as plain text and links only the run
   number and short SHA, so no separate action row or reserved empty card height
   is needed.
-- The page checks its own public Pages workflow without authentication. A
-  compact header control immediately before Login/account links an active or
-  failed UI deployment and offers Reload when a newer successful version is
-  available; failed deployments use a neutral control with a small red marker,
-  and GitHub API failure leaves the page unchanged.
+- The page checks its own public Pages workflow without authentication. For
+  authenticated operators, a compact header control immediately before the
+  account links an active or failed UI deployment and offers Reload when a
+  newer successful version is available. Public read-only mode hides this
+  operator-only update control; GitHub API failure leaves the page unchanged.
+- The public Login control matches the height, border, radius, typography, and
+  visual weight of the joined authenticated account control.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap

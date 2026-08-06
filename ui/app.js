@@ -74,6 +74,7 @@ let pullRequestsInFlight = false;
 let reviewInFlight = false;
 let selectedPrNumbers = [];
 let siteDeploymentTimer = null;
+let latestSiteDeploymentPresentation = null;
 
 export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
   const runId = Number(run?.id);
@@ -172,9 +173,11 @@ async function refreshSiteDeploymentStatus() {
     if (!response.ok) throw new Error('Pages status unavailable.');
     const payload = await response.json();
     const presentation = siteDeploymentPresentation(payload.workflow_runs?.[0]);
-    renderSiteDeploymentStatus(presentation);
+    latestSiteDeploymentPresentation = presentation;
+    renderSiteDeploymentStatus(currentIdentity ? presentation : null);
     scheduleSiteDeploymentRefresh(presentation?.active === true);
   } catch {
+    latestSiteDeploymentPresentation = null;
     renderSiteDeploymentStatus(null);
     scheduleSiteDeploymentRefresh(false);
   }
@@ -247,6 +250,7 @@ function showPublicMode({ refresh = true } = {}) {
   elements.loginButton.hidden = false;
   elements.loginButton.disabled = false;
   elements.loginButton.textContent = 'Login';
+  renderSiteDeploymentStatus(null);
   elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = true;
   elements.connectButton.disabled = false;
@@ -294,6 +298,7 @@ function showSignedIn(identity, token) {
   closeAuthDialog();
   elements.accountControl.hidden = false;
   elements.loginButton.hidden = true;
+  renderSiteDeploymentStatus(latestSiteDeploymentPresentation);
   showDashboardLoading();
   elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = false;
