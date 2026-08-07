@@ -2,9 +2,9 @@
 
 ## 2026-08-07
 
-- Made the desktop dashboard fit exactly within the viewport. New Deployment
-  and Deployment Activity fill the remaining height and scroll internally,
-  including empty activity states; narrow layouts retain normal page scrolling.
+- Reverted the viewport-locked desktop dashboard and its internal panel
+  scrolling. Only the public read-only Deployment Activity panel now fills the
+  remaining viewport height; normal vertical page scrolling remains available.
 
 ## 2026-08-06
 

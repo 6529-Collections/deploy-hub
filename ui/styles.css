@@ -35,10 +35,6 @@ a {
 }
 
 .shell {
-  display: flex;
-  height: 100dvh;
-  flex-direction: column;
-  overflow: hidden;
   width: min(1280px, calc(100% - 40px));
   margin: 0 auto;
   padding: 32px 0 24px;
@@ -452,21 +448,12 @@ a:focus-visible {
   gap: 14px;
 }
 
-#dashboard {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
 .summary-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 14px;
 }
 
 .workspace-grid {
-  min-height: 0;
-  flex: 1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -586,28 +573,7 @@ a:focus-visible {
 }
 
 .panel {
-  display: flex;
-  min-height: 0;
-  flex-direction: column;
-  overflow: hidden;
   padding: 22px;
-}
-
-.panel-scroll-area {
-  min-height: 0;
-  flex: 1;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-}
-
-.request-scroll-area {
-  padding-right: 4px;
-}
-
-.operations-scroll-area {
-  display: flex;
-  flex-direction: column;
 }
 
 .panel-heading,
@@ -923,9 +889,6 @@ code {
 }
 
 .empty-state {
-  display: grid;
-  flex: 1;
-  place-items: center;
   padding: 38px 12px;
   margin-bottom: 0;
   text-align: center;
@@ -937,19 +900,35 @@ code {
 }
 
 @media (min-width: 901px) {
-  body {
-    overflow: hidden;
+  .shell {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+  }
+
+  #dashboard[data-mode='public'] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  #dashboard[data-mode='public'] .workspace-grid {
+    flex: 1;
+  }
+
+  #dashboard[data-mode='public'] .operations-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #dashboard[data-mode='public'] .empty-state {
+    display: grid;
+    flex: 1;
+    place-items: center;
   }
 }
 
 @media (max-width: 900px) {
-  .shell {
-    display: block;
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-  }
-
   .header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -977,22 +956,6 @@ code {
   .summary-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
-  }
-
-  #dashboard {
-    display: block;
-  }
-
-  .workspace-grid {
-    min-height: auto;
-  }
-
-  .panel {
-    overflow: visible;
-  }
-
-  .panel-scroll-area {
-    overflow: visible;
   }
 
   .operations-panel {
