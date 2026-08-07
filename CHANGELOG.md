@@ -2,6 +2,8 @@
 
 ## 2026-08-07
 
+- Stopped the open-PR search field from taking focus automatically when a
+  stored authenticated session finishes loading.
 - Changed Deployment Activity polling to 15 seconds for authenticated
   operators and one minute for public read-only users. Pages update checks now
   run every minute; public users only see Reload when a newer successful UI

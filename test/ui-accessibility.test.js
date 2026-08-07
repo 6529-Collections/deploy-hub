@@ -269,6 +269,10 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(html, /class="button button-quiet header-login"/);
   assert.match(app, /visibleSiteDeploymentPresentation/);
+  assert.doesNotMatch(
+    app,
+    /function showSignedIn[\s\S]*?elements\.prSearch\.focus\(\);[\s\S]*?function connect/
+  );
   assert.match(html, /id="close-auth"[\s\S]*?aria-label="Close login"/);
   assert.match(html, /for="pr-search"/);
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);

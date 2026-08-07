@@ -314,7 +314,6 @@ function showSignedIn(identity, token) {
   elements.disconnectButton.hidden = false;
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
-  elements.prSearch.focus();
   startRefreshTimer(OPERATOR_REFRESH_INTERVAL_MS);
   void refreshPullRequests({ announce: true });
   void refreshDashboard();
