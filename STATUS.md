@@ -110,10 +110,10 @@ account control. Header authentication controls remain hidden until stored
 session detection resolves. Compact deployment notices keep their marker and
 message left-aligned together, and environment runs render as
 `Status · Run #… - SHA` with clear spacing and baseline alignment.
-On desktop, the public read-only Deployment Activity panel extends to the
-bottom of the viewport. Authenticated and narrow layouts retain natural page
-flow, and the page remains vertically scrollable whenever content needs more
-space.
+The public and authenticated read-only Deployment Activity panel extends to
+the bottom of the dynamic viewport on desktop and mobile. The page still grows
+and scrolls vertically whenever content needs more space; the authenticated
+operator layout retains natural page flow.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

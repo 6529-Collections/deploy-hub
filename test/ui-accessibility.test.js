@@ -428,7 +428,7 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
   assert.match(css, /\.operations-panel\s*{[\s\S]*?grid-column: span 2;/);
   assert.match(
     css,
-    /#dashboard\[data-mode='public'\] \.operations-panel\s*{[\s\S]*?grid-column: 1 \/ -1;/
+    /#dashboard\[data-mode='public'\] \.operations-panel,\s*#dashboard\[data-mode='viewer'\] \.operations-panel\s*{[\s\S]*?grid-column: 1 \/ -1;/
   );
   assert.match(css, /\.button\s*{[\s\S]*?white-space: nowrap;/);
   assert.match(css, /body\s*{[\s\S]*?background: #050505;/);
@@ -445,18 +445,18 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
     css,
     /@media \(max-width: 900px\)[\s\S]*?\.site-deployment-status\s*{[\s\S]*?justify-content: flex-start;/
   );
+  assert.match(css, /\.shell\s*{[\s\S]*?min-height: 100dvh;/);
   assert.match(
     css,
-    /@media \(min-width: 901px\)[\s\S]*?\.shell\s*{[\s\S]*?min-height: 100dvh;/
-  );
-  assert.match(css, /#dashboard\[data-mode='public'\]\s*{[\s\S]*?flex: 1;/);
-  assert.match(
-    css,
-    /#dashboard\[data-mode='public'\] \.workspace-grid\s*{[\s\S]*?flex: 1;/
+    /#dashboard\[data-mode='public'\],\s*#dashboard\[data-mode='viewer'\]\s*{[\s\S]*?flex: 1;/
   );
   assert.match(
     css,
-    /#dashboard\[data-mode='public'\] \.operations-panel\s*{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/
+    /#dashboard\[data-mode='public'\] \.workspace-grid,\s*#dashboard\[data-mode='viewer'\] \.workspace-grid\s*{[\s\S]*?flex: 1;/
+  );
+  assert.match(
+    css,
+    /#dashboard\[data-mode='public'\] \.operations-panel,\s*#dashboard\[data-mode='viewer'\] \.operations-panel\s*{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/
   );
   assert.doesNotMatch(css, /\.panel-scroll-area/);
 });

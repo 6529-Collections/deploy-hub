@@ -220,9 +220,10 @@ Evidence:
   resolves. Compact deployment notices group the marker with their left-aligned
   message, and environment runs render as `Status · Run #… - SHA` with explicit
   spacing.
-- On desktop, the public read-only Deployment Activity panel fills the
-  remaining viewport height. Authenticated and narrow layouts retain natural
-  page flow, with vertical page scrolling whenever content needs more space.
+- On desktop and mobile, public and authenticated read-only Deployment Activity
+  fills the remaining dynamic viewport height while retaining natural page
+  growth and vertical scrolling. The authenticated operator layout keeps its
+  natural page flow.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap

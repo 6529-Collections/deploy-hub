@@ -2,6 +2,10 @@
 
 ## 2026-08-07
 
+- Extended the public and authenticated read-only Deployment Activity panel to
+  the bottom of the dynamic viewport on mobile as well as desktop, while
+  retaining normal page growth and vertical scrolling when content needs more
+  room.
 - Separated GitHub identity from deployment authority in the static UI. Any
   valid GitHub token now receives authenticated reads and their higher API
   allowance, while only organization admins or `release-bus-operators` receive
