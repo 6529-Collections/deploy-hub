@@ -87,17 +87,20 @@ number and short SHA, eliminating the separate bottom action row and its
 reserved empty height. Environment runs are read directly from their canonical
 workflows rather than inferred from only the repository's newest 100 Actions
 runs.
-The header also checks the public Deploy Hub Pages workflow: authenticated
-operators receive a compact status control immediately before their account
-that links an active or failed UI deployment, while an already completed newer
-version offers Reload. Public read-only mode hides this operator-only control.
+The header also checks the Deploy Hub Pages workflow every minute.
+Authenticated operators receive a compact status control immediately before
+their account that links an active or failed UI deployment, while an already
+completed newer version offers Reload. Public read-only mode only shows the
+new-version Reload control; it hides deployments in progress and failures.
 On compact screens that status occupies a second header row while the brand and
 account remain together above it. The static UI also includes standalone web
 app and iPhone home-screen metadata under the `6529 Deploy Hub` name using the
 existing blue icon assets.
-The self-status check requires no authentication and disappears harmlessly if
-GitHub cannot be reached. Failed UI deployments use a neutral control with a
-small red marker. The Pages deployment action now allows 15 minutes for
+The self-status check uses the existing token for authenticated operators and
+otherwise reads public GitHub state; it disappears harmlessly if GitHub cannot
+be reached. Operator Activity refreshes every 15 seconds and public Activity
+every minute. Failed UI deployments use a neutral control with a small red
+marker. The Pages deployment action now allows 15 minutes for
 GitHub's hosted deployment queue inside a 16-minute job envelope. The public
 Login control now matches the height and styling of the joined authenticated
 account control. Header authentication controls remain hidden until stored

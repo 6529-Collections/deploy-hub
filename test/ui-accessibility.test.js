@@ -164,6 +164,31 @@ test('browser entry module initializes the public read-only UI without a server'
         url: ''
       }
     );
+    const activeDeployment = app.siteDeploymentPresentation({
+      id: 125,
+      status: 'queued'
+    });
+    const availableUpdate = app.siteDeploymentPresentation(
+      {
+        conclusion: 'success',
+        head_sha: 'c'.repeat(40),
+        id: 126,
+        status: 'completed'
+      },
+      'a'.repeat(40)
+    );
+    assert.equal(
+      app.visibleSiteDeploymentPresentation(activeDeployment, false),
+      null
+    );
+    assert.equal(
+      app.visibleSiteDeploymentPresentation(availableUpdate, false),
+      availableUpdate
+    );
+    assert.equal(
+      app.visibleSiteDeploymentPresentation(activeDeployment, true),
+      activeDeployment
+    );
   } finally {
     if (documentDescriptor) {
       Object.defineProperty(globalThis, 'document', documentDescriptor);
@@ -243,10 +268,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     /hidden/
   );
   assert.match(html, /class="button button-quiet header-login"/);
-  assert.match(
-    app,
-    /renderSiteDeploymentStatus\(currentIdentity \? presentation : null\)/
-  );
+  assert.match(app, /visibleSiteDeploymentPresentation/);
   assert.match(html, /id="close-auth"[\s\S]*?aria-label="Close login"/);
   assert.match(html, /for="pr-search"/);
   assert.match(html, /id="pr-search"[\s\S]*aria-describedby="pr-search-help"/);

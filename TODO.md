@@ -197,11 +197,13 @@ Evidence:
   latest-run value keeps the GitHub state as plain text and links only the run
   number and short SHA, so no separate action row or reserved empty card height
   is needed.
-- The page checks its own public Pages workflow without authentication. For
-  authenticated operators, a compact header control immediately before the
-  account links an active or failed UI deployment and offers Reload when a
-  newer successful version is available. Public read-only mode hides this
-  operator-only update control; GitHub API failure leaves the page unchanged.
+- The page checks its own Pages workflow every minute, using the existing token
+  when authenticated. Operators can open active or failed UI deployments and
+  reload a newer successful version. Public read-only mode only offers Reload
+  for a newer successful version; it hides deployment progress and failures.
+- Deployment Activity refreshes every 15 seconds for authenticated operators
+  and every minute in public read-only mode. GitHub API failures leave the last
+  complete snapshot unchanged.
 - Desktop keeps that deployment control between the brand and account. Compact
   screens preserve the brand and account on the first row and place deployment
   status on a full-width second row only when it is present.

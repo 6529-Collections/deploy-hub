@@ -175,10 +175,11 @@ test('static shell restricts connections and loads no third-party script', async
   assert.doesNotMatch(html, /<script[^>]+src="https?:/i);
 });
 
-test('dashboard uses fast operator polling and slower public REST polling', async () => {
+test('dashboard uses the agreed operator and public polling cadence', async () => {
   const app = await readFile(new URL('../ui/app.js', import.meta.url), 'utf8');
-  assert.match(app, /OPERATOR_REFRESH_INTERVAL_MS = 5_000/);
-  assert.match(app, /PUBLIC_REFRESH_INTERVAL_MS = 5 \* 60_000/);
+  assert.match(app, /OPERATOR_REFRESH_INTERVAL_MS = 15_000/);
+  assert.match(app, /PUBLIC_REFRESH_INTERVAL_MS = 60_000/);
+  assert.match(app, /SITE_DEPLOYMENT_REFRESH_INTERVAL_MS = 60_000/);
   assert.match(app, /readDashboard\(token\)/);
   assert.match(app, /readPublicDashboard\(\)/);
 });

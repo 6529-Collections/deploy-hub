@@ -16,10 +16,9 @@ import {
   storeToken
 } from './github-auth.js';
 
-const OPERATOR_REFRESH_INTERVAL_MS = 5_000;
-const PUBLIC_REFRESH_INTERVAL_MS = 5 * 60_000;
-const SITE_DEPLOYMENT_ACTIVE_INTERVAL_MS = 60_000;
-const SITE_DEPLOYMENT_IDLE_INTERVAL_MS = 5 * 60_000;
+const OPERATOR_REFRESH_INTERVAL_MS = 15_000;
+const PUBLIC_REFRESH_INTERVAL_MS = 60_000;
+const SITE_DEPLOYMENT_REFRESH_INTERVAL_MS = 60_000;
 const MAX_SELECTED_PULL_REQUESTS = 20;
 const SITE_VERSION = (() => {
   const value = new globalThis.URL(import.meta.url).searchParams.get('v') ?? '';
@@ -118,6 +117,11 @@ export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
   return null;
 }
 
+export function visibleSiteDeploymentPresentation(presentation, authenticated) {
+  if (authenticated) return presentation;
+  return presentation?.kind === 'ready' ? presentation : null;
+}
+
 function renderSiteDeploymentStatus(presentation) {
   elements.siteDeploymentStatus.replaceChildren();
   if (!presentation) {
@@ -148,38 +152,40 @@ function renderSiteDeploymentStatus(presentation) {
   elements.siteDeploymentStatus.hidden = false;
 }
 
-function scheduleSiteDeploymentRefresh(active) {
+function scheduleSiteDeploymentRefresh() {
   if (siteDeploymentTimer) globalThis.clearTimeout(siteDeploymentTimer);
   siteDeploymentTimer = globalThis.setTimeout(
     () => void refreshSiteDeploymentStatus(),
-    active
-      ? SITE_DEPLOYMENT_ACTIVE_INTERVAL_MS
-      : SITE_DEPLOYMENT_IDLE_INTERVAL_MS
+    SITE_DEPLOYMENT_REFRESH_INTERVAL_MS
   );
 }
 
 async function refreshSiteDeploymentStatus() {
   try {
+    const headers = {
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    if (activeToken) headers.Authorization = `Bearer ${activeToken}`;
     const response = await globalThis.fetch(
       'https://api.github.com/repos/6529-Collections/deploy-hub/actions/workflows/deploy-pages.yml/runs?branch=main&per_page=1',
       {
         cache: 'no-store',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
+        headers
       }
     );
     if (!response.ok) throw new Error('Pages status unavailable.');
     const payload = await response.json();
     const presentation = siteDeploymentPresentation(payload.workflow_runs?.[0]);
     latestSiteDeploymentPresentation = presentation;
-    renderSiteDeploymentStatus(currentIdentity ? presentation : null);
-    scheduleSiteDeploymentRefresh(presentation?.active === true);
+    renderSiteDeploymentStatus(
+      visibleSiteDeploymentPresentation(presentation, Boolean(currentIdentity))
+    );
+    scheduleSiteDeploymentRefresh();
   } catch {
     latestSiteDeploymentPresentation = null;
     renderSiteDeploymentStatus(null);
-    scheduleSiteDeploymentRefresh(false);
+    scheduleSiteDeploymentRefresh();
   }
 }
 
@@ -250,7 +256,9 @@ function showPublicMode({ refresh = true, revealLogin = true } = {}) {
   elements.loginButton.hidden = !revealLogin;
   elements.loginButton.disabled = false;
   elements.loginButton.textContent = 'Login';
-  renderSiteDeploymentStatus(null);
+  renderSiteDeploymentStatus(
+    visibleSiteDeploymentPresentation(latestSiteDeploymentPresentation, false)
+  );
   elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = true;
   elements.connectButton.disabled = false;
@@ -298,7 +306,9 @@ function showSignedIn(identity, token) {
   closeAuthDialog();
   elements.accountControl.hidden = false;
   elements.loginButton.hidden = true;
-  renderSiteDeploymentStatus(latestSiteDeploymentPresentation);
+  renderSiteDeploymentStatus(
+    visibleSiteDeploymentPresentation(latestSiteDeploymentPresentation, true)
+  );
   showDashboardLoading();
   elements.dashboard.hidden = false;
   elements.disconnectButton.hidden = false;

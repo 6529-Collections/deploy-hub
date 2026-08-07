@@ -2,6 +2,11 @@
 
 ## 2026-08-07
 
+- Changed Deployment Activity polling to 15 seconds for authenticated
+  operators and one minute for public read-only users. Pages update checks now
+  run every minute; public users only see Reload when a newer successful UI
+  version is available, while deployment progress and failures remain
+  operator-only.
 - Reverted the viewport-locked desktop dashboard and its internal panel
   scrolling. Only the public read-only Deployment Activity panel now fills the
   remaining viewport height; normal vertical page scrolling remains available.
