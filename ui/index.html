@@ -203,104 +203,112 @@
               <span class="repo-label">6529seize-frontend</span>
             </div>
 
-            <form id="operation-form">
-              <div class="picker-heading">
-                <label for="pr-search">Search open PRs</label>
-                <button
-                  class="button button-quiet button-small"
-                  id="refresh-prs"
-                  type="button"
-                >
-                  Reload
-                </button>
-              </div>
-              <input
-                id="pr-search"
-                name="pr-search"
-                type="search"
-                placeholder="Search PR, branch, title, or author"
-                autocomplete="off"
-                spellcheck="false"
-                aria-describedby="pr-search-help"
-              />
-              <p class="field-hint" id="pr-search-help">
-                Select one or more PRs. Selection order is deployment order.
-              </p>
-              <div class="pr-picker">
-                <p class="pr-picker-state" id="pr-picker-state">
-                  Loading open pull requests…
+            <div class="panel-scroll-area request-scroll-area">
+              <form id="operation-form">
+                <div class="picker-heading">
+                  <label for="pr-search">Search open PRs</label>
+                  <button
+                    class="button button-quiet button-small"
+                    id="refresh-prs"
+                    type="button"
+                  >
+                    Reload
+                  </button>
+                </div>
+                <input
+                  id="pr-search"
+                  name="pr-search"
+                  type="search"
+                  placeholder="Search PR, branch, title, or author"
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-describedby="pr-search-help"
+                />
+                <p class="field-hint" id="pr-search-help">
+                  Select one or more PRs. Selection order is deployment order.
                 </p>
-                <div
-                  class="pr-options"
-                  id="pr-options"
-                  role="group"
-                  aria-label="Open frontend pull requests"
-                ></div>
-              </div>
-              <p class="selected-prs" id="selected-prs">None selected</p>
-
-              <fieldset>
-                <legend>Final target</legend>
-                <div class="target-options">
-                  <label class="target-option">
-                    <input type="radio" name="target" value="staging" checked />
-                    <span>
-                      <strong>Staging</strong>
-                      <small
-                        >Deploy and run the complete staging validation.</small
-                      >
-                    </span>
-                  </label>
-                  <label class="target-option">
-                    <input type="radio" name="target" value="production" />
-                    <span>
-                      <strong>Production</strong>
-                      <small
-                        >Validate in staging, then continue to
-                        production.</small
-                      >
-                    </span>
-                  </label>
+                <div class="pr-picker">
+                  <p class="pr-picker-state" id="pr-picker-state">
+                    Loading open pull requests…
+                  </p>
+                  <div
+                    class="pr-options"
+                    id="pr-options"
+                    role="group"
+                    aria-label="Open frontend pull requests"
+                  ></div>
                 </div>
-              </fieldset>
+                <p class="selected-prs" id="selected-prs">None selected</p>
 
-              <button
-                class="button button-primary button-wide"
-                id="review-operation"
-                type="submit"
-                disabled
-              >
-                Review selected PRs
-              </button>
-            </form>
+                <fieldset>
+                  <legend>Final target</legend>
+                  <div class="target-options">
+                    <label class="target-option">
+                      <input
+                        type="radio"
+                        name="target"
+                        value="staging"
+                        checked
+                      />
+                      <span>
+                        <strong>Staging</strong>
+                        <small
+                          >Deploy and run the complete staging
+                          validation.</small
+                        >
+                      </span>
+                    </label>
+                    <label class="target-option">
+                      <input type="radio" name="target" value="production" />
+                      <span>
+                        <strong>Production</strong>
+                        <small
+                          >Validate in staging, then continue to
+                          production.</small
+                        >
+                      </span>
+                    </label>
+                  </div>
+                </fieldset>
 
-            <div class="request-preview" id="request-preview" hidden>
-              <div class="preview-heading">
-                <div>
-                  <p class="eyebrow">Frozen request</p>
-                  <h3 id="preview-target" tabindex="-1">Target</h3>
-                </div>
                 <button
-                  class="button button-quiet button-small"
-                  id="edit-operation"
-                  type="button"
+                  class="button button-primary button-wide"
+                  id="review-operation"
+                  type="submit"
+                  disabled
                 >
-                  Edit
+                  Review selected PRs
+                </button>
+              </form>
+
+              <div class="request-preview" id="request-preview" hidden>
+                <div class="preview-heading">
+                  <div>
+                    <p class="eyebrow">Frozen request</p>
+                    <h3 id="preview-target" tabindex="-1">Target</h3>
+                  </div>
+                  <button
+                    class="button button-quiet button-small"
+                    id="edit-operation"
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                </div>
+                <ul class="preview-list" id="preview-list"></ul>
+                <button
+                  class="button button-primary button-wide"
+                  id="start-operation"
+                  type="button"
+                  aria-describedby="preview-target"
+                >
+                  Start operation
                 </button>
               </div>
-              <ul class="preview-list" id="preview-list"></ul>
-              <button
-                class="button button-primary button-wide"
-                id="start-operation"
-                type="button"
-                aria-describedby="preview-target"
-              >
-                Start operation
-              </button>
+              <p class="form-message" id="operation-message" role="status">
+                Select at least one open pull request.
+              </p>
             </div>
-            <p class="form-message" id="operation-message" role="status">
-              Select at least one open pull request.
-            </p>
           </section>
 
           <section
@@ -351,12 +359,18 @@
                 </svg>
               </button>
             </div>
-            <p class="summary-detail" id="refresh-state" hidden></p>
-            <p class="stale-warning" id="stale-warning" role="status" hidden>
-              Refresh failed. Showing the last complete GitHub snapshot.
-            </p>
-            <div class="operations-list" id="operations-list" role="list"></div>
-            <p class="empty-state" id="operations-empty">Loading…</p>
+            <div class="panel-scroll-area operations-scroll-area">
+              <p class="summary-detail" id="refresh-state" hidden></p>
+              <p class="stale-warning" id="stale-warning" role="status" hidden>
+                Refresh failed. Showing the last complete GitHub snapshot.
+              </p>
+              <div
+                class="operations-list"
+                id="operations-list"
+                role="list"
+              ></div>
+              <p class="empty-state" id="operations-empty">Loading…</p>
+            </div>
           </section>
         </div>
       </div>

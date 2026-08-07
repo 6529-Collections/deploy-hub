@@ -308,6 +308,14 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     2
   );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
+  assert.match(
+    html,
+    /class="panel-scroll-area request-scroll-area"[\s\S]*?id="operation-form"/
+  );
+  assert.match(
+    html,
+    /class="panel-scroll-area operations-scroll-area"[\s\S]*?id="operations-list"/
+  );
   assert.match(html, /id="refresh-state" hidden/);
   assert.match(html, /id="operations-list"[\s\S]*role="list"/);
   assert.doesNotMatch(html, /tabindex="[1-9]/);
@@ -395,6 +403,31 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
   assert.match(
     css,
     /@media \(max-width: 900px\)[\s\S]*?\.site-deployment-status\s*{[\s\S]*?justify-content: flex-start;/
+  );
+  assert.match(
+    css,
+    /\.shell\s*{[\s\S]*?height: 100dvh;[\s\S]*?overflow: hidden;/
+  );
+  assert.match(css, /#dashboard\s*{[\s\S]*?min-height: 0;[\s\S]*?flex: 1;/);
+  assert.match(
+    css,
+    /\.workspace-grid\s*{[\s\S]*?min-height: 0;[\s\S]*?flex: 1;/
+  );
+  assert.match(
+    css,
+    /\.panel-scroll-area\s*{[\s\S]*?flex: 1;[\s\S]*?overflow-y: auto;/
+  );
+  assert.match(
+    css,
+    /@media \(min-width: 901px\)[\s\S]*?body\s*{[\s\S]*?overflow: hidden;/
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 900px\)[\s\S]*?\.shell\s*{[\s\S]*?height: auto;[\s\S]*?overflow: visible;/
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 900px\)[\s\S]*?\.panel-scroll-area\s*{[\s\S]*?overflow: visible;/
   );
 });
 

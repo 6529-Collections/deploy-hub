@@ -1,6 +1,6 @@
 # Deploy Hub Status
 
-Last updated: 2026-08-06
+Last updated: 2026-08-07
 
 ## Current position
 
@@ -104,6 +104,9 @@ account control. Header authentication controls remain hidden until stored
 session detection resolves. Compact deployment notices keep their marker and
 message left-aligned together, and environment runs render as
 `Status · Run #… - SHA` with clear spacing and baseline alignment.
+On desktop, the dashboard fits the viewport: authenticated request/activity
+panels and the public activity panel extend to the bottom edge and keep overflow
+inside their content areas. Narrow layouts retain natural page scrolling.
 The review action remains disabled with a visible prompt until an open PR is
 selected. The PR picker uses two-line titles, wrapping metadata, and
 vertical-only scrolling. Signed-in identity and disconnect now share one joined

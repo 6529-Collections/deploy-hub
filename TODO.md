@@ -1,6 +1,6 @@
 # Deploy Hub FE Implementation Tracker
 
-Last updated: 2026-08-06
+Last updated: 2026-08-07
 
 This is the only active top-level implementation tracker. It intentionally
 contains eight frontend tasks rather than decomposing every concern into a
@@ -214,6 +214,9 @@ Evidence:
   resolves. Compact deployment notices group the marker with their left-aligned
   message, and environment runs render as `Status · Run #… - SHA` with explicit
   spacing.
+- Desktop keeps the complete dashboard within the viewport. Authenticated
+  request/activity panels and the public activity panel fill the remaining
+  height and scroll internally; narrow layouts retain natural page scrolling.
 - The review action is disabled with a visible selection prompt until at least
   one open frontend PR is selected.
 - PR titles wrap to at most two lines, metadata and long branch names wrap
