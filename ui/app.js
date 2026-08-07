@@ -74,6 +74,7 @@ let reviewInFlight = false;
 let selectedPrNumbers = [];
 let siteDeploymentTimer = null;
 let latestSiteDeploymentPresentation = null;
+let hasDashboardSnapshot = false;
 
 export function siteDeploymentPresentation(run, currentVersion = SITE_VERSION) {
   const runId = Number(run?.id);
@@ -232,6 +233,7 @@ function beginDashboardMode(mode) {
   dashboardMode = mode;
   refreshGeneration += 1;
   refreshInFlight = false;
+  hasDashboardSnapshot = false;
   elements.dashboard.dataset.mode = mode;
 }
 
@@ -297,7 +299,8 @@ function showDashboardLoading() {
 }
 
 function showSignedIn(identity, token) {
-  beginDashboardMode('operator');
+  const mode = identity.operator ? 'operator' : 'viewer';
+  beginDashboardMode(mode);
   activeToken = token;
   currentIdentity = identity;
   elements.authProfile.textContent = `@${identity.login}`;
@@ -315,7 +318,7 @@ function showSignedIn(identity, token) {
   elements.connectButton.disabled = false;
   elements.tokenInput.value = '';
   startRefreshTimer(OPERATOR_REFRESH_INTERVAL_MS);
-  void refreshPullRequests({ announce: true });
+  if (identity.operator) void refreshPullRequests({ announce: true });
   void refreshDashboard();
 }
 
@@ -329,12 +332,7 @@ async function connect(token, { silent = false } = {}) {
   try {
     identity = await authenticateGitHubToken(token);
   } catch (error) {
-    if (
-      error instanceof GitHubAuthError &&
-      ['invalid_token', 'insufficient_scope', 'not_operator'].includes(
-        error.code
-      )
-    ) {
+    if (error instanceof GitHubAuthError && error.code === 'invalid_token') {
       forgetToken(localStorage);
     }
     elements.connectButton.disabled = false;
@@ -694,6 +692,48 @@ function renderDashboard(model) {
   );
   elements.operationsEmpty.textContent = 'No Deploy Hub operations found yet.';
   elements.operationsEmpty.hidden = model.operations.length > 0;
+  hasDashboardSnapshot = true;
+}
+
+export function dashboardFailurePresentation(error, hasSnapshot) {
+  if (hasSnapshot) {
+    return {
+      message: 'Refresh failed. Showing the last complete GitHub snapshot.',
+      state: ''
+    };
+  }
+  const rateLimited =
+    error instanceof GitHubOperationError && error.code === 'rate_limited';
+  return {
+    message: rateLimited
+      ? 'GitHub rate limit reached. Log in or try again later.'
+      : 'Could not load GitHub data. Try again.',
+    state: rateLimited ? 'Rate Limit Reached' : 'Unavailable'
+  };
+}
+
+function renderDashboardFailure(error) {
+  const presentation = dashboardFailurePresentation(
+    error,
+    hasDashboardSnapshot
+  );
+  elements.staleWarning.textContent = presentation.message;
+  elements.staleWarning.hidden = false;
+  if (!presentation.state) return;
+  for (const stateElement of [
+    elements.stagingState,
+    elements.productionState
+  ]) {
+    stateElement.className = 'summary-value summary-value-disabled';
+    stateElement.textContent = presentation.state;
+    stateElement.setAttribute('aria-busy', 'false');
+    stateElement.removeAttribute('href');
+    stateElement.setAttribute('aria-disabled', 'true');
+    stateElement.setAttribute('tabindex', '-1');
+  }
+  elements.operationsList.replaceChildren();
+  elements.operationsEmpty.textContent = presentation.message;
+  elements.operationsEmpty.hidden = false;
 }
 
 async function refreshDashboard() {
@@ -706,15 +746,15 @@ async function refreshDashboard() {
   elements.operationsPanel.setAttribute('aria-busy', 'true');
   try {
     const model =
-      mode === 'operator'
+      mode !== 'public'
         ? await readDashboard(token)
         : await readPublicDashboard();
     if (generation === refreshGeneration) renderDashboard(model);
   } catch (error) {
     if (generation !== refreshGeneration) return;
-    elements.staleWarning.hidden = false;
+    renderDashboardFailure(error);
     if (
-      mode === 'operator' &&
+      mode !== 'public' &&
       error instanceof GitHubOperationError &&
       error.status === 401
     ) {
@@ -856,7 +896,7 @@ elements.refreshPrs.addEventListener('click', () => {
 elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
-showPublicMode({ revealLogin: !storedToken });
+showPublicMode({ refresh: !storedToken, revealLogin: !storedToken });
 void refreshSiteDeploymentStatus();
 if (storedToken) {
   void connect(storedToken, { silent: true });

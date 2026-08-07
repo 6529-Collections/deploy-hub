@@ -111,9 +111,10 @@ to receive status updates on its original exact head after it is merged.
   five minutes.
 - Public mode has no deployment form, exact queued-PR projection, Stop, retry,
   removal, or other mutation controls.
-- Login opens a modal. Existing direct GitHub-token authentication and operator
-  verification unlock the fixed frontend repository, workflows, refs, targets,
-  and inputs.
+- Login opens a modal. Any valid GitHub token unlocks authenticated reads and
+  their higher API allowance. Organization-admin or operator-team verification
+  separately unlocks the fixed deployment controls; valid non-operators remain
+  read-only.
 - Authenticated operators can submit one or more frontend PRs with an explicit
   final target and receive the exact queued-PR projection.
 - Poll GitHub at least every five seconds after authentication.
@@ -121,6 +122,9 @@ to receive status updates on its original exact head after it is merged.
 - Show environments, active and waiting cohorts, PRs, exact SHAs, phase,
   elapsed time, runtime/E2E evidence, failures, and GitHub links.
 - A complete read replaces current display state and repairs missed polls.
+- A failed first read replaces loaders with an explicit GitHub rate-limit or
+  availability state. The UI claims to show a stale snapshot only when a
+  complete snapshot was previously rendered.
 - Use the saved Deploy Hub icon and favicon assets when the live UI is built.
 
 ## Agent operation

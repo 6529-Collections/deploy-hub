@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { URL } from 'node:url';
 
+import { GitHubOperationError } from '../ui/github-operations.js';
+
 const UI_ROOT = new URL('../ui/', import.meta.url);
 
 async function readUiFile(path) {
@@ -136,6 +138,27 @@ test('browser entry module initializes the public read-only UI without a server'
     assert.equal(app.formatDisplayState('in_progress'), 'In Progress');
     assert.equal(app.formatDisplayState('action_required'), 'Action Required');
     assert.equal(app.formatDisplayState('failure'), 'Failure');
+    assert.deepEqual(
+      app.dashboardFailurePresentation(
+        new GitHubOperationError(
+          'rate_limited',
+          'GitHub rate limit reached.',
+          403
+        ),
+        false
+      ),
+      {
+        message: 'GitHub rate limit reached. Log in or try again later.',
+        state: 'Rate Limit Reached'
+      }
+    );
+    assert.deepEqual(
+      app.dashboardFailurePresentation(new Error('offline'), true),
+      {
+        message: 'Refresh failed. Showing the last complete GitHub snapshot.',
+        state: ''
+      }
+    );
     assert.deepEqual(
       app.siteDeploymentPresentation({ id: 123, status: 'in_progress' }),
       {

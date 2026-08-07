@@ -65,7 +65,7 @@ export async function authenticateGitHubToken(
   if (membershipResponse.ok) {
     const membership = await membershipResponse.json();
     if (membership.state === 'active' && membership.role === 'admin') {
-      return { login };
+      return { login, operator: true };
     }
   }
 
@@ -78,21 +78,11 @@ export async function authenticateGitHubToken(
   if (teamResponse.ok) {
     const teamMembership = await teamResponse.json();
     if (teamMembership.state === 'active') {
-      return { login };
+      return { login, operator: true };
     }
   }
 
-  if (teamResponse.status === 401 || teamResponse.status === 403) {
-    throw new GitHubAuthError(
-      'insufficient_scope',
-      'This token cannot verify deployment-operator access.'
-    );
-  }
-
-  throw new GitHubAuthError(
-    'not_operator',
-    'This GitHub user is not a deployment operator.'
-  );
+  return { login, operator: false };
 }
 
 export function loadStoredToken(storage) {

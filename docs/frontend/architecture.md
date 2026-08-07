@@ -127,11 +127,13 @@ minutes, shows the two environments and recent workflow activity, and exposes
 no mutation controls. It deliberately omits the exact queued-PR count because
 that durable status projection requires authenticated GitHub reads.
 
-After operator authentication, the static page polls GitHub at least every five
-seconds. Each complete read derives the current environments, active operation,
-pending statuses, run phases, runtime proof, E2E, and recent history. A failed
-poll leaves the last visible snapshot marked stale; the next complete read
-replaces it without event replay.
+After GitHub authentication, the static page uses the caller's authenticated
+API allowance. Valid non-operators remain read-only; verified organization
+admins or operator-team members additionally receive mutation controls. Each
+complete read derives the current environments, active operation, pending
+statuses, run phases, runtime proof, E2E, and recent history. A failed poll
+leaves an existing complete snapshot marked stale. When no snapshot exists,
+loaders resolve to an explicit rate-limit or availability state instead.
 
 The UI is not an authorization boundary. GitHub repository permissions,
 protected refs, workflow permissions, environments, and explicit production

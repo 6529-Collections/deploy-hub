@@ -58,7 +58,7 @@ test('authenticates an active deployment-operator team member', async () => {
 
   const identity = await authenticateGitHubToken(TOKEN, fetchImpl);
 
-  assert.deepEqual(identity, { login: 'prxt6529' });
+  assert.deepEqual(identity, { login: 'prxt6529', operator: true });
   assert.equal(JSON.stringify(identity).includes(TOKEN), false);
   assert.equal(requests.length, 3);
   for (const request of requests) {
@@ -78,7 +78,8 @@ test('authenticates an active organization admin without a team lookup', async (
   );
 
   assert.deepEqual(await authenticateGitHubToken(TOKEN, fetchImpl), {
-    login: 'admin-user'
+    login: 'admin-user',
+    operator: true
   });
   assert.equal(requests.length, 2);
 });
@@ -107,7 +108,7 @@ test('reports an actionable error when GitHub cannot authenticate', async () => 
   );
 });
 
-test('rejects users outside the operator team', async () => {
+test('authenticates users outside the operator team as read-only viewers', async () => {
   const fetchImpl = sequenceFetch(
     [
       jsonResponse(200, { login: 'ordinary-user' }),
@@ -117,13 +118,13 @@ test('rejects users outside the operator team', async () => {
     []
   );
 
-  await assert.rejects(
-    authenticateGitHubToken(TOKEN, fetchImpl),
-    (error) => error instanceof GitHubAuthError && error.code === 'not_operator'
-  );
+  assert.deepEqual(await authenticateGitHubToken(TOKEN, fetchImpl), {
+    login: 'ordinary-user',
+    operator: false
+  });
 });
 
-test('rejects a token that cannot verify operator membership', async () => {
+test('keeps a valid token read-only when operator membership cannot be verified', async () => {
   const fetchImpl = sequenceFetch(
     [
       jsonResponse(200, { login: 'limited-user' }),
@@ -133,13 +134,9 @@ test('rejects a token that cannot verify operator membership', async () => {
     []
   );
 
-  await assert.rejects(
-    authenticateGitHubToken(TOKEN, fetchImpl),
-    (error) =>
-      error instanceof GitHubAuthError &&
-      error.code === 'insufficient_scope' &&
-      !error.message.includes(TOKEN)
-  );
+  const identity = await authenticateGitHubToken(TOKEN, fetchImpl);
+  assert.deepEqual(identity, { login: 'limited-user', operator: false });
+  assert.equal(JSON.stringify(identity).includes(TOKEN), false);
 });
 
 test('stores and forgets the token only through the supplied browser storage', () => {
@@ -177,9 +174,16 @@ test('static shell restricts connections and loads no third-party script', async
 
 test('dashboard uses the agreed operator and public polling cadence', async () => {
   const app = await readFile(new URL('../ui/app.js', import.meta.url), 'utf8');
+  const css = await readFile(
+    new URL('../ui/styles.css', import.meta.url),
+    'utf8'
+  );
   assert.match(app, /OPERATOR_REFRESH_INTERVAL_MS = 15_000/);
   assert.match(app, /PUBLIC_REFRESH_INTERVAL_MS = 60_000/);
   assert.match(app, /SITE_DEPLOYMENT_REFRESH_INTERVAL_MS = 60_000/);
   assert.match(app, /readDashboard\(token\)/);
   assert.match(app, /readPublicDashboard\(\)/);
+  assert.match(app, /identity\.operator \? 'operator' : 'viewer'/);
+  assert.match(app, /showPublicMode\(\{ refresh: !storedToken/);
+  assert.match(css, /#dashboard\[data-mode='viewer'\] \.request-panel/);
 });

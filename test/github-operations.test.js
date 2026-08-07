@@ -502,6 +502,23 @@ test('reads the public dashboard through unauthenticated REST only', async () =>
   assert.equal(model.operations[0].id, 'public-operation');
 });
 
+test('reports exhausted unauthenticated GitHub rate limits explicitly', async () => {
+  await assert.rejects(
+    readPublicDashboard(async () => ({
+      headers: {
+        get: (name) => (name === 'x-ratelimit-remaining' ? '0' : null)
+      },
+      json: async () => ({ message: 'API rate limit exceeded' }),
+      ok: false,
+      status: 403
+    })),
+    (error) =>
+      error instanceof GitHubOperationError &&
+      error.code === 'rate_limited' &&
+      error.message === 'GitHub rate limit reached. Log in or try again later.'
+  );
+});
+
 test('recovers the operation id from a correlated canonical workflow run', () => {
   const controller = {
     conclusion: null,

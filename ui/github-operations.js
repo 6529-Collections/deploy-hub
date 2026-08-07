@@ -86,13 +86,22 @@ async function githubRequest(
   });
 
   if (!response.ok) {
+    const rateLimited =
+      response.status === 403 &&
+      response.headers?.get?.('x-ratelimit-remaining') === '0';
     const missingWorkflow =
       response.status === 404 && path.includes('/actions/');
     throw new GitHubOperationError(
-      missingWorkflow ? 'workflow_unavailable' : 'github_request_failed',
-      missingWorkflow
-        ? 'The frontend Deploy Hub workflow is still pending merge.'
-        : `GitHub rejected the request (HTTP ${response.status}).`,
+      rateLimited
+        ? 'rate_limited'
+        : missingWorkflow
+          ? 'workflow_unavailable'
+          : 'github_request_failed',
+      rateLimited
+        ? 'GitHub rate limit reached. Log in or try again later.'
+        : missingWorkflow
+          ? 'The frontend Deploy Hub workflow is still pending merge.'
+          : `GitHub rejected the request (HTTP ${response.status}).`,
       response.status
     );
   }

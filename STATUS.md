@@ -63,9 +63,12 @@ Task 2 is **DONE**. Tasks 3, 4, and 5 are **DONE — PENDING** frontend PR
 The completed Task 2 UI now opens as a public read-only dashboard. Signed-out
 users see current environment and recent workflow activity through three public
 REST reads every five minutes, with a full-width Operations panel and no
-deployment, queue, Stop, or removal controls. Login opens a modal; a verified
-operator receives the exact queued-PR projection, five-second refresh,
-deployment form, Stop, and tracked staging-removal controls. The UI freezes and
+deployment, queue, Stop, or removal controls. Login opens a modal; any valid
+GitHub identity receives authenticated reads, while only a verified operator
+receives the exact queued-PR projection, deployment form, Stop, and tracked
+staging-removal controls. A failed first read now replaces loaders with an
+explicit rate-limit or availability error; stale-snapshot messaging is used
+only after a complete snapshot has actually rendered. The UI freezes and
 previews exact PR heads and submits the fixed live workflow contract only in
 that authenticated mode. It remains static and stores no Deploy Hub operation
 state outside GitHub. The operator UI uses exact one-third/two-thirds panel

@@ -134,13 +134,15 @@ updates without a browser refresh.
 
 Acceptance criteria:
 
-- [x] Existing GitHub-token authentication and operator verification remain
-      intact.
+- [x] Existing GitHub-token authentication remains direct: every valid identity
+      may use authenticated reads, while admin/team verification alone unlocks
+      mutation controls.
 - [x] Signed-out users receive a public REST-only, read-only dashboard with
       five-minute polling, full-width Operations, and no deployment or recovery
       controls.
-- [x] Login opens a modal and switches successful operators to exact
-      five-second polling, queued-PR state, and mutation controls.
+- [x] Login opens a modal and switches every valid identity to authenticated
+      reads; successful operator verification additionally unlocks queued-PR
+      state and mutation controls.
 - [x] The UI accepts one or more frontend PRs and an explicit Staging or
       Production final target.
 - [x] Submission freezes and displays exact PR heads before dispatch.
@@ -180,15 +182,17 @@ Evidence:
   view immediately. It reads three public REST endpoints every five minutes,
   exposes no deployment or recovery controls, and omits the exact queue badge
   rather than approximating authenticated commit-status data.
-- A top-right Login button opens the compact token form in a modal. Successful
-  operator verification restores the deployment form, exact queued-PR state,
-  mutation controls, and five-second polling. The deployment form lists current
-  open frontend PRs and supports bounded ordered multi-selection and search.
+- A top-right Login button opens the compact token form in a modal. Any valid
+  identity receives authenticated polling; successful operator verification
+  additionally restores the deployment form, exact queued-PR state, and
+  mutation controls. The deployment form lists current open frontend PRs and
+  supports bounded ordered multi-selection and search.
 - Field focus uses a subtle one-pixel highlight, and GitHub's machine states
   are displayed without semantic changes: underscores become spaces and each
   word is capitalized.
-- Environment cards show a loader until the first complete GitHub snapshot;
-  `No recent run` appears only after a successful read finds no matching run.
+- Environment cards show a loader until the first GitHub result. A failed first
+  read resolves to an explicit rate-limit or availability state; stale-snapshot
+  messaging appears only when a prior complete snapshot exists.
 - Staging and Production cards link both to the latest matching run and their
   canonical frontend workflow pages.
 - Environment truth reads each canonical workflow directly, so an infrequent

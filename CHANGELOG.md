@@ -2,6 +2,12 @@
 
 ## 2026-08-07
 
+- Separated GitHub identity from deployment authority in the static UI. Any
+  valid GitHub token now receives authenticated reads and their higher API
+  allowance, while only organization admins or `release-bus-operators` receive
+  mutation controls. Failed first dashboard reads now resolve permanent loaders
+  into an explicit rate-limit or availability state; stale-snapshot messaging
+  appears only when a complete snapshot actually exists.
 - Stopped the open-PR search field from taking focus automatically when a
   stored authenticated session finishes loading.
 - Changed Deployment Activity polling to 15 seconds for authenticated

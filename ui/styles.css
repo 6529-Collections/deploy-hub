@@ -461,11 +461,13 @@ a:focus-visible {
   grid-column: span 2;
 }
 
-#dashboard[data-mode='public'] .request-panel {
+#dashboard[data-mode='public'] .request-panel,
+#dashboard[data-mode='viewer'] .request-panel {
   display: none;
 }
 
-#dashboard[data-mode='public'] .operations-panel {
+#dashboard[data-mode='public'] .operations-panel,
+#dashboard[data-mode='viewer'] .operations-panel {
   grid-column: 1 / -1;
 }
 
