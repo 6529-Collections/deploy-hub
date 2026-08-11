@@ -358,6 +358,11 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     2
   );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
+  assert.match(html, /id="session-checking"[\s\S]*role="status"[\s\S]*hidden/);
+  assert.match(
+    app,
+    /if \(storedToken\) \{\s*showStoredSessionLoading\(\);\s*\} else \{\s*showPublicMode\(\);/
+  );
   assert.match(html, /id="refresh-state" hidden/);
   assert.match(
     html,
@@ -441,6 +446,10 @@ test('desktop layout stays aligned and the visual shell stays neutral black', as
     /\.workspace-grid\s*{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/
   );
   assert.match(css, /\.operations-panel\s*{[\s\S]*?grid-column: span 2;/);
+  assert.match(
+    css,
+    /#dashboard\[data-session='checking'\] \.request-panel > :not\(\.session-checking\)\s*{[\s\S]*?visibility: hidden;/
+  );
   assert.match(
     css,
     /#dashboard\[data-mode='public'\] \.operations-panel,\s*#dashboard\[data-mode='viewer'\] \.operations-panel\s*{[\s\S]*?grid-column: 1 \/ -1;/

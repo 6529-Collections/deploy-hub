@@ -17,6 +17,10 @@ Empty Active Deployment and Queued Batches sections stay hidden. Read-only and
 operator views use the same compact activity layout; only operators receive
 mutation controls.
 
+On reload, a stored session reserves the operator layout while GitHub checks
+access, so returning operators do not see the public full-width layout flash
+before the deployment form appears.
+
 Every visible request identifies its exact PR SHA. The accepted behavior for a
 moved PR head is also fixed:
 

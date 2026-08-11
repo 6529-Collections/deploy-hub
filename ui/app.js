@@ -59,6 +59,7 @@ const elements = {
   recentEmpty: document.querySelector('#recent-operations-empty'),
   recentList: document.querySelector('#recent-operations-list'),
   selectedPrs: document.querySelector('#selected-prs'),
+  sessionChecking: document.querySelector('#session-checking'),
   siteDeploymentStatus: document.querySelector('#site-deployment-status'),
   stagingState: document.querySelector('#staging-state'),
   staleWarning: document.querySelector('#stale-warning'),
@@ -259,6 +260,8 @@ function showPublicMode({ refresh = true, revealLogin = true } = {}) {
   currentIdentity = null;
   frozenPreview = null;
   elements.authProfile.textContent = '';
+  delete elements.dashboard.dataset.session;
+  elements.sessionChecking.hidden = true;
   elements.accountControl.hidden = true;
   elements.loginButton.hidden = !revealLogin;
   elements.loginButton.disabled = false;
@@ -274,6 +277,21 @@ function showPublicMode({ refresh = true, revealLogin = true } = {}) {
   showDashboardLoading();
   startRefreshTimer(PUBLIC_REFRESH_INTERVAL_MS);
   if (refresh) void refreshDashboard();
+}
+
+function showStoredSessionLoading() {
+  clearRefreshTimer();
+  beginDashboardMode('operator');
+  activeToken = '';
+  currentIdentity = null;
+  frozenPreview = null;
+  elements.dashboard.dataset.session = 'checking';
+  elements.sessionChecking.hidden = false;
+  elements.accountControl.hidden = true;
+  elements.loginButton.hidden = true;
+  elements.disconnectButton.hidden = true;
+  elements.dashboard.hidden = false;
+  showDashboardLoading();
 }
 
 function showDashboardLoading() {
@@ -308,6 +326,8 @@ function showSignedIn(identity, token) {
   beginDashboardMode(mode);
   activeToken = token;
   currentIdentity = identity;
+  delete elements.dashboard.dataset.session;
+  elements.sessionChecking.hidden = true;
   elements.authProfile.textContent = `@${identity.login}`;
   elements.authProfile.href = `https://github.com/${encodeURIComponent(identity.login)}`;
   elements.authMessage.textContent = '';
@@ -340,10 +360,14 @@ async function connect(token, { silent = false } = {}) {
     if (error instanceof GitHubAuthError && error.code === 'invalid_token') {
       forgetToken(localStorage);
     }
-    elements.connectButton.disabled = false;
-    elements.loginButton.disabled = false;
-    elements.loginButton.hidden = false;
-    elements.loginButton.textContent = 'Login';
+    if (silent) {
+      showPublicMode();
+    } else {
+      elements.connectButton.disabled = false;
+      elements.loginButton.disabled = false;
+      elements.loginButton.hidden = false;
+      elements.loginButton.textContent = 'Login';
+    }
     if (!silent) {
       elements.authMessage.textContent = safeMessage(
         error,
@@ -357,10 +381,14 @@ async function connect(token, { silent = false } = {}) {
     storeToken(localStorage, token);
     showSignedIn(identity, token.trim());
   } catch {
-    elements.connectButton.disabled = false;
-    elements.loginButton.disabled = false;
-    elements.loginButton.hidden = false;
-    elements.loginButton.textContent = 'Login';
+    if (silent) {
+      showPublicMode();
+    } else {
+      elements.connectButton.disabled = false;
+      elements.loginButton.disabled = false;
+      elements.loginButton.hidden = false;
+      elements.loginButton.textContent = 'Login';
+    }
     if (!silent) {
       elements.authMessage.textContent =
         'Deploy Hub could not start. Reload the page.';
@@ -943,7 +971,11 @@ elements.refreshPrs.addEventListener('click', () => {
 elements.prSearch.addEventListener('input', renderPullRequests);
 
 const storedToken = loadStoredToken(localStorage);
-showPublicMode({ refresh: !storedToken, revealLogin: !storedToken });
+if (storedToken) {
+  showStoredSessionLoading();
+} else {
+  showPublicMode();
+}
 void refreshSiteDeploymentStatus();
 if (storedToken) {
   void connect(storedToken, { silent: true });

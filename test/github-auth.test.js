@@ -184,6 +184,6 @@ test('dashboard uses the agreed operator and public polling cadence', async () =
   assert.match(app, /readDashboard\(token\)/);
   assert.match(app, /readPublicDashboard\(\)/);
   assert.match(app, /identity\.operator \? 'operator' : 'viewer'/);
-  assert.match(app, /showPublicMode\(\{ refresh: !storedToken/);
+  assert.match(app, /if \(storedToken\) \{\s*showStoredSessionLoading\(\);/);
   assert.match(css, /#dashboard\[data-mode='viewer'\] \.request-panel/);
 });

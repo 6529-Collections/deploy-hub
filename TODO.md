@@ -154,6 +154,8 @@ Acceptance criteria:
 - [x] Deployment Activity has distinct `Active Deployment`, `Queued Batches`,
       and `Recent Operations` sections. Empty Active and Queued sections stay
       hidden, and read-only users receive the same compact activity layout.
+- [x] A stored session reserves the operator layout while GitHub verifies it,
+      avoiding a public full-width flash before mutation access is known.
 - [x] Queued operations are grouped into adjacent target-aware batches and
       every visible PR includes its exact SHA.
 - [x] Every non-terminal operation exposes Stop and clearly shows whether it

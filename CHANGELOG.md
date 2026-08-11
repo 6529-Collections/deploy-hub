@@ -2,6 +2,8 @@
 
 ## 2026-08-11
 
+- Reserved the operator layout while a stored GitHub session is verified,
+  replacing the public-layout flash with a small `Checking session…` state.
 - Hid empty Active Deployment and Queued Batches sections, removed equal-height
   stretching, and exposed the same compact activity layout to read-only users
   while keeping mutation controls operator-only.

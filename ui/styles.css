@@ -464,6 +464,25 @@ a:focus-visible {
   grid-column: span 2;
 }
 
+.request-panel {
+  position: relative;
+}
+
+.session-checking {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  place-items: center;
+}
+
+#dashboard[data-session='checking'] .request-panel > :not(.session-checking) {
+  visibility: hidden;
+}
+
 #dashboard[data-mode='public'] .request-panel,
 #dashboard[data-mode='viewer'] .request-panel {
   display: none;
