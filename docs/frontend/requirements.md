@@ -118,17 +118,19 @@ not appear staging-validated or production-complete.
 
 - Plain static files hosted anywhere.
 - Public read-only mode uses unauthenticated REST calls for the public frontend
-  repository, shows environment and recent workflow activity, and polls every
-  five minutes.
-- Public mode has no deployment form, exact queued-PR projection, Stop, retry,
-  removal, or other mutation controls.
+  repository, shows environment and workflow-backed activity, and polls every
+  minute.
+- Public mode has no deployment form, Stop, retry, removal, or other mutation
+  controls. It shows queued work whenever that work is visible through the
+  public workflow projection.
 - Login opens a modal. Any valid GitHub token unlocks authenticated reads and
   their higher API allowance. Organization-admin or operator-team verification
   separately unlocks the fixed deployment controls; valid non-operators remain
   read-only.
-- Authenticated operators can submit one or more frontend PRs with an explicit
-  final target and receive the exact queued-PR projection.
-- Poll GitHub at least every five seconds after authentication.
+- Every authenticated identity receives the exact queued-PR projection.
+  Authenticated operators can additionally submit one or more frontend PRs
+  with an explicit final target.
+- Poll GitHub every 15 seconds after authentication and every minute publicly.
 - Show new operations and updates without browser refresh.
 - Separate deployment activity into `Active Deployment`, `Queued Batches`, and
   `Recent Operations`.

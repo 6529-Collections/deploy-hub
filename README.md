@@ -28,10 +28,10 @@ production before considering backend support.
 
 Deploy Hub is a portable static app in this repository. Anyone can view the
 public repository's environment and workflow activity without signing in.
-Anyone with a valid GitHub token can use authenticated reads and the larger
-authenticated API allowance. Verified operators additionally see exact queued
-PR state and deployment controls. Codex uses its existing GitHub authentication
-through one small command or skill.
+Anyone with a valid GitHub token can use authenticated reads, including exact
+queued-PR state, and the larger authenticated API allowance. Verified operators
+additionally receive deployment controls. Codex uses its existing GitHub
+authentication through one small command or skill.
 
 GitHub and the frontend repository remain the mutation and execution
 authority. Deploy Hub has no backend, proxy API, Lambda, database, custom queue,

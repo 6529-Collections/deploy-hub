@@ -139,20 +139,21 @@ Acceptance criteria:
       may use authenticated reads, while admin/team verification alone unlocks
       mutation controls.
 - [x] Signed-out users receive a public REST-only, read-only dashboard with
-      five-minute polling, full-width Operations, and no deployment or recovery
+      one-minute polling, full-width Operations, and no deployment or recovery
       controls.
 - [x] Login opens a modal and switches every valid identity to authenticated
-      reads; successful operator verification additionally unlocks queued-PR
-      state and mutation controls.
+      reads, including exact queued-PR state; successful operator verification
+      additionally unlocks mutation controls.
 - [x] The UI accepts one or more frontend PRs and an explicit Staging or
       Production final target.
 - [x] Submission freezes and displays exact PR heads before dispatch.
-- [x] An open page discovers new operations and updates at least every five
-      seconds without manual refresh.
+- [x] An authenticated open page discovers new operations and updates every 15
+      seconds without manual refresh; public mode refreshes every minute.
 - [x] Current environment, waiting cohorts, target, phase, elapsed time,
       blocker, runtime proof, E2E, PR, and exact GitHub run links are visible.
 - [x] Deployment Activity has distinct `Active Deployment`, `Queued Batches`,
-      and `Recent Operations` sections with simple loading and empty states.
+      and `Recent Operations` sections. Empty Active and Queued sections stay
+      hidden, and read-only users receive the same compact activity layout.
 - [x] Queued operations are grouped into adjacent target-aware batches and
       every visible PR includes its exact SHA.
 - [x] Every non-terminal operation exposes Stop and clearly shows whether it
@@ -175,8 +176,9 @@ Evidence:
   workflow contract, projects GitHub-native dashboard truth, and publishes
   exact Stop requests without storing separate operation state.
 - `ui/index.html`, `ui/app.js`, and `ui/styles.css` provide the submission,
-  five-second refresh, environment, operation, Stop, and removal surfaces.
-- Thirty-nine authentication, contract, projection, token-canary,
+  15-second authenticated refresh, environment, operation, Stop, and removal
+  surfaces.
+- Forty-two authentication, contract, projection, token-canary,
   browser-entry, accessibility, branding, and refresh tests pass with
   formatting and lint.
 - The desktop UI now uses one shared three-column grid: summary cards each span
@@ -184,14 +186,14 @@ Evidence:
   The header is one `6529 Deploy Hub` line, action labels do not wrap, and
   neutral near-black surfaces replace the prior blue-tinted gradient.
 - Initial load shows the public Staging, Production, and full-width Operations
-  view immediately. It reads three public REST endpoints every five minutes,
-  exposes no deployment or recovery controls, and omits the exact queue badge
-  rather than approximating authenticated commit-status data.
+  view immediately. It reads three public REST endpoints every minute, exposes
+  no deployment or recovery controls, and shows workflow-backed queued work
+  without approximating unavailable commit-status data.
 - A top-right Login button opens the compact token form in a modal. Any valid
-  identity receives authenticated polling; successful operator verification
-  additionally restores the deployment form, exact queued-PR state, and
-  mutation controls. The deployment form lists current open frontend PRs and
-  supports bounded ordered multi-selection and search.
+  identity receives authenticated polling and exact queued-PR state; successful
+  operator verification additionally restores the deployment form and mutation
+  controls. The deployment form lists current open frontend PRs and supports
+  bounded ordered multi-selection and search.
 - Field focus uses a subtle one-pixel highlight, and GitHub's machine states
   are displayed without semantic changes: underscores become spaces and each
   word is capitalized.

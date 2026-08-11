@@ -27,8 +27,8 @@ const SITE_VERSION = (() => {
 })();
 
 const elements = {
-  activeEmpty: document.querySelector('#active-operations-empty'),
   activeList: document.querySelector('#active-operations-list'),
+  activeSection: document.querySelector('#active-operations-section'),
   accountControl: document.querySelector('#account-control'),
   authDialog: document.querySelector('#auth-dialog'),
   authForm: document.querySelector('#auth-form'),
@@ -50,7 +50,6 @@ const elements = {
   previewList: document.querySelector('#preview-list'),
   previewTarget: document.querySelector('#preview-target'),
   productionState: document.querySelector('#production-state'),
-  queuedBatchesEmpty: document.querySelector('#queued-batches-empty'),
   queuedBatchesList: document.querySelector('#queued-batches-list'),
   queuedBatchesSection: document.querySelector('#queued-batches-section'),
   queueBadge: document.querySelector('#waiting-state'),
@@ -290,25 +289,18 @@ function showDashboardLoading() {
     stateElement.setAttribute('aria-disabled', 'true');
     stateElement.setAttribute('tabindex', '-1');
   }
-  if (dashboardMode === 'operator') {
-    elements.queueBadge.hidden = false;
-    elements.queueBadge.textContent = 'Loading…';
-    elements.queueBadge.setAttribute('aria-busy', 'true');
-  } else {
-    elements.queueBadge.hidden = true;
-  }
+  elements.queueBadge.hidden = false;
+  elements.queueBadge.textContent = 'Loading…';
+  elements.queueBadge.setAttribute('aria-busy', 'true');
   elements.refreshButton.disabled = true;
   elements.operationsPanel.setAttribute('aria-busy', 'true');
-  elements.queuedBatchesSection.hidden = dashboardMode !== 'operator';
-  for (const [list, empty] of [
-    [elements.activeList, elements.activeEmpty],
-    [elements.queuedBatchesList, elements.queuedBatchesEmpty],
-    [elements.recentList, elements.recentEmpty]
-  ]) {
-    list.replaceChildren();
-    empty.textContent = 'Loading…';
-    empty.hidden = false;
-  }
+  elements.activeSection.hidden = true;
+  elements.queuedBatchesSection.hidden = true;
+  elements.activeList.replaceChildren();
+  elements.queuedBatchesList.replaceChildren();
+  elements.recentList.replaceChildren();
+  elements.recentEmpty.textContent = 'Loading…';
+  elements.recentEmpty.hidden = false;
 }
 
 function showSignedIn(identity, token) {
@@ -688,7 +680,7 @@ function renderOperation(operation, authenticated) {
   return card;
 }
 
-function renderQueuedBatch(batch, index) {
+function renderQueuedBatch(batch, index, canMutate) {
   const group = document.createElement('article');
   group.className = 'batch-group';
   group.setAttribute('role', 'listitem');
@@ -710,42 +702,36 @@ function renderQueuedBatch(batch, index) {
   operations.className = 'batch-operations';
   operations.setAttribute('role', 'list');
   operations.append(
-    ...batch.operations.map((operation) => renderOperation(operation, true))
+    ...batch.operations.map((operation) =>
+      renderOperation(operation, canMutate)
+    )
   );
   group.append(heading, operations);
   return group;
 }
 
 function renderDashboard(model) {
-  const authenticated = dashboardMode === 'operator';
+  const canMutate = dashboardMode === 'operator';
   const activity = buildActivitySections(model.operations);
   setEnvironment(model.environments.staging, elements.stagingState);
   setEnvironment(model.environments.production, elements.productionState);
-  elements.queueBadge.hidden = !authenticated;
-  if (authenticated) {
-    elements.queueBadge.textContent = `${model.waiting} queued`;
-    elements.queueBadge.setAttribute('aria-busy', 'false');
-  }
+  elements.queueBadge.hidden = false;
+  elements.queueBadge.textContent = `${model.waiting} queued`;
+  elements.queueBadge.setAttribute('aria-busy', 'false');
   elements.staleWarning.hidden = true;
   elements.activeList.replaceChildren(
-    ...activity.active.map((operation) =>
-      renderOperation(operation, authenticated)
-    )
+    ...activity.active.map((operation) => renderOperation(operation, canMutate))
   );
-  elements.activeEmpty.textContent = 'No active deployment.';
-  elements.activeEmpty.hidden = activity.active.length > 0;
+  elements.activeSection.hidden = activity.active.length === 0;
 
-  elements.queuedBatchesSection.hidden = !authenticated;
+  elements.queuedBatchesSection.hidden = activity.batches.length === 0;
   elements.queuedBatchesList.replaceChildren(
-    ...activity.batches.map((batch, index) => renderQueuedBatch(batch, index))
-  );
-  elements.queuedBatchesEmpty.textContent = 'No queued batches.';
-  elements.queuedBatchesEmpty.hidden = activity.batches.length > 0;
-
-  elements.recentList.replaceChildren(
-    ...activity.recent.map((operation) =>
-      renderOperation(operation, authenticated)
+    ...activity.batches.map((batch, index) =>
+      renderQueuedBatch(batch, index, canMutate)
     )
+  );
+  elements.recentList.replaceChildren(
+    ...activity.recent.map((operation) => renderOperation(operation, canMutate))
   );
   elements.recentEmpty.textContent = 'No completed Deploy Hub operations yet.';
   elements.recentEmpty.hidden = activity.recent.length > 0;
@@ -789,13 +775,12 @@ function renderDashboardFailure(error) {
     stateElement.setAttribute('tabindex', '-1');
   }
   elements.activeList.replaceChildren();
+  elements.activeSection.hidden = true;
   elements.queuedBatchesSection.hidden = true;
   elements.queuedBatchesList.replaceChildren();
   elements.recentList.replaceChildren();
-  elements.activeEmpty.textContent = presentation.message;
-  elements.activeEmpty.hidden = false;
-  elements.queuedBatchesEmpty.hidden = true;
-  elements.recentEmpty.hidden = true;
+  elements.recentEmpty.textContent = presentation.message;
+  elements.recentEmpty.hidden = false;
 }
 
 async function refreshDashboard() {

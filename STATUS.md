@@ -13,6 +13,10 @@ The UI now presents deployment activity in three simple sections:
 - **Queued Batches** — waiting operations grouped by adjacent final target.
 - **Recent Operations** — completed, failed, stopped, or cancelled work.
 
+Empty Active Deployment and Queued Batches sections stay hidden. Read-only and
+operator views use the same compact activity layout; only operators receive
+mutation controls.
+
 Every visible request identifies its exact PR SHA. The accepted behavior for a
 moved PR head is also fixed:
 

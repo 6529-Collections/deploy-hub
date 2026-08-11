@@ -127,7 +127,8 @@ test('browser entry module initializes the public read-only UI without a server'
     assert.equal(elements.get('#disconnect-github').hidden, true);
     assert.equal(elements.get('#login-github').hidden, false);
     assert.equal(elements.get('#site-deployment-status').hidden, true);
-    assert.equal(elements.get('#waiting-state').hidden, true);
+    assert.equal(elements.get('#waiting-state').hidden, false);
+    assert.equal(elements.get('#waiting-state').textContent, 'Loading…');
     assert.equal(elements.get('#github-token').focused, false);
     elements.get('#login-github').listeners.get('click')();
     assert.equal(elements.get('#auth-dialog').open, true);
@@ -362,7 +363,9 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
     html,
     /<h3 id="active-operations-title">Active Deployment<\/h3>/
   );
+  assert.match(html, /id="active-operations-section"[\s\S]*?hidden/);
   assert.match(html, /<h3 id="queued-batches-title">Queued Batches<\/h3>/);
+  assert.match(html, /id="queued-batches-section"[\s\S]*?hidden/);
   assert.match(
     html,
     /<h3 id="recent-operations-title">Recent Operations<\/h3>/
@@ -370,6 +373,7 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   assert.match(html, /id="active-operations-list"[\s\S]*role="list"/);
   assert.match(html, /id="queued-batches-list"[\s\S]*role="list"/);
   assert.match(html, /id="recent-operations-list"[\s\S]*role="list"/);
+  assert.doesNotMatch(html, /No active deployment|No queued batches/);
   assert.doesNotMatch(html, /tabindex="[1-9]/);
 });
 

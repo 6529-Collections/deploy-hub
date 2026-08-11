@@ -2,6 +2,9 @@
 
 ## 2026-08-11
 
+- Hid empty Active Deployment and Queued Batches sections, removed equal-height
+  stretching, and exposed the same compact activity layout to read-only users
+  while keeping mutation controls operator-only.
 - Split Deployment Activity into **Active Deployment**, target-aware
   **Queued Batches**, and **Recent Operations**, with exact PR SHAs shown for
   every request.

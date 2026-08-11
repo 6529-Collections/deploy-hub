@@ -358,7 +358,9 @@
             <div class="activity-sections" id="operations-list">
               <section
                 class="activity-section"
+                id="active-operations-section"
                 aria-labelledby="active-operations-title"
+                hidden
               >
                 <h3 id="active-operations-title">Active Deployment</h3>
                 <div
@@ -366,7 +368,6 @@
                   id="active-operations-list"
                   role="list"
                 ></div>
-                <p class="empty-state" id="active-operations-empty">Loading…</p>
               </section>
 
               <section
@@ -381,7 +382,6 @@
                   id="queued-batches-list"
                   role="list"
                 ></div>
-                <p class="empty-state" id="queued-batches-empty">Loading…</p>
               </section>
 
               <section

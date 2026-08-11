@@ -128,10 +128,10 @@ same SHA or separately authorized known-good deployment may proceed.
 ## UI projection
 
 Signed-out access is a public read-only projection of the public frontend
-repository. It uses only unauthenticated GitHub REST endpoints, polls every five
-minutes, shows the two environments and recent workflow activity, and exposes
-no mutation controls. It deliberately omits the exact queued-PR count because
-that durable status projection requires authenticated GitHub reads.
+repository. It uses only unauthenticated GitHub REST endpoints, polls every
+minute, shows the two environments and workflow-backed activity, and exposes
+no mutation controls. Public REST cannot provide the complete exact queued-PR
+projection; authentication fills in that additional GitHub status evidence.
 
 After GitHub authentication, the static page uses the caller's authenticated
 API allowance. Valid non-operators remain read-only; verified organization
@@ -143,6 +143,8 @@ loaders resolve to an explicit rate-limit or availability state instead.
 
 The activity projection has three stable sections: the one active deployment,
 target-aware queued batches in accepted order, and recent terminal operations.
+Empty active and queued sections stay hidden. Public, authenticated read-only,
+and operator modes share this layout; mutation controls remain operator-only.
 The UI derives these sections from GitHub truth and stores no separate queue.
 
 The UI is not an authorization boundary. GitHub repository permissions,

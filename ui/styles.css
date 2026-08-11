@@ -833,6 +833,7 @@ code {
 
 .activity-sections {
   display: grid;
+  align-content: start;
   gap: 18px;
 }
 
@@ -840,7 +841,7 @@ code {
   min-width: 0;
 }
 
-.activity-section + .activity-section {
+.activity-section:not([hidden]) ~ .activity-section:not([hidden]) {
   padding-top: 18px;
   border-top: 1px solid #242428;
 }
