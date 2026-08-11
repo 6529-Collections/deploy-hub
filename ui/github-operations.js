@@ -584,6 +584,46 @@ export function buildDashboardModel(repository, runsPayload, refreshedAt) {
   };
 }
 
+function isWaitingOperation(operation) {
+  const runState = operation.run?.status?.toLowerCase() ?? '';
+  return (
+    !operation.terminal &&
+    (operation.queued || ['pending', 'queued', 'waiting'].includes(runState))
+  );
+}
+
+export function buildActivitySections(operations = []) {
+  const active = [];
+  const waiting = [];
+  const recent = [];
+
+  for (const operation of operations) {
+    if (operation.terminal) {
+      recent.push(operation);
+    } else if (isWaitingOperation(operation)) {
+      waiting.push(operation);
+    } else {
+      active.push(operation);
+    }
+  }
+
+  waiting.sort((left, right) =>
+    (left.createdAt ?? '').localeCompare(right.createdAt ?? '')
+  );
+  const batches = [];
+  for (const operation of waiting) {
+    const target = operation.target || 'target pending';
+    const current = batches.at(-1);
+    if (current?.target === target) {
+      current.operations.push(operation);
+      continue;
+    }
+    batches.push({ operations: [operation], target });
+  }
+
+  return { active, batches, recent };
+}
+
 export async function readDashboard(
   token,
   fetchImpl = globalThis.fetch,

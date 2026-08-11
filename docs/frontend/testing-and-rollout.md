@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-06
+Last updated: 2026-08-11
 
 Release Bus remains OFF. Canonical manual frontend workflows remain available
 throughout rollout.
@@ -15,6 +15,12 @@ throughout rollout.
 - Commit-status progression and exact run links.
 - Queued, running, success, product failure, infrastructure failure, stale,
   cancel, and retry projection.
+- A queued moved head becomes `Cancelled · PR updated`, leaves its batch, and
+  does not enqueue the replacement head automatically.
+- An active moved head completes or recovers its frozen SHA while the new PR
+  head remains explicitly not deployed.
+- Active, queued-batch, and recent-operation UI sections preserve accepted
+  order, target boundaries, exact PRs, and exact SHAs.
 - Five-second polling replacement and recovery after a failed poll.
 - Public REST-only projection, authenticated read-only login, operator
   transition, first-load rate-limit handling, stale-snapshot recovery, and

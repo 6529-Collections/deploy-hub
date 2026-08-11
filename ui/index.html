@@ -355,8 +355,48 @@
             <p class="stale-warning" id="stale-warning" role="status" hidden>
               Refresh failed. Showing the last complete GitHub snapshot.
             </p>
-            <div class="operations-list" id="operations-list" role="list"></div>
-            <p class="empty-state" id="operations-empty">Loading…</p>
+            <div class="activity-sections" id="operations-list">
+              <section
+                class="activity-section"
+                aria-labelledby="active-operations-title"
+              >
+                <h3 id="active-operations-title">Active Deployment</h3>
+                <div
+                  class="operations-list"
+                  id="active-operations-list"
+                  role="list"
+                ></div>
+                <p class="empty-state" id="active-operations-empty">Loading…</p>
+              </section>
+
+              <section
+                class="activity-section"
+                id="queued-batches-section"
+                aria-labelledby="queued-batches-title"
+                hidden
+              >
+                <h3 id="queued-batches-title">Queued Batches</h3>
+                <div
+                  class="queued-batches-list"
+                  id="queued-batches-list"
+                  role="list"
+                ></div>
+                <p class="empty-state" id="queued-batches-empty">Loading…</p>
+              </section>
+
+              <section
+                class="activity-section"
+                aria-labelledby="recent-operations-title"
+              >
+                <h3 id="recent-operations-title">Recent Operations</h3>
+                <div
+                  class="operations-list"
+                  id="recent-operations-list"
+                  role="list"
+                ></div>
+                <p class="empty-state" id="recent-operations-empty">Loading…</p>
+              </section>
+            </div>
           </section>
         </div>
       </div>

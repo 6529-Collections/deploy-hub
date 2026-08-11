@@ -1,5 +1,17 @@
 # Planning Changelog
 
+## 2026-08-11
+
+- Split Deployment Activity into **Active Deployment**, target-aware
+  **Queued Batches**, and **Recent Operations**, with exact PR SHAs shown for
+  every request.
+- Defined moved-head behavior: a queued request becomes
+  `Cancelled · PR updated`, while an already active operation continues using
+  its frozen SHA and never claims the newer head was deployed.
+- Reopened Tasks 3–5 and deferred real controller, PR-status, retry, Stop, and
+  recovery wiring until the separate canonical FE workflow simplification is
+  complete.
+
 ## 2026-08-07
 
 - Extended the public and authenticated read-only Deployment Activity panel to

@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-06
+Last updated: 2026-08-11
 
 ## Boundary
 
@@ -95,6 +95,12 @@ branch or environment.
 - GitHub Actions owns waiting. Deploy Hub owns no locks, leases, heartbeats, or
   custom queue service.
 
+Before a queued request is frozen into a cohort, the controller rechecks its
+current PR head. A moved head ends that queued request as
+`Cancelled · PR updated` and excludes it from the cohort. Once mutation starts,
+the frozen SHA remains authoritative even if the contributor pushes again; the
+new head is explicitly projected as not deployed.
+
 ## Canonical workflow reuse
 
 The operation workflow supplies exact identity, ordering, and status. Existing
@@ -134,6 +140,10 @@ complete read derives the current environments, active operation, pending
 statuses, run phases, runtime proof, E2E, and recent history. A failed poll
 leaves an existing complete snapshot marked stale. When no snapshot exists,
 loaders resolve to an explicit rate-limit or availability state instead.
+
+The activity projection has three stable sections: the one active deployment,
+target-aware queued batches in accepted order, and recent terminal operations.
+The UI derives these sections from GitHub truth and stores no separate queue.
 
 The UI is not an authorization boundary. GitHub repository permissions,
 protected refs, workflow permissions, environments, and explicit production

@@ -1,5 +1,6 @@
 import {
   GitHubOperationError,
+  buildActivitySections,
   createOperationId,
   dispatchOperation,
   freezePullRequests,
@@ -26,6 +27,8 @@ const SITE_VERSION = (() => {
 })();
 
 const elements = {
+  activeEmpty: document.querySelector('#active-operations-empty'),
+  activeList: document.querySelector('#active-operations-list'),
   accountControl: document.querySelector('#account-control'),
   authDialog: document.querySelector('#auth-dialog'),
   authForm: document.querySelector('#auth-form'),
@@ -39,8 +42,6 @@ const elements = {
   loginButton: document.querySelector('#login-github'),
   operationForm: document.querySelector('#operation-form'),
   operationMessage: document.querySelector('#operation-message'),
-  operationsEmpty: document.querySelector('#operations-empty'),
-  operationsList: document.querySelector('#operations-list'),
   operationsPanel: document.querySelector('#operations-panel'),
   prOptions: document.querySelector('#pr-options'),
   prPickerState: document.querySelector('#pr-picker-state'),
@@ -49,10 +50,15 @@ const elements = {
   previewList: document.querySelector('#preview-list'),
   previewTarget: document.querySelector('#preview-target'),
   productionState: document.querySelector('#production-state'),
+  queuedBatchesEmpty: document.querySelector('#queued-batches-empty'),
+  queuedBatchesList: document.querySelector('#queued-batches-list'),
+  queuedBatchesSection: document.querySelector('#queued-batches-section'),
   queueBadge: document.querySelector('#waiting-state'),
   refreshButton: document.querySelector('#refresh-dashboard'),
   refreshPrs: document.querySelector('#refresh-prs'),
   reviewButton: document.querySelector('#review-operation'),
+  recentEmpty: document.querySelector('#recent-operations-empty'),
+  recentList: document.querySelector('#recent-operations-list'),
   selectedPrs: document.querySelector('#selected-prs'),
   siteDeploymentStatus: document.querySelector('#site-deployment-status'),
   stagingState: document.querySelector('#staging-state'),
@@ -293,9 +299,16 @@ function showDashboardLoading() {
   }
   elements.refreshButton.disabled = true;
   elements.operationsPanel.setAttribute('aria-busy', 'true');
-  elements.operationsList.replaceChildren();
-  elements.operationsEmpty.textContent = 'Loading…';
-  elements.operationsEmpty.hidden = false;
+  elements.queuedBatchesSection.hidden = dashboardMode !== 'operator';
+  for (const [list, empty] of [
+    [elements.activeList, elements.activeEmpty],
+    [elements.queuedBatchesList, elements.queuedBatchesEmpty],
+    [elements.recentList, elements.recentEmpty]
+  ]) {
+    list.replaceChildren();
+    empty.textContent = 'Loading…';
+    empty.hidden = false;
+  }
 }
 
 function showSignedIn(identity, token) {
@@ -637,7 +650,7 @@ function renderOperation(operation, authenticated) {
       link.textContent = `PR #${request.pr} · ${request.title}`;
       const sha = document.createElement('span');
       sha.className = 'sha';
-      sha.textContent = request.sha.slice(0, 12);
+      sha.textContent = `SHA ${request.sha.slice(0, 12)}`;
       copy.append(link, sha);
       row.append(copy);
       if (authenticated && request.canRemove && operation.terminal) {
@@ -675,8 +688,37 @@ function renderOperation(operation, authenticated) {
   return card;
 }
 
+function renderQueuedBatch(batch, index) {
+  const group = document.createElement('article');
+  group.className = 'batch-group';
+  group.setAttribute('role', 'listitem');
+
+  const heading = document.createElement('div');
+  heading.className = 'batch-heading';
+  const title = document.createElement('h4');
+  title.textContent = `Batch ${index + 1} · ${formatDisplayState(batch.target)}`;
+  const count = document.createElement('span');
+  const requestCount = batch.operations.reduce(
+    (total, operation) => total + operation.requests.length,
+    0
+  );
+  count.className = 'batch-count';
+  count.textContent = `${requestCount} ${requestCount === 1 ? 'PR' : 'PRs'}`;
+  heading.append(title, count);
+
+  const operations = document.createElement('div');
+  operations.className = 'batch-operations';
+  operations.setAttribute('role', 'list');
+  operations.append(
+    ...batch.operations.map((operation) => renderOperation(operation, true))
+  );
+  group.append(heading, operations);
+  return group;
+}
+
 function renderDashboard(model) {
   const authenticated = dashboardMode === 'operator';
+  const activity = buildActivitySections(model.operations);
   setEnvironment(model.environments.staging, elements.stagingState);
   setEnvironment(model.environments.production, elements.productionState);
   elements.queueBadge.hidden = !authenticated;
@@ -685,13 +727,28 @@ function renderDashboard(model) {
     elements.queueBadge.setAttribute('aria-busy', 'false');
   }
   elements.staleWarning.hidden = true;
-  elements.operationsList.replaceChildren(
-    ...model.operations.map((operation) =>
+  elements.activeList.replaceChildren(
+    ...activity.active.map((operation) =>
       renderOperation(operation, authenticated)
     )
   );
-  elements.operationsEmpty.textContent = 'No Deploy Hub operations found yet.';
-  elements.operationsEmpty.hidden = model.operations.length > 0;
+  elements.activeEmpty.textContent = 'No active deployment.';
+  elements.activeEmpty.hidden = activity.active.length > 0;
+
+  elements.queuedBatchesSection.hidden = !authenticated;
+  elements.queuedBatchesList.replaceChildren(
+    ...activity.batches.map((batch, index) => renderQueuedBatch(batch, index))
+  );
+  elements.queuedBatchesEmpty.textContent = 'No queued batches.';
+  elements.queuedBatchesEmpty.hidden = activity.batches.length > 0;
+
+  elements.recentList.replaceChildren(
+    ...activity.recent.map((operation) =>
+      renderOperation(operation, authenticated)
+    )
+  );
+  elements.recentEmpty.textContent = 'No completed Deploy Hub operations yet.';
+  elements.recentEmpty.hidden = activity.recent.length > 0;
   hasDashboardSnapshot = true;
 }
 
@@ -731,9 +788,14 @@ function renderDashboardFailure(error) {
     stateElement.setAttribute('aria-disabled', 'true');
     stateElement.setAttribute('tabindex', '-1');
   }
-  elements.operationsList.replaceChildren();
-  elements.operationsEmpty.textContent = presentation.message;
-  elements.operationsEmpty.hidden = false;
+  elements.activeList.replaceChildren();
+  elements.queuedBatchesSection.hidden = true;
+  elements.queuedBatchesList.replaceChildren();
+  elements.recentList.replaceChildren();
+  elements.activeEmpty.textContent = presentation.message;
+  elements.activeEmpty.hidden = false;
+  elements.queuedBatchesEmpty.hidden = true;
+  elements.recentEmpty.hidden = true;
 }
 
 async function refreshDashboard() {

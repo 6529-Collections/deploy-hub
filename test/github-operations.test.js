@@ -5,6 +5,7 @@ import {
   FRONTEND_REPOSITORY,
   GitHubOperationError,
   QUEUED_REQUEST_CONTEXT,
+  buildActivitySections,
   buildDashboardModel,
   createOperationId,
   dispatchOperation,
@@ -21,6 +22,61 @@ const SHA_A = 'a'.repeat(40);
 const SHA_B = 'b'.repeat(40);
 const RUN_URL =
   'https://github.com/6529-Collections/6529seize-frontend/actions/runs/123';
+
+test('separates active work, adjacent queued batches, and recent operations', () => {
+  const active = {
+    createdAt: '2026-08-04T12:00:00.000Z',
+    queued: false,
+    run: { status: 'in_progress' },
+    target: 'staging',
+    terminal: false
+  };
+  const queuedProductionA = {
+    createdAt: '2026-08-04T12:05:00.000Z',
+    queued: true,
+    requests: [{ pr: 2 }],
+    target: 'production',
+    terminal: false
+  };
+  const queuedProductionB = {
+    createdAt: '2026-08-04T12:06:00.000Z',
+    queued: true,
+    requests: [{ pr: 3 }],
+    target: 'production',
+    terminal: false
+  };
+  const queuedStaging = {
+    createdAt: '2026-08-04T12:07:00.000Z',
+    queued: true,
+    requests: [{ pr: 4 }],
+    target: 'staging',
+    terminal: false
+  };
+  const recent = {
+    createdAt: '2026-08-04T11:00:00.000Z',
+    queued: false,
+    target: 'staging',
+    terminal: true
+  };
+
+  const sections = buildActivitySections([
+    queuedStaging,
+    queuedProductionB,
+    queuedProductionA,
+    active,
+    recent
+  ]);
+
+  assert.deepEqual(sections.active, [active]);
+  assert.deepEqual(sections.batches, [
+    {
+      operations: [queuedProductionA, queuedProductionB],
+      target: 'production'
+    },
+    { operations: [queuedStaging], target: 'staging' }
+  ]);
+  assert.deepEqual(sections.recent, [recent]);
+});
 
 function jsonResponse(status, payload = {}) {
   return {

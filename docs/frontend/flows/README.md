@@ -29,8 +29,11 @@ that Tasks 1–6 must implement and prove.
   authentication.
 - The request freezes the repository, PR number, current PR-head SHA, final
   target (`Staging` or `Production`), requester, and request time.
-- A moved PR head makes that request stale. Deploy Hub never silently adopts
-  newer commits.
+- If a queued PR head moves, its request ends as
+  `Cancelled · PR updated` and is removed from the queue. Deploy Hub never
+  silently adopts or automatically enqueues the newer commit.
+- If an active PR head moves, the frozen SHA completes or safely recovers. The
+  newer head is explicitly shown as not deployed.
 - GitHub commit status is the durable request and progress surface. The browser
   only polls GitHub to display it; execution does not depend on an open browser
   or an agent polling.
@@ -116,6 +119,10 @@ operation advances:
 After a production-target PR is merged, its original exact-head commit status
 continues to update. The merged PR remains closed; the status is simply visible
 from its Checks/commit-status surface and links to the live operation.
+
+The Deploy Hub UI projects the same GitHub facts into **Active Deployment**,
+**Queued Batches**, and **Recent Operations**. This is a view of GitHub state,
+not a separate queue or state store.
 
 ## Small state model
 

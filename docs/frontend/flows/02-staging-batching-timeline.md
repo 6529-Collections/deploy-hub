@@ -63,3 +63,11 @@ If PR 2 and PR 3 had the same final target, they would form one cumulative
 snapshot and follow Diagram 3 on failure. Here, different targets are kept
 separate so faulty staging-only PR 3 cannot contaminate PR 2's production
 evidence or delay its production continuation.
+
+## When a requested PR changes
+
+- If PR 2 moves while queued, it is removed from its batch and ends as
+  `Cancelled · PR updated`. Its new head requires a new deployment request.
+- If PR 1 moves after deployment starts, its frozen SHA continues through
+  completion or safe recovery. The new PR head is marked not deployed and
+  points back to the exact active or last validated SHA.

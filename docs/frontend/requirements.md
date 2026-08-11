@@ -2,7 +2,7 @@
 
 Status: Accepted FE-only MVP
 
-Last updated: 2026-08-06
+Last updated: 2026-08-11
 
 ## Product outcome
 
@@ -25,6 +25,13 @@ Every request contains:
 
 A moved PR head is stale. Retry uses the same exact SHA and target. Deploy Hub
 never silently follows a branch or upgrades staging intent to production.
+
+- If a queued PR moves, its request is removed from the queue and ends as
+  `Cancelled · PR updated`. Deploy Hub does not enqueue the new head
+  automatically.
+- If an active PR moves, the frozen SHA continues through safe completion or
+  recovery. The new PR head must say that it is not deployed and identify the
+  earlier SHA still being processed or last validated.
 
 ## Stopping an operation
 
@@ -103,6 +110,10 @@ The PR must show exact SHA, target, current phase, conclusion, blocker when
 present, and a link to the authoritative run. A production-target PR continues
 to receive status updates on its original exact head after it is merged.
 
+Deploy Hub reports deployment of exact commits, never merely that a PR is
+deployed. A current PR head that differs from the deployed or active SHA must
+not appear staging-validated or production-complete.
+
 ## UI
 
 - Plain static files hosted anywhere.
@@ -119,8 +130,10 @@ to receive status updates on its original exact head after it is merged.
   final target and receive the exact queued-PR projection.
 - Poll GitHub at least every five seconds after authentication.
 - Show new operations and updates without browser refresh.
-- Show environments, active and waiting cohorts, PRs, exact SHAs, phase,
-  elapsed time, runtime/E2E evidence, failures, and GitHub links.
+- Separate deployment activity into `Active Deployment`, `Queued Batches`, and
+  `Recent Operations`.
+- Show batch order and composition, target, PRs, exact SHAs, phase, elapsed
+  time, runtime/E2E evidence, failures, and GitHub links.
 - A complete read replaces current display state and repairs missed polls.
 - A failed first read replaces loaders with an explicit GitHub rate-limit or
   availability state. The UI claims to show a stale snapshot only when a

@@ -55,6 +55,9 @@ existing manual path.
   contract, and use Stop and tracked staging removal. Failed first loads resolve
   to a clear error instead of permanent loaders; stale-snapshot copy appears
   only after a real complete snapshot.
+- Deployment Activity is split into **Active Deployment**, **Queued Batches**,
+  and **Recent Operations**. Queued work is grouped by adjacent final target,
+  and each request shows its exact PR SHA.
 - The one-shot agent command supports submit, status, Stop, exact-SHA retry,
   and tracked staging removal through the same fixed GitHub contract and the
   caller's existing GitHub authentication.
@@ -75,8 +78,9 @@ existing manual path.
   contains the dedicated manual-only real dry run. It is not merged or active.
 - Frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  contains the open, in-review workflow implementation and staging removal
-  flow; it is not merged or active.
+  contains the earlier workflow/controller prototype; it is not merged or
+  active. Real controller integration is deferred until the separate canonical
+  FE deployment workflow simplification finishes.
 - Release Bus is OFF. Canonical manual frontend workflows remain the fallback.
 
 ## Active documentation
@@ -135,10 +139,8 @@ loop. `retry` rejects a moved PR rather than changing the original exact SHA or
 target, and `remove` accepts only a tracked, open exact PR currently shown in
 staging.
 
-Until frontend PR
-[#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-is merged, mutation commands fail closed because the live workflow is not on
-frontend `main`.
+Mutation commands fail closed because no accepted live Deploy Hub controller is
+currently present on frontend `main`.
 
 The canonical frontend workflows remain the direct break-glass paths:
 

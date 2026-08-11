@@ -831,6 +831,80 @@ code {
   gap: 10px;
 }
 
+.activity-sections {
+  display: grid;
+  gap: 18px;
+}
+
+.activity-section {
+  min-width: 0;
+}
+
+.activity-section + .activity-section {
+  padding-top: 18px;
+  border-top: 1px solid #242428;
+}
+
+.activity-section h3,
+.batch-heading h4 {
+  margin: 0 0 10px;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.queued-batches-list,
+.batch-operations {
+  display: grid;
+  gap: 10px;
+}
+
+.batch-group {
+  padding: 12px;
+  border: 1px solid #2a2a2f;
+  border-radius: 12px;
+  background: #09090b;
+}
+
+.batch-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.batch-heading h4 {
+  margin-bottom: 0;
+  color: #f8fafc;
+  text-transform: none;
+}
+
+.batch-count {
+  color: #9ca3af;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+#dashboard[data-mode='public'] .activity-sections,
+#dashboard[data-mode='viewer'] .activity-sections {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+#dashboard[data-mode='public'] .activity-section:last-child,
+#dashboard[data-mode='viewer'] .activity-section:last-child {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+#dashboard[data-mode='public'] .activity-section:last-child .empty-state,
+#dashboard[data-mode='viewer'] .activity-section:last-child .empty-state {
+  flex: 1;
+}
+
 .operation-card {
   padding: 15px;
   border: 1px solid #2a2a2f;

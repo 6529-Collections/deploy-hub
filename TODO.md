@@ -1,6 +1,6 @@
 # Deploy Hub FE Implementation Tracker
 
-Last updated: 2026-08-07
+Last updated: 2026-08-11
 
 This is the only active top-level implementation tracker. It intentionally
 contains eight frontend tasks rather than decomposing every concern into a
@@ -28,9 +28,9 @@ separate project.
 |    0 | FE-only repository baseline           | DONE        | —          |
 |    1 | Real FE dry-run workflow              | DONE — PENDING [FE PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653) | 0          |
 |    2 | Live frontend UI                      | DONE        | 1          |
-|    3 | Real frontend staging                 | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 1, 2       |
-|    4 | Real frontend production              | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3          |
-|    5 | Agent operations and recovery         | DONE — PENDING [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586) | 3, 4       |
+|    3 | Real frontend staging                 | IN PROGRESS | 1, 2       |
+|    4 | Real frontend production              | NOT STARTED | 3          |
+|    5 | Agent operations and recovery         | NOT STARTED | 3, 4       |
 |    6 | Canary, burn-in, and establishment    | NOT STARTED | 2–5        |
 |    7 | Deferred frontend Release Bus cleanup | NOT STARTED | 6          |
 
@@ -39,17 +39,17 @@ separate project.
 - [Frontend PR #3579](https://github.com/6529-Collections/6529seize-frontend/pull/3579)
   is merged and owns the dormant deterministic simulator being replaced.
 - [Frontend PR #3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
-  is open at exact head `1a34765b1f23d49481801b7ca4829dadfa205352`.
+  is open at last reviewed exact head
+  `47bc50915845dbc1c1ca2d89967b63df0f2538f1`.
   It replaces the simulator with the dedicated manual-only real dry run for
   Task 1. It cannot deploy, dispatch another workflow, or mutate a ref or
   environment. It is intentionally pending merge; no dry run was dispatched.
 - [Frontend PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  is open at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c`.
-  It completes Task 3 and Task 4, including durable request intake,
-  truthful terminal cohort outcomes, current production preflight, and tracked
-  forward-only removal from staging. It also provides the lower-level
-  primitives used by Task 5. It is intentionally pending merge. No Deploy Hub
-  operation was dispatched.
+  is open at last reviewed exact head
+  `c2b6b44eb59fcf682bc32d43810af8a458c31a15`. It contains the prior live
+  controller prototype, but Tasks 3–5 are reopened because that controller must
+  be revised after the separate canonical FE workflow simplification lands.
+  No Deploy Hub operation was dispatched.
 
 ## Task details
 
@@ -121,7 +121,8 @@ Evidence:
   authority and is replaced by the real planning path in PR #3653.
 - Open frontend PR
   [#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653)
-  at exact head `1a34765b1f23d49481801b7ca4829dadfa205352` contains the
+  at last reviewed exact head `47bc50915845dbc1c1ca2d89967b63df0f2538f1`
+  contains the
   complete manual-only dry run. Eleven focused tests and the frontend
   changed-file check pass locally; newly triggered CI was not polled.
 
@@ -150,6 +151,10 @@ Acceptance criteria:
       seconds without manual refresh.
 - [x] Current environment, waiting cohorts, target, phase, elapsed time,
       blocker, runtime proof, E2E, PR, and exact GitHub run links are visible.
+- [x] Deployment Activity has distinct `Active Deployment`, `Queued Batches`,
+      and `Recent Operations` sections with simple loading and empty states.
+- [x] Queued operations are grouped into adjacent target-aware batches and
+      every visible PR includes its exact SHA.
 - [x] Every non-terminal operation exposes Stop and clearly shows whether it
       cancelled before mutation or is settling the environment safely.
 - [x] A tracked, unmerged PR currently in staging exposes Remove from staging,
@@ -240,15 +245,32 @@ Evidence:
   passed exact-head repository
   [CI](https://github.com/6529-Collections/deploy-hub/actions/runs/30916099582).
 
-### [x] Task 3 — Real frontend staging
+### [ ] Task 3 — Real frontend staging
 
-Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+Status: `IN PROGRESS`
+
+The checked controller items below are retained prototype evidence from
+[FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586),
+not proof that the revised live integration is complete. The unchecked items
+are the work that remains after the FE workflow simplification.
 
 Outcome: The dry-run-proven frontend plan is extended so an exact frontend
 request reaches staging through the canonical path, receives runtime proof and
 full E2E, and produces independently useful outcomes when a batch fails.
 
 Acceptance criteria:
+
+- [x] The static UI separates active deployment, queued target-aware batches,
+      and recent terminal operations without adding another state store.
+- [ ] Immediately before a queued request enters a cohort, its PR head is
+      rechecked. A moved head is removed and ends as
+      `Cancelled · PR updated`; the replacement head is not auto-enqueued.
+- [ ] If a PR moves after its deployment starts, the frozen SHA completes or
+      safely recovers while the new head is explicitly marked not deployed.
+- [ ] The revised frontend controller supplies real active, queue-order, batch,
+      exact-SHA, and terminal evidence that the UI can project from GitHub.
+- [ ] Reconcile the controller with the final simplified canonical FE staging
+      workflow after that separate frontend work lands.
 
 - [x] The frontend operation workflow is thin and reuses canonical
       `deploy-staging.yml` and staging E2E implementation.
@@ -291,8 +313,9 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c` contains the
-  complete in-review staging, bounded replay, Stop, exact composition, and
+  at last reviewed exact head `c2b6b44eb59fcf682bc32d43810af8a458c31a15`
+  contains the prior in-review staging, bounded replay, Stop, exact
+  composition, and
   removal implementation.
 - The latest follow-up hardens workflow provenance, GitHub retry/timeout
   behavior, mergeability polling, newest-status selection, reconciliation race
@@ -308,9 +331,12 @@ Evidence:
 - Later cohorts now receive terminal status when an earlier cohort stops or
   fails, including an unexpected controller failure.
 
-### [x] Task 4 — Real frontend production
+### [ ] Task 4 — Real frontend production
 
-Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+Status: `NOT STARTED`
+
+The checked items below describe behavior already explored in the earlier
+prototype. Production revision does not start until Task 3 is complete.
 
 Outcome: Explicitly authorized production-target PRs that passed together in
 staging can share one exact `main` deployment and production validation.
@@ -347,8 +373,8 @@ Evidence:
 
 - Open frontend PR
   [#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
-  at exact head `2b868c912a49b588212d0d80df7973c1fa9a216c` contains the
-  complete in-review bot-only production continuation.
+  at last reviewed exact head `c2b6b44eb59fcf682bc32d43810af8a458c31a15`
+  contains the prior in-review bot-only production continuation.
 - Before every merge it rechecks the retained requester, exact open PR head,
   current `main` base, non-draft clean mergeability, the required installed App
   PR CI check, all current check runs, and external commit statuses. The
@@ -356,9 +382,12 @@ Evidence:
   ordinary `main` advancement while preventing removed-history candidates and
   unintended rollback.
 
-### [x] Task 5 — Agent operations and recovery
+### [ ] Task 5 — Agent operations and recovery
 
-Status: **DONE — PENDING** [FE PR #3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+Status: `NOT STARTED`
+
+The checked items below describe existing command/prototype groundwork. Live
+agent-operation revision does not start until Tasks 3 and 4 are complete.
 
 Outcome: Codex operates the same frontend contract without the browser or a
 Deploy Hub credential.
@@ -447,9 +476,9 @@ Evidence: Not yet available.
 
 ## Current next task
 
-Task 6 — Canary, burn-in, and establishment. First merge frontend PR
-[#3653](https://github.com/6529-Collections/6529seize-frontend/pull/3653) only
-after its normal review gates and explicit owner authorization, then collect
-manual dry-run evidence with no staging or production mutation. Keep frontend
-PR #3586 open until that evidence passes and the owner separately authorizes a
-controlled real canary.
+Finish Task 3 after the separate frontend workflow simplification lands. Then
+revise frontend PR
+[#3586](https://github.com/6529-Collections/6529seize-frontend/pull/3586)
+to provide the real GitHub operation truth required by the completed UI
+structure. Do not begin production or agent-operation work before Task 3 is
+current and proven.

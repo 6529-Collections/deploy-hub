@@ -358,7 +358,18 @@ test('forms and live interaction surfaces expose accessible relationships', asyn
   );
   assert.match(html, /id="operations-panel"[\s\S]*aria-busy="false"/);
   assert.match(html, /id="refresh-state" hidden/);
-  assert.match(html, /id="operations-list"[\s\S]*role="list"/);
+  assert.match(
+    html,
+    /<h3 id="active-operations-title">Active Deployment<\/h3>/
+  );
+  assert.match(html, /<h3 id="queued-batches-title">Queued Batches<\/h3>/);
+  assert.match(
+    html,
+    /<h3 id="recent-operations-title">Recent Operations<\/h3>/
+  );
+  assert.match(html, /id="active-operations-list"[\s\S]*role="list"/);
+  assert.match(html, /id="queued-batches-list"[\s\S]*role="list"/);
+  assert.match(html, /id="recent-operations-list"[\s\S]*role="list"/);
   assert.doesNotMatch(html, /tabindex="[1-9]/);
 });
 
